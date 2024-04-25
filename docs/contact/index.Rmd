@@ -1,0 +1,11 @@
+---
+title: "Contact Info"
+output:
+  html_document:
+    includes:
+      in_header: "https://mygospelbuddy.com/docs/header.html"
+      after_body: "https://mygospelbuddy.com/docs/footer.html"
+---
+
+Email:  mygospelbuddy@gmail.com  
+Instagram:  <a href="https://www.instagram.com/mygospelbuddy">mygospelbuddy</a>
