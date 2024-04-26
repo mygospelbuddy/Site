@@ -1,5 +1,5 @@
 ---
-title: "The Gospel Buddy"
+title: "About the Gospel Buddy"
 output:
   html_document:
     includes:
