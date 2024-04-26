@@ -3,8 +3,8 @@ title: "Building the Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "https://mygospelbuddy.com/docs/header.html"
-      after_body: "https://mygospelbuddy.com/docs/footer.html"
+      in_header: "https://www.mygospelbuddy.com/docs/header.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
 ---
 
 <style>
