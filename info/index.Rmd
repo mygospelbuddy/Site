@@ -98,7 +98,7 @@ The Gospel Buddy replaces the verse numbers on the Church's website with buttons
 
 #### How Does the Gospel Buddy Extension Gather Footnote Data?
 
-The Gospel Buddy runs a web scraping utility after the release of new General Conference talks biannually. The Gospel Buddy searches for links to scriptures within every Conference Talk - both new and previous - to maintain the most up-to-date footnote data. After the scripture links are extracted, they are decoded using functions to create a usable dataset. These datasets can be found here on my website's <a href="https://kameronyork.com/datasets">Datasets Page</a>.
+The Gospel Buddy runs a web scraping utility after the release of new General Conference talks biannually. The Gospel Buddy searches for links to scriptures within every Conference Talk - both new and previous - to maintain the most up-to-date footnote data. After the scripture links are extracted, they are processed using a script to create a usable data set.
 
 #### How Can the Gospel Buddy Help Me Study Come Follow Me?
 
@@ -107,6 +107,7 @@ Come Follow Me is an excellent scripture study resource provided by the Church o
 <br>
 <div class=large-image>
  <img src="https://www.mygospelbuddy.com/docs/assets/come-follow-me.png" alt="Studying Come Follow Me with the Gospel Buddy Extension">
+</div>
 <br>
 <br>
 
