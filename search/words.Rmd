@@ -74,7 +74,7 @@ output:
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 <script src="https://www.mygospelbuddy.com/search/words-search.js"></script>
 
-<input type="text" id="wordInput" placeholder="Enter a word to search..." style="width: 60%; padding: 10px; margin-top: 20px;">
+<input type="text" id="wordInput" placeholder="Enter a word to search...">
 <button onclick="clearSearch()">Clear</button>
 <button onclick="searchAndDisplay()">Search</button>
 
