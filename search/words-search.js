@@ -1,57 +1,65 @@
 async function fetchData() {
-    const response = await fetch("https://kameronyork.com/datasets/general-conference-talks.csv");
-    const data = await response.text();
-    return Papa.parse(data, {
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true
-    }).data;
+    document.getElementById("loader").style.display = "block"; // Show loader
+    const response = await fetch("https://kameronyork.com/datasets/general-conference-talks.json");
+    const data = await response.json();
+    document.getElementById("loader").style.display = "none"; // Hide loader
+    return data;
 }
 
-let currentSearchWord = ''; // Global variable to store the current search term
+
+let currentSearchWords = []; // Global variable to store the current search terms
+const colors = ['#FF0000', '#0000FF', '#00FF00', '#FF00FF', '#00FFFF', '#FFFF00']; // Global colors array
 
 async function searchAndDisplay() {
-    const searchWord = document.getElementById("wordInput").value.trim().toLowerCase();
-    if (searchWord === "") {
+    const searchInput = document.getElementById("wordInput").value.trim().toLowerCase();
+    if (searchInput === "") {
         clearSearch(); // Clear the search input and reset the plot
-        currentSearchWord = ''; // Reset the stored search word
+        currentSearchWords = []; // Reset the stored search words
         return; // Abort the search
     }
-    currentSearchWord = searchWord; // Update the global variable
+
+    // Check if input contains parentheses, indicating multiple search terms
+    if (searchInput.includes('(') && searchInput.includes(')')) {
+        currentSearchWords = searchInput.match(/\(([^)]+)\)/g).map(term => term.replace(/[()]/g, '').trim());
+    } else {
+        currentSearchWords = [searchInput];
+    }
+
     const data = await fetchData();
     const byConference = document.getElementById("conferenceToggle").checked;
-    let counts = {};
+    let allCounts = {};
     let yearLookup = {};
 
-    data.forEach(row => {
-        const text = row['text'].toLowerCase();
-        const year = row['year'];
-        const conferenceId = row['conference-id'];
+    currentSearchWords.forEach(searchWord => {
+        let counts = {};
+        data.forEach(row => {
+            const text = row['text'].toLowerCase();
+            const year = row['year'];
+            const conferenceId = row['conference-id'];
 
-        const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-        const matches = text.match(regex);
-        const count = matches ? matches.length : 0;
+            const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
+            const matches = text.match(regex);
+            const count = matches ? matches.length : 0;
 
-        const key = byConference ? conferenceId : year.toString();
-        if (!counts[key]) counts[key] = 0;
-        counts[key] += count;
+            const key = byConference ? conferenceId : year.toString();
+            if (!counts[key]) counts[key] = 0;
+            counts[key] += count;
 
-        if (!yearLookup[key]) {
-            yearLookup[key] = year;
-        }
+            if (!yearLookup[key]) {
+                yearLookup[key] = year;
+            }
+        });
+        allCounts[searchWord] = counts;
     });
 
-    drawScatterPlot(counts, yearLookup, byConference);
+    drawScatterPlot(allCounts, yearLookup, byConference);
+    updateLegend(currentSearchWords);
     document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
 }
 
-
-
-function drawScatterPlot(counts, yearLookup, byConference) {
+function drawScatterPlot(allCounts, yearLookup, byConference) {
     const canvas = document.getElementById('plotCanvas');
     const ctx = canvas.getContext('2d');
-    const keys = Object.keys(counts).sort((a, b) => a - b);
-    const maxCount = Math.max(...Object.values(counts));
 
     canvas.width = canvas.offsetWidth;
     canvas.height = canvas.width * (3 / 4);  // Maintain a 4:3 aspect ratio
@@ -66,7 +74,15 @@ function drawScatterPlot(counts, yearLookup, byConference) {
     ctx.strokeStyle = 'black';
     ctx.strokeRect(margin.left, margin.top, plotWidth, plotHeight);
 
-    const xScale = plotWidth / (keys.length - 1);
+    let maxCount = 0;
+    let allKeys = new Set();
+    Object.values(allCounts).forEach(counts => {
+        maxCount = Math.max(maxCount, ...Object.values(counts));
+        Object.keys(counts).forEach(key => allKeys.add(key));
+    });
+    allKeys = Array.from(allKeys).sort((a, b) => a - b);
+
+    const xScale = plotWidth / (allKeys.length - 1);
     const yScale = plotHeight / maxCount;
 
     // Y-axis
@@ -86,35 +102,42 @@ function drawScatterPlot(counts, yearLookup, byConference) {
     }
 
     // X-axis and labels
-    const labelSpacingX = determineLabelSpacing(keys.length);
+    const labelSpacingX = determineLabelSpacing(allKeys.length);
     ctx.textAlign = 'center';
     ctx.beginPath();
     ctx.moveTo(margin.left, canvas.height - margin.bottom);
     ctx.lineTo(canvas.width - margin.right, canvas.height - margin.bottom);
     ctx.stroke();
-    keys.forEach((key, index) => {
+    allKeys.forEach((key, index) => {
         if (index % labelSpacingX === 0) {
             const x = margin.left + index * xScale;
             ctx.fillText(yearLookup[key], x, canvas.height - margin.bottom + 20);
         }
     });
 
-    // Draw and store points for click detection
-    let points = [];  // Array to store circle centers and radius for click detection
-    ctx.fillStyle = '#FF0000';
-    keys.forEach((key, index) => {
-        const x = margin.left + index * xScale;
-        const y = canvas.height - margin.bottom - (counts[key] * yScale);
-        ctx.beginPath();
-        ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        ctx.fill();
+    let points = [];
 
-        // Store the center, radius, and key for each point
-        points.push({
-            centerX: x,
-            centerY: y,
-            radius: 5,
-            key: key  // Key is already set correctly based on the toggle state during data processing
+    currentSearchWords.forEach((searchWord, idx) => {
+        ctx.fillStyle = colors[idx % colors.length];
+        const counts = allCounts[searchWord];
+
+        allKeys.forEach((key, index) => {
+            if (counts[key] !== 0) {
+                const x = margin.left + index * xScale;
+                const y = canvas.height - margin.bottom - (counts[key] * yScale);
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.fill();
+
+                // Store the center, radius, and key for each point
+                points.push({
+                    centerX: x,
+                    centerY: y,
+                    radius: 5,
+                    key: key,
+                    searchWord: searchWord
+                });
+            }
         });
     });
 
@@ -127,21 +150,66 @@ function drawScatterPlot(counts, yearLookup, byConference) {
         points.forEach(point => {
             const distance = Math.sqrt((point.centerX - mouseX) ** 2 + (point.centerY - mouseY) ** 2);
             if (distance < point.radius) {
-                displayTalksTable(point.key, byConference); // Use the stored key
-                console.log(`Scatter point clicked: Key = ${point.key}, Count = ${counts[point.key]}`);
+                displayTalksTable(point.key, point.searchWord, byConference); // Use the stored key and searchWord
+                console.log(`Scatter point clicked: Key = ${point.key}, Search Word = ${point.searchWord}`);
             }
         });
     });
 }
 
-async function displayTalksTable(key, byConference) {
+function updateLegend(searchWords) {
+    const legendContainer = document.getElementById('legendContainer');
+    legendContainer.innerHTML = ''; // Clear existing legend content
+
+    if (searchWords.length > 1) {
+
+        // Create the legend box
+        const legendBox = document.createElement('div');
+        legendBox.style.border = '1px solid black';
+        legendBox.style.backgroundColor = 'white';
+        legendBox.style.padding = '10px';
+        legendBox.style.display = 'inline-block';
+
+        searchWords.forEach((word, idx) => {
+            const legendItem = document.createElement('div');
+            legendItem.style.display = 'flex';
+            legendItem.style.alignItems = 'center';
+            legendItem.style.marginBottom = '5px';
+
+            const colorBox = document.createElement('div');
+            colorBox.style.width = '12px';
+            colorBox.style.height = '12px';
+            colorBox.style.backgroundColor = colors[idx % colors.length];
+            colorBox.style.marginRight = '10px';
+
+            const legendText = document.createElement('span');
+            legendText.style.fontSize = '8pt';
+            legendText.style.color = 'black';
+            legendText.innerText = word;
+
+            legendItem.appendChild(colorBox);
+            legendItem.appendChild(legendText);
+            legendBox.appendChild(legendItem);
+        });
+
+        legendContainer.appendChild(legendBox);
+        
+        // Add breaks outside the legend border
+        const br1 = document.createElement('br');
+        const br2 = document.createElement('br');
+        legendContainer.appendChild(br1);
+        legendContainer.appendChild(br2);
+    }
+}
+
+
+async function displayTalksTable(key, searchWord, byConference) {
     const data = await fetchData();
     let filteredData = [];
 
     if (byConference) {
-        // Filter by conference ID and count occurrences of the search word
         filteredData = data.filter(talk => {
-            const regex = new RegExp(`\\b${currentSearchWord}\\b`, 'gi');
+            const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
             const matches = talk.text.match(regex);
             if (matches && talk['conference-id'].toString() === key) {
                 talk.count = matches.length;
@@ -150,9 +218,8 @@ async function displayTalksTable(key, byConference) {
             return false;
         });
     } else {
-        // Filter by year and count occurrences of the search word
         filteredData = data.filter(talk => {
-            const regex = new RegExp(`\\b${currentSearchWord}\\b`, 'gi');
+            const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
             const matches = talk.text.match(regex);
             if (matches && talk.year.toString() === key) {
                 talk.count = matches.length;
@@ -165,17 +232,14 @@ async function displayTalksTable(key, byConference) {
     generateTalksTable(filteredData);
 }
 
-
-
 function generateTalksTable(talks) {
-    let tableHTML = `<table style="width: 100%; margin: auto; border-collapse: collapse; font-size: 10pt;">`; // Set font size here
+    let tableHTML = `<table style="width: 100%; margin: auto; border-collapse: collapse; font-size: 10pt;">`;
     tableHTML += '<tr><th>#</th><th>Year</th><th>Month</th><th>Speaker</th><th>Talk</th></tr>';
 
-    // Find the maximum count to set the 100% width for databars
     const maxCount = Math.max(...talks.map(talk => talk.count));
 
     talks.sort((a, b) => b['talk-id'] - a['talk-id']).forEach(talk => {
-        const percentWidth = (talk.count / maxCount) * 100; // Calculate the percentage width of the databar
+        const percentWidth = (talk.count / maxCount) * 100;
 
         tableHTML += `<tr>
             <td style="text-align: center; position: relative;">
@@ -189,40 +253,35 @@ function generateTalksTable(talks) {
         </tr>`;
     });
 
-    tableHTML += '</table>';
-    document.getElementById("tableContainer").innerHTML = tableHTML; // Ensure there's a div with id "tableContainer" in your HTML
+    tableHTML += '</table><br><br>';
+    document.getElementById("tableContainer").innerHTML = tableHTML;
 }
-
-
-
-
-
 
 function clearSearch() {
     document.getElementById("wordInput").value = '';
     drawScatterPlot({}, {}, false);
-    document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
+    document.getElementById("tableContainer").innerHTML = "<p></p>";
 
+    const legendContainer = document.getElementById('legendContainer');
+    legendContainer.innerHTML = ''; // Clear the legend content
+    legendContainer.style.border = '';
+    legendContainer.style.backgroundColor = '';
+    legendContainer.style.padding = '';
 }
-
-
-
 
 document.addEventListener("DOMContentLoaded", function() {
     const inputField = document.getElementById("wordInput");
     inputField.addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
-            event.preventDefault(); // Prevent the default form submission
-            searchAndDisplay(); // Trigger search and display
+            event.preventDefault();
+            searchAndDisplay();
         }
     });
     document.getElementById("conferenceToggle").addEventListener("change", searchAndDisplay);
-    drawScatterPlot({}, {}, false); // Initialize a blank plot area
+    drawScatterPlot({}, {}, false);
 
     document.getElementById("clearButton").addEventListener("click", clearSearch);
 });
-
-
 
 function determineLabelSpacing(count) {
     if (count <= 10) {
