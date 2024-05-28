@@ -1,0 +1,126 @@
+---
+title: "Using Conference Text Search"
+output:
+  html_document:
+    includes:
+      in_header: "https://www.mygospelbuddy.com/docs/header.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+---
+
+<style>
+  /* Center alignment for the title, text under the title, and buttons */
+  h1, .subtitle-text, .download-button {
+    text-align: center;
+  }
+
+  /* Left alignment for paragraphs and their titles in the middle of the document */
+  h4 {
+    text-align: left;
+  }
+</style>
+
+<div class="subtitle-text">
+  <p>How to use search operators and find insights from General Conference talks.</p>
+</div>
+<br>
+
+<style>
+  .download-button {
+    display: inline-block; /* Use inline-block to allow setting width */
+    width: 180px; /* Set fixed width */
+    height: 50px;
+    margin-right: 10px;
+    background-color: #0073e6; /* Blue color */
+    color: #ffffff; /* White text color */
+    padding: 10px 10px; /* Adjust padding as needed */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold;
+    text-align: center; /* Center text horizontally */
+    line-height: 30px; /* Center text vertically */
+  }
+
+  .download-button img {
+    width: 20px; /* Adjust image size as needed */
+    margin-right: 10px; /* Add space between image and text */
+  }
+  /* Apply styling to larger images */
+  .large-image {
+    width: 75%; /* Set the width of the images to 75% of their current size */
+    display: block; /* Center the images */
+    margin: 0 auto; /* Center the images */
+    border: 2px solid #f0f0f0;
+  }
+
+  /* Apply styling to Chrome and Edge icons */
+  .download-button img {
+    width: 20px; /* Adjust image size as needed */
+    margin-right: 10px; /* Add space between image and text */
+  }
+
+  @media (max-width: 600px) {
+  .download-button {
+    display: block; /* Change to block-level element */
+    margin: 0 auto; /* Center the buttons horizontally */
+    width: 180px; /* Set fixed width */
+    height: 50px;
+    margin-bottom: 10px; /* Add spacing between buttons */
+    background-color: #0073e6; /* Blue color */
+    color: #ffffff; /* White text color */
+    padding: 10px 10px; /* Adjust padding as needed */
+    border-radius: 5px; /* Rounded corners */
+    text-decoration: none; /* Remove underline */
+    font-weight: bold;
+    text-align: center; /* Center text horizontally */
+    line-height: 30px; /* Center text vertically */
+  }
+}
+</style>
+
+#### How does the Conference Text Search work?
+
+Searching on the <b>conference text</b> search page allows you to find words or phrases within all general conference talks available on the Church's website. To make a search <a href="https://www.mygospelbuddy.com/search/words">click here</a>
+
+Using the conference text search page can also help you find conference talks to study. A scatter plot is generated displaying how many times that word or phrase has been used in conference talks either by year or by conference. Clicking on a point in the scatter plot will generate a table of all General Conference talks which include that word or phrase within that year or conference.
+
+The setting pane allow users to change how they're searching. One setting changes the search function from grouping by year to grouping by individual conference.  Another setting allows the user to enter "Table Mode". Table mode generates the data of the search in table format instead of in a scatter plot. Searching in this way make copying values to Excel and clicking through to conference talks easier on mobile devices.
+
+The search page also has advanced ways to search. To learn how to compare multiple search terms and combine related search terms read the sections below!
+
+
+#### How to run a Comparison Search:
+
+An important feature of this page is comparing two or more search terms.  To compare terms you will wrap each unique term within a pair of parentheses.  To compare mentions of Joseph Smith to mentions of Brigham Young you will enter the search in this format: (Joseph Smith) (Brigham Young).  This search will result in two series plotted on the chart area each in a unique color.
+
+<br>
+<div class=large-image>
+ <img src="https://www.mygospelbuddy.com/docs/assets/comparison-search.png" alt="Running a comparison search on the gospel buddy website">
+</div>
+<br>
+<br>
+
+When running a comparison search the legend generated below the chart area will be important.  Each unique search term will appear with it's corresponding color within the legend.
+
+#### How to run a Combined Search:
+
+Combining related search terms is possible using a combined search.  For instance, searching the term, "temple" will not include the plural version, "temples". Combining these terms will generate a plot in which the points display the sum of "temple" and "temples". To run this combined search you will use "||" as the OR operand. In our temple example the search would be entered as: temple || temples.
+
+<br>
+<div class=large-image>
+ <img src="https://www.mygospelbuddy.com/docs/assets/combined-search.png" alt="Running a combined search on the gospel buddy website">
+</div>
+<br>
+<br>
+
+#### Can I use Combined Searches within a Comparison search?
+
+Yes. Combining search terms within comparison searches is easy. If you'd like to compare all mentions of Russell M. Nelson to all mentions of Brigham Young you might want to combine multiple terms for each. Russell M. Nelson is sometimes referred to as, "President Nelson" within conference talks. We will follow the same logic for Brigham Young. This search would be entered as: (Russell M. Nelson || President Nelson) (Brigham Young || President Young)
+
+<br>
+<div class=large-image>
+ <img src="https://www.mygospelbuddy.com/docs/assets/advanced-search.png" alt="Running an advanced search on the gospel buddy website">
+</div>
+<br>
+<br>
+
+
