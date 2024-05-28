@@ -3,12 +3,17 @@ async function fetchData() {
     if (loader) {
         loader.style.display = "block"; // Show loader
     }
-    const response = await fetch("https://kameronyork.com/datasets/general-conference-talks.json");
-    const data = await response.json();
-    if (loader) {
-        loader.style.display = "none"; // Hide loader
+    try {
+        const response = await fetch("https://kameronyork.com/datasets/general-conference-talks.json");
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error fetching data:", error);
+    } finally {
+        if (loader) {
+            loader.style.display = "none"; // Hide loader
+        }
     }
-    return data;
 }
 
 let currentSearchWords = []; // Global variable to store the current search terms
@@ -36,45 +41,52 @@ async function searchAndDisplay() {
         currentSearchWords = [searchInput];
     }
 
-    const data = await fetchData();
-    const byConference = document.getElementById("conferenceToggle").checked;
-    const tableMode = document.getElementById("tableModeToggle").checked;
-    let allCounts = {};
-    let yearLookup = {};
+    try {
+        const data = await fetchData();
+        if (!data) throw new Error("No data returned from fetch");
 
-    currentSearchWords.forEach(searchWord => {
-        let counts = {};
-        data.forEach(row => {
-            const text = row['text'].toLowerCase();
-            const year = row['year'];
-            const month = row['month'];
-            const conferenceId = row['conference-id'];
+        const byConference = document.getElementById("conferenceToggle").checked;
+        const tableMode = document.getElementById("tableModeToggle").checked;
+        let allCounts = {};
+        let yearLookup = {};
 
-            const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-            const matches = text.match(regex);
-            const count = matches ? matches.length : 0;
+        currentSearchWords.forEach(searchWord => {
+            let counts = {};
+            data.forEach(row => {
+                const text = row['text'].toLowerCase();
+                const year = row['year'];
+                const month = row['month'];
+                const conferenceId = row['conference-id'];
 
-            const key = byConference ? `${year}-${month}` : year.toString();
-            if (!counts[key]) counts[key] = 0;
-            counts[key] += count;
+                const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
+                const matches = text.match(regex);
+                const count = matches ? matches.length : 0;
 
-            if (!yearLookup[key]) {
-                yearLookup[key] = byConference ? `${year}-${month}` : year;
-            }
+                const key = byConference ? `${month} ${year}` : year.toString();
+                if (!counts[key]) counts[key] = 0;
+                counts[key] += count;
+
+                if (!yearLookup[key]) {
+                    yearLookup[key] = byConference ? `${month} ${year}` : year;
+                }
+            });
+            allCounts[searchWord] = counts;
         });
-        allCounts[searchWord] = counts;
-    });
 
-    if (tableMode) {
-        drawTable(allCounts, yearLookup, byConference);
-        updateLegend([]);  // Clear legend when in table mode
-    } else {
-        drawScatterPlot(allCounts, yearLookup, byConference);
-        updateLegend(currentSearchWords);  // Restore legend when switching back to scatter plot mode
-    }
-    document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
-    if (loader) {
-        loader.style.display = "none"; // Hide loader
+        if (tableMode) {
+            drawTable(allCounts, yearLookup, byConference);
+            updateLegend([]);  // Clear legend when in table mode
+        } else {
+            drawScatterPlot(allCounts, yearLookup, byConference);
+            updateLegend(currentSearchWords);  // Restore legend when switching back to scatter plot mode
+        }
+        document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
+    } catch (error) {
+        console.error("Error during search and display:", error);
+    } finally {
+        if (loader) {
+            loader.style.display = "none"; // Hide loader
+        }
     }
 }
 
@@ -289,34 +301,41 @@ async function displayTalksTable(key, searchWord, byConference) {
     if (loader) {
         loader.style.display = "block"; // Show loader
     }
-    const data = await fetchData();
-    let filteredData = [];
+    try {
+        const data = await fetchData();
+        if (!data) throw new Error("No data returned from fetch");
 
-    if (byConference) {
-        filteredData = data.filter(talk => {
-            const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-            const matches = talk.text.match(regex);
-            if (matches && `${talk.year}-${talk.month}` === key) {
-                talk.count = matches.length;
-                return true;
-            }
-            return false;
-        });
-    } else {
-        filteredData = data.filter(talk => {
-            const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-            const matches = talk.text.match(regex);
-            if (matches && talk.year.toString() === key) {
-                talk.count = matches.length;
-                return true;
-            }
-            return false;
-        });
-    }
+        let filteredData = [];
 
-    generateTalksTable(filteredData);
-    if (loader) {
-        loader.style.display = "none"; // Hide loader
+        if (byConference) {
+            filteredData = data.filter(talk => {
+                const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
+                const matches = talk.text.match(regex);
+                if (matches && `${talk.month} ${talk.year}` === key) {
+                    talk.count = matches.length;
+                    return true;
+                }
+                return false;
+            });
+        } else {
+            filteredData = data.filter(talk => {
+                const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
+                const matches = talk.text.match(regex);
+                if (matches && talk.year.toString() === key) {
+                    talk.count = matches.length;
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        generateTalksTable(filteredData);
+    } catch (error) {
+        console.error("Error displaying talks table:", error);
+    } finally {
+        if (loader) {
+            loader.style.display = "none"; // Hide loader
+        }
     }
 }
 
@@ -346,6 +365,10 @@ function generateTalksTable(talks) {
 }
 
 function clearSearch() {
+    const loader = document.getElementById("loader");
+    if (loader) {
+        loader.style.display = "block"; // Show loader
+    }
     document.getElementById("wordInput").value = '';
     drawScatterPlot({}, {}, false);
     document.getElementById("tableContainer").innerHTML = "<p></p>";
@@ -355,6 +378,9 @@ function clearSearch() {
     legendContainer.style.border = '';
     legendContainer.style.backgroundColor = '';
     legendContainer.style.padding = '';
+    if (loader) {
+        loader.style.display = "none"; // Hide loader
+    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
