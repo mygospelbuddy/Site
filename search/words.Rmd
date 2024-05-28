@@ -1,5 +1,4 @@
 ---
-title: "Search the Gospel Buddy"
 output:
   html_document:
     includes:

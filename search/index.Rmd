@@ -20,8 +20,6 @@ output:
 
 <div class="subtitle-text">
   <p>Enter a scripture or sequence to find General Conference talks that quote it!</p>
-  <br>
-  <p>NEW - <a href="https://www.mygospelbuddy.com/search/words">Search words or phrases in Conference talks</a></p>
 </div>
 <br>
 
