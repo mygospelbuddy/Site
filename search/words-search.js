@@ -19,12 +19,14 @@ async function searchAndDisplay() {
         return; // Abort the search
     }
 
-    // Check if input contains parentheses, indicating multiple search terms
-    if (searchInput.includes('(') && searchInput.includes(')')) {
-        currentSearchWords = searchInput.match(/\(([^)]+)\)/g).map(term => term.replace(/[()]/g, '').trim());
-    } else {
-        currentSearchWords = [searchInput];
-    }
+    // Parse the input for "||" operator and parentheses
+    currentSearchWords = searchInput.split(/\s+(?=\()/).map(group => {
+        if (group.includes('||')) {
+            return group.replace(/[()]/g, '').split('||').map(term => term.trim());
+        } else {
+            return [group.replace(/[()]/g, '').trim()];
+        }
+    });
 
     try {
         const data = await fetchData();
@@ -35,40 +37,61 @@ async function searchAndDisplay() {
         let allCounts = {};
         let yearLookup = {};
 
-        currentSearchWords.forEach(searchWord => {
-            let counts = {};
-            data.forEach(row => {
-                const text = row['text'].toLowerCase();
-                const year = row['year'];
-                const month = row['month'];
-                const conferenceId = row['conference-id'];
+        currentSearchWords.forEach(group => {
+            group.forEach(searchWord => {
+                let counts = {};
+                data.forEach(row => {
+                    const text = row['text'].toLowerCase();
+                    const year = row['year'];
+                    const month = row['month'];
+                    const conferenceId = row['conference-id'];
 
-                const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-                const matches = text.match(regex);
-                const count = matches ? matches.length : 0;
+                    const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
+                    const matches = text.match(regex);
+                    const count = matches ? matches.length : 0;
 
-                const key = byConference ? `${month} ${year}` : year.toString();
-                if (!counts[key]) counts[key] = 0;
-                counts[key] += count;
+                    const key = byConference ? `${month} ${year}` : year.toString();
+                    if (!counts[key]) counts[key] = 0;
+                    counts[key] += count;
 
-                if (!yearLookup[key]) {
-                    yearLookup[key] = byConference ? `${month} ${year}` : year;
-                }
+                    if (!yearLookup[key]) {
+                        yearLookup[key] = byConference ? `${month} ${year}` : year;
+                    }
+                });
+                allCounts[searchWord] = counts;
             });
-            allCounts[searchWord] = counts;
         });
 
+        let combinedCounts = combineCounts(allCounts, currentSearchWords);
+
         if (tableMode) {
-            drawTable(allCounts, yearLookup, byConference);
+            drawTable(combinedCounts, yearLookup, byConference);
             updateLegend([]);  // Clear legend when in table mode
         } else {
-            drawScatterPlot(allCounts, yearLookup, byConference);
+            drawScatterPlot(combinedCounts, yearLookup, byConference);
             updateLegend(currentSearchWords);  // Restore legend when switching back to scatter plot mode
         }
         document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
     } catch (error) {
         console.error("Error during search and display:", error);
     }
+}
+
+function combineCounts(allCounts, searchGroups) {
+    let combinedCounts = {};
+    searchGroups.forEach(group => {
+        let groupKey = group.join(' || ');
+        combinedCounts[groupKey] = {};
+        group.forEach(term => {
+            Object.keys(allCounts[term]).forEach(year => {
+                if (!combinedCounts[groupKey][year]) {
+                    combinedCounts[groupKey][year] = 0;
+                }
+                combinedCounts[groupKey][year] += allCounts[term][year];
+            });
+        });
+    });
+    return combinedCounts;
 }
 
 function drawScatterPlot(allCounts, yearLookup, byConference) {
@@ -137,9 +160,10 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
 
     let points = [];
 
-    currentSearchWords.forEach((searchWord, idx) => {
-        ctx.fillStyle = colors[idx % colors.length];
-        const counts = allCounts[searchWord];
+    currentSearchWords.forEach((group, groupIdx) => {
+        const groupKey = group.join(' || ');
+        ctx.fillStyle = colors[groupIdx % colors.length];
+        const counts = allCounts[groupKey];
 
         allKeys.forEach((key, index) => {
             if (counts[key] !== 0) {
@@ -155,7 +179,7 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
                     centerY: y,
                     radius: 5,
                     key: key,
-                    searchWord: searchWord
+                    searchGroup: groupKey
                 });
             }
         });
@@ -170,8 +194,8 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
         points.forEach(point => {
             const distance = Math.sqrt((point.centerX - mouseX) ** 2 + (point.centerY - mouseY) ** 2);
             if (distance < point.radius) {
-                displayTalksTable(point.key, point.searchWord, byConference); // Use the stored key and searchWord
-                console.log(`Scatter point clicked: Key = ${point.key}, Search Word = ${point.searchWord}`);
+                displayTalksTable(point.key, point.searchGroup, byConference); // Use the stored key and searchGroup
+                console.log(`Scatter point clicked: Key = ${point.key}, Search Group = ${point.searchGroup}`);
             }
         });
     });
@@ -191,8 +215,9 @@ function drawTable(allCounts, yearLookup, byConference) {
 
     let tableHTML = '<table style="width: 100%; border-collapse: collapse; font-size: 10pt;">';
     tableHTML += `<tr style="background-color: #f8f8f8;"><th style="padding: 5px;">${byConference ? 'Conference' : 'Year'}</th>`;
-    currentSearchWords.forEach(word => {
-        tableHTML += `<th style="padding: 5px;">${word}</th>`;
+    currentSearchWords.forEach(group => {
+        const groupKey = group.join(' || ');
+        tableHTML += `<th style="padding: 5px;">${groupKey}</th>`;
     });
     tableHTML += '</tr>';
 
@@ -205,8 +230,9 @@ function drawTable(allCounts, yearLookup, byConference) {
     allKeys.forEach(key => {
         tableHTML += `<tr data-key="${key}" style="background-color: white; padding: 2px 0;">`;
         tableHTML += `<td style="padding: 5px;">${yearLookup[key]}</td>`;
-        currentSearchWords.forEach(word => {
-            tableHTML += `<td class="clickable-cell" style="padding: 5px; background-color: #FFF5E6;">${allCounts[word][key] || 0}</td>`;
+        currentSearchWords.forEach(group => {
+            const groupKey = group.join(' || ');
+            tableHTML += `<td class="clickable-cell" style="padding: 5px; background-color: #FFF5E6;">${allCounts[groupKey][key] || 0}</td>`;
         });
         tableHTML += '</tr>';
     });
@@ -226,8 +252,8 @@ function drawTable(allCounts, yearLookup, byConference) {
             const row = cell.parentElement;
             const key = row.getAttribute('data-key');
             const cellIndex = Array.prototype.indexOf.call(row.children, cell) - 1; // Subtract 1 to account for the year/month column
-            const searchWord = currentSearchWords[cellIndex];
-            displayTalksTable(key, searchWord, byConference);
+            const searchGroup = currentSearchWords[cellIndex].join(' || ');
+            displayTalksTable(key, searchGroup, byConference);
         });
     });
 }
@@ -236,8 +262,7 @@ function updateLegend(searchWords) {
     const legendContainer = document.getElementById('legendContainer');
     legendContainer.innerHTML = ''; // Clear existing legend content
 
-    if (searchWords.length > 1) {
-
+    if (searchWords.length > 0) {
         // Create the legend box
         const legendBox = document.createElement('div');
         legendBox.style.border = '1px solid black';
@@ -245,26 +270,43 @@ function updateLegend(searchWords) {
         legendBox.style.padding = '10px';
         legendBox.style.display = 'inline-block';
 
-        searchWords.forEach((word, idx) => {
-            const legendItem = document.createElement('div');
-            legendItem.style.display = 'flex';
-            legendItem.style.alignItems = 'center';
-            legendItem.style.marginBottom = '5px';
+        searchWords.forEach((group, groupIdx) => {
+            const groupKey = group.join(' || ');
+            group.forEach((term, idx) => {
+                const legendItem = document.createElement('div');
+                legendItem.style.display = 'flex';
+                legendItem.style.alignItems = 'center';
+                legendItem.style.marginBottom = '5px';
 
-            const colorBox = document.createElement('div');
-            colorBox.style.width = '12px';
-            colorBox.style.height = '12px';
-            colorBox.style.backgroundColor = colors[idx % colors.length];
-            colorBox.style.marginRight = '10px';
+                const colorBox = document.createElement('div');
+                colorBox.style.width = '12px';
+                colorBox.style.height = '12px';
+                colorBox.style.backgroundColor = colors[groupIdx % colors.length];
+                colorBox.style.marginRight = '10px';
 
-            const legendText = document.createElement('span');
-            legendText.style.fontSize = '8pt';
-            legendText.style.color = 'black';
-            legendText.innerText = word;
+                const legendText = document.createElement('span');
+                legendText.style.fontSize = '8pt';
+                legendText.style.color = 'black';
+                legendText.innerText = term;
 
-            legendItem.appendChild(colorBox);
-            legendItem.appendChild(legendText);
-            legendBox.appendChild(legendItem);
+                if (idx > 0) {
+                    colorBox.style.backgroundColor = 'transparent'; // Transparent for subsequent terms
+                }
+
+                legendItem.appendChild(colorBox);
+                legendItem.appendChild(legendText);
+                legendBox.appendChild(legendItem);
+            });
+
+            // Add a light gray horizontal line after each group except the last one
+            if (groupIdx < searchWords.length - 1) {
+                const separator = document.createElement('div');
+                separator.style.width = '100%';
+                separator.style.height = '1px';
+                separator.style.backgroundColor = '#d3d3d3';
+                separator.style.margin = '5px 0';
+                legendBox.appendChild(separator);
+            }
         });
 
         legendContainer.appendChild(legendBox);
@@ -277,29 +319,43 @@ function updateLegend(searchWords) {
     }
 }
 
-async function displayTalksTable(key, searchWord, byConference) {
+async function displayTalksTable(key, searchGroup, byConference) {
     try {
         const data = await fetchData();
         if (!data) throw new Error("No data returned from fetch");
 
         let filteredData = [];
 
+        const terms = searchGroup.split(' || ');
+
         if (byConference) {
             filteredData = data.filter(talk => {
-                const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-                const matches = talk.text.match(regex);
+                const matches = terms.some(term => {
+                    const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                    return regex.test(talk.text);
+                });
                 if (matches && `${talk.month} ${talk.year}` === key) {
-                    talk.count = matches.length;
+                    talk.count = terms.reduce((acc, term) => {
+                        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                        const termMatches = talk.text.match(regex);
+                        return acc + (termMatches ? termMatches.length : 0);
+                    }, 0);
                     return true;
                 }
                 return false;
             });
         } else {
             filteredData = data.filter(talk => {
-                const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
-                const matches = talk.text.match(regex);
+                const matches = terms.some(term => {
+                    const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                    return regex.test(talk.text);
+                });
                 if (matches && talk.year.toString() === key) {
-                    talk.count = matches.length;
+                    talk.count = terms.reduce((acc, term) => {
+                        const regex = new RegExp(`\\b${term}\\b`, 'gi');
+                        const termMatches = talk.text.match(regex);
+                        return acc + (termMatches ? termMatches.length : 0);
+                    }, 0);
                     return true;
                 }
                 return false;
