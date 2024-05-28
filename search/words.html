@@ -17942,24 +17942,6 @@ background-color: #FFD580;
 .clickable-cell:hover {
 background-color: #FFE5B4;
 }
-.loader {
-display: none; 
-position: absolute;
-top: 30%;
-left: 40%;
-transform: translate(0%, 0%);
-border: 10px solid #f3f3f3; 
-border-top: 10px solid #3498db; 
-border-radius: 50%;
-width: 80px;
-height: 80px;
-animation: spin 2s linear infinite;
-z-index: 1000; 
-}
-@keyframes spin {
-0% { transform: rotate(0deg); }
-100% { transform: rotate(360deg); }
-}
 </style>
 </head>
 <script>async function fetchData() {
@@ -18395,9 +18377,6 @@ function determineLabelSpacing(count) {
 <div id="plotContainer">
 <canvas id="plotCanvas">
 </canvas>
-<div id="loader" class="loader">
-
-</div>
 </div>
 <div id="legendContainer">
 
