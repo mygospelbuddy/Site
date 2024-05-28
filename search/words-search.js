@@ -1,18 +1,10 @@
 async function fetchData() {
-    const loader = document.getElementById("loader");
-    if (loader) {
-        loader.style.display = "block"; // Show loader
-    }
     try {
         const response = await fetch("https://kameronyork.com/datasets/general-conference-talks.json");
         const data = await response.json();
         return data;
     } catch (error) {
         console.error("Error fetching data:", error);
-    } finally {
-        if (loader) {
-            loader.style.display = "none"; // Hide loader
-        }
     }
 }
 
@@ -20,17 +12,10 @@ let currentSearchWords = []; // Global variable to store the current search term
 const colors = ['#FF0000', '#0000FF', '#00FF00', '#FF00FF', '#00FFFF', '#FFFF00']; // Global colors array
 
 async function searchAndDisplay() {
-    const loader = document.getElementById("loader");
-    if (loader) {
-        loader.style.display = "block"; // Show loader
-    }
     const searchInput = document.getElementById("wordInput").value.trim().toLowerCase();
     if (searchInput === "") {
         clearSearch(); // Clear the search input and reset the plot
         currentSearchWords = []; // Reset the stored search words
-        if (loader) {
-            loader.style.display = "none"; // Hide loader
-        }
         return; // Abort the search
     }
 
@@ -83,10 +68,6 @@ async function searchAndDisplay() {
         document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
     } catch (error) {
         console.error("Error during search and display:", error);
-    } finally {
-        if (loader) {
-            loader.style.display = "none"; // Hide loader
-        }
     }
 }
 
@@ -297,10 +278,6 @@ function updateLegend(searchWords) {
 }
 
 async function displayTalksTable(key, searchWord, byConference) {
-    const loader = document.getElementById("loader");
-    if (loader) {
-        loader.style.display = "block"; // Show loader
-    }
     try {
         const data = await fetchData();
         if (!data) throw new Error("No data returned from fetch");
@@ -332,10 +309,6 @@ async function displayTalksTable(key, searchWord, byConference) {
         generateTalksTable(filteredData);
     } catch (error) {
         console.error("Error displaying talks table:", error);
-    } finally {
-        if (loader) {
-            loader.style.display = "none"; // Hide loader
-        }
     }
 }
 
@@ -365,10 +338,6 @@ function generateTalksTable(talks) {
 }
 
 function clearSearch() {
-    const loader = document.getElementById("loader");
-    if (loader) {
-        loader.style.display = "block"; // Show loader
-    }
     document.getElementById("wordInput").value = '';
     drawScatterPlot({}, {}, false);
     document.getElementById("tableContainer").innerHTML = "<p></p>";
@@ -378,9 +347,6 @@ function clearSearch() {
     legendContainer.style.border = '';
     legendContainer.style.backgroundColor = '';
     legendContainer.style.padding = '';
-    if (loader) {
-        loader.style.display = "none"; // Hide loader
-    }
 }
 
 document.addEventListener("DOMContentLoaded", function() {
