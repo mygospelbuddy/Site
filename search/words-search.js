@@ -1,20 +1,31 @@
 async function fetchData() {
-    document.getElementById("loader").style.display = "block"; // Show loader
+    const loader = document.getElementById("loader");
+    if (loader) {
+        loader.style.display = "block"; // Show loader
+    }
     const response = await fetch("https://kameronyork.com/datasets/general-conference-talks.json");
     const data = await response.json();
-    document.getElementById("loader").style.display = "none"; // Hide loader
+    if (loader) {
+        loader.style.display = "none"; // Hide loader
+    }
     return data;
 }
-
 
 let currentSearchWords = []; // Global variable to store the current search terms
 const colors = ['#FF0000', '#0000FF', '#00FF00', '#FF00FF', '#00FFFF', '#FFFF00']; // Global colors array
 
 async function searchAndDisplay() {
+    const loader = document.getElementById("loader");
+    if (loader) {
+        loader.style.display = "block"; // Show loader
+    }
     const searchInput = document.getElementById("wordInput").value.trim().toLowerCase();
     if (searchInput === "") {
         clearSearch(); // Clear the search input and reset the plot
         currentSearchWords = []; // Reset the stored search words
+        if (loader) {
+            loader.style.display = "none"; // Hide loader
+        }
         return; // Abort the search
     }
 
@@ -27,6 +38,7 @@ async function searchAndDisplay() {
 
     const data = await fetchData();
     const byConference = document.getElementById("conferenceToggle").checked;
+    const tableMode = document.getElementById("tableModeToggle").checked;
     let allCounts = {};
     let yearLookup = {};
 
@@ -35,30 +47,46 @@ async function searchAndDisplay() {
         data.forEach(row => {
             const text = row['text'].toLowerCase();
             const year = row['year'];
+            const month = row['month'];
             const conferenceId = row['conference-id'];
 
             const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
             const matches = text.match(regex);
             const count = matches ? matches.length : 0;
 
-            const key = byConference ? conferenceId : year.toString();
+            const key = byConference ? `${year}-${month}` : year.toString();
             if (!counts[key]) counts[key] = 0;
             counts[key] += count;
 
             if (!yearLookup[key]) {
-                yearLookup[key] = year;
+                yearLookup[key] = byConference ? `${year}-${month}` : year;
             }
         });
         allCounts[searchWord] = counts;
     });
 
-    drawScatterPlot(allCounts, yearLookup, byConference);
-    updateLegend(currentSearchWords);
+    if (tableMode) {
+        drawTable(allCounts, yearLookup, byConference);
+        updateLegend([]);  // Clear legend when in table mode
+    } else {
+        drawScatterPlot(allCounts, yearLookup, byConference);
+        updateLegend(currentSearchWords);  // Restore legend when switching back to scatter plot mode
+    }
     document.getElementById("tableContainer").innerHTML = "<p></p>";  // Clear the table content
+    if (loader) {
+        loader.style.display = "none"; // Hide loader
+    }
 }
 
 function drawScatterPlot(allCounts, yearLookup, byConference) {
-    const canvas = document.getElementById('plotCanvas');
+    const plotContainer = document.getElementById('plotContainer');
+    plotContainer.innerHTML = ''; // Clear existing content
+
+    // Create a new canvas element
+    const canvas = document.createElement('canvas');
+    canvas.id = 'plotCanvas';
+    plotContainer.appendChild(canvas);
+
     const ctx = canvas.getContext('2d');
 
     canvas.width = canvas.offsetWidth;
@@ -110,8 +138,7 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
     ctx.stroke();
     allKeys.forEach((key, index) => {
         if (index % labelSpacingX === 0) {
-            const x = margin.left + index * xScale;
-            ctx.fillText(yearLookup[key], x, canvas.height - margin.bottom + 20);
+            ctx.fillText(yearLookup[key], margin.left + index * xScale, canvas.height - margin.bottom + 20);
         }
     });
 
@@ -153,6 +180,61 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
                 displayTalksTable(point.key, point.searchWord, byConference); // Use the stored key and searchWord
                 console.log(`Scatter point clicked: Key = ${point.key}, Search Word = ${point.searchWord}`);
             }
+        });
+    });
+}
+
+function drawTable(allCounts, yearLookup, byConference) {
+    const tableContainer = document.getElementById('plotContainer');
+    tableContainer.innerHTML = ''; // Clear existing content
+
+    // Create the table container div with dynamic height and border
+    const tableDiv = document.createElement('div');
+    tableDiv.style.width = '100%';
+    tableDiv.style.border = '1px solid black';
+    tableDiv.style.overflow = 'auto';
+    tableDiv.style.backgroundColor = 'white';
+    tableContainer.appendChild(tableDiv);
+
+    let tableHTML = '<table style="width: 100%; border-collapse: collapse; font-size: 10pt;">';
+    tableHTML += `<tr style="background-color: #f8f8f8;"><th style="padding: 5px;">${byConference ? 'Conference' : 'Year'}</th>`;
+    currentSearchWords.forEach(word => {
+        tableHTML += `<th style="padding: 5px;">${word}</th>`;
+    });
+    tableHTML += '</tr>';
+
+    let allKeys = new Set();
+    Object.values(allCounts).forEach(counts => {
+        Object.keys(counts).forEach(key => allKeys.add(key));
+    });
+    allKeys = Array.from(allKeys).sort((a, b) => a - b);
+
+    allKeys.forEach(key => {
+        tableHTML += `<tr data-key="${key}" style="background-color: white; padding: 2px 0;">`;
+        tableHTML += `<td style="padding: 5px;">${yearLookup[key]}</td>`;
+        currentSearchWords.forEach(word => {
+            tableHTML += `<td class="clickable-cell" style="padding: 5px; background-color: #FFF5E6;">${allCounts[word][key] || 0}</td>`;
+        });
+        tableHTML += '</tr>';
+    });
+
+    tableHTML += '</table>';
+    tableDiv.innerHTML = tableHTML;
+
+    // Adjust table container height dynamically based on the table content
+    const tableHeight = tableDiv.querySelector('table').offsetHeight;
+    const maxHeight = tableContainer.offsetWidth * 0.75; // 4:3 aspect ratio
+
+    tableDiv.style.height = tableHeight > maxHeight ? `${maxHeight}px` : `${tableHeight}px`;
+
+    const cells = tableDiv.querySelectorAll('.clickable-cell');
+    cells.forEach(cell => {
+        cell.addEventListener('click', function () {
+            const row = cell.parentElement;
+            const key = row.getAttribute('data-key');
+            const cellIndex = Array.prototype.indexOf.call(row.children, cell) - 1; // Subtract 1 to account for the year/month column
+            const searchWord = currentSearchWords[cellIndex];
+            displayTalksTable(key, searchWord, byConference);
         });
     });
 }
@@ -202,8 +284,11 @@ function updateLegend(searchWords) {
     }
 }
 
-
 async function displayTalksTable(key, searchWord, byConference) {
+    const loader = document.getElementById("loader");
+    if (loader) {
+        loader.style.display = "block"; // Show loader
+    }
     const data = await fetchData();
     let filteredData = [];
 
@@ -211,7 +296,7 @@ async function displayTalksTable(key, searchWord, byConference) {
         filteredData = data.filter(talk => {
             const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
             const matches = talk.text.match(regex);
-            if (matches && talk['conference-id'].toString() === key) {
+            if (matches && `${talk.year}-${talk.month}` === key) {
                 talk.count = matches.length;
                 return true;
             }
@@ -230,6 +315,9 @@ async function displayTalksTable(key, searchWord, byConference) {
     }
 
     generateTalksTable(filteredData);
+    if (loader) {
+        loader.style.display = "none"; // Hide loader
+    }
 }
 
 function generateTalksTable(talks) {
@@ -278,6 +366,7 @@ document.addEventListener("DOMContentLoaded", function() {
         }
     });
     document.getElementById("conferenceToggle").addEventListener("change", searchAndDisplay);
+    document.getElementById("tableModeToggle").addEventListener("change", searchAndDisplay);
     drawScatterPlot({}, {}, false);
 
     document.getElementById("clearButton").addEventListener("click", clearSearch);

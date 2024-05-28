@@ -17931,6 +17931,17 @@ display: block;
 .dropdown:hover .dropdown-content {
 display: block;
 }
+.clickable-cell {
+background-color: #FFF5E6;
+cursor: pointer;
+transition: background-color 0.2s;
+}
+.clickable-cell:active {
+background-color: #FFD580;
+}
+.clickable-cell:hover {
+background-color: #FFE5B4;
+}
 .loader {
 display: none; 
 position: absolute;
@@ -18268,8 +18279,11 @@ function determineLabelSpacing(count) {
 <div id="dropdownContent" class="dropdown-content">
 <label>by conference
 <input type="checkbox" id="conferenceToggle"></label>
+<label for="tableModeToggle">Table-Mode
+<input type="checkbox" id="tableModeToggle"></label>
 </div>
 </div>
+<p><br></p>
 <div id="plotContainer">
 <canvas id="plotCanvas">
 </canvas>
@@ -18280,6 +18294,7 @@ function determineLabelSpacing(count) {
 <div id="legendContainer">
 
 </div>
+<p><br></p>
 <div id="tableContainer">
 
 </div>

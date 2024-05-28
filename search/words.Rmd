@@ -67,6 +67,20 @@ output:
   .dropdown:hover .dropdown-content {
       display: block;
   }
+  
+  .clickable-cell {
+      background-color: #FFF5E6;
+      cursor: pointer;
+      transition: background-color 0.2s;
+  }
+
+  .clickable-cell:active {
+      background-color: #FFD580;
+  }
+
+  .clickable-cell:hover {
+      background-color: #FFE5B4;
+  }
 
   .loader {
       display: none; /* Hide the loader initially */
@@ -92,7 +106,7 @@ output:
 </head>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
-<script src="C:/Users/theka/Desktop/Projects/Website_project/gospelbuddy.com/Site/search/words-search.js"></script>
+<script src="https://www.mygospelbuddy.com/search/words-search.js"></script>
 
 <br><br>
 <input type="text" id="wordInput" placeholder="Enter a word to search...">
@@ -102,9 +116,12 @@ output:
 <div class="dropdown">
   <button id="dropdownButton" class="dropbtn"></button>
   <div id="dropdownContent" class="dropdown-content">
-  <label>by conference <input type="checkbox" id="conferenceToggle"></label>
+  <label>by conference  <input type="checkbox" id="conferenceToggle"></label>
+  <label for="tableModeToggle">Table-Mode  <input type="checkbox" id="tableModeToggle"></label>
   </div>
 </div>
+
+<br>
 
 <div id="plotContainer">
   <canvas id="plotCanvas"></canvas>
@@ -113,6 +130,8 @@ output:
 
 <div id="legendContainer">
 </div>
+
+<br>
 
 <div id="tableContainer">
 </div>
