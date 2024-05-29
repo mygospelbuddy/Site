@@ -15,38 +15,61 @@
   <meta property="og:url" content="https://mygospelbuddy.com/gospel-buddy/">
   <meta property="og:type" content="website">
   <style>
-    body {
+    /* Styles have been shortened for brevity */
+    body, .shadow-bottom, .navbar, .container, .header {
       margin: 0;
       padding: 0;
-      font-family: Roboto, sans-serif;
     }
-    header {
-      border-bottom: 1px solid #ccc;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      background-color: white;
+    .header {
+      background: linear-gradient(to bottom, #E74C3C 50%, transparent 50%);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
     }
-    .navbar {
-      padding: 10px 15px;
+    .header img {
+      border-radius: 50%;
+      border: 5px solid #0d0f38;
+      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+      height: 75%;
+      width: auto;
+      max-width: 100%;
+    }
+    :root {
+      --primary-color: #02007e;
+      --body-color: #f9f9f9;
+      --text-color: #636363;
+      --text-color-dark: #242738;
+      --white-color: #ffffff;
+      --light-color: #f8f9fa;
+      --font-family: Roboto;
+    }
+    .header + div {
+      margin-top: -1px;
+    }
+    .center-container {
+      display: flex;
+      justify-content: center; /* Centers the badge horizontally */
+      width: 100%; /* Full width to stretch across the screen */
+      margin-top: 10px;
     }
     .badge {
       display: flex;
       align-items: center;
+      justify-content: center;
       background-color: #FFFFFF;
       border-radius: 8px;
       padding: 5px 10px;
       margin-top: 10px;
       margin-left: 10px;
       box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      width: 220px; /* Specific width for the badge */
+      width: 80px; /* Specific width for the badge */
     }
     .badge img {
       height: 60px;
       width: 60px;
       margin-right: 10px;
       border-radius: 4px;
-    }
-    .badge span {
-      font-size: 18px; /* Setting the font size to 16px */
     }
   </style>
   <link href="https://mygospelbuddy.com/scripting/css/articles.style.min.css" rel="stylesheet" media="screen">
@@ -87,12 +110,13 @@
           </div>
       </nav>
   </header>
-  <a href="https://www.mygospelbuddy.com/" class="badge-link">
+  <div class="center-container">
     <div class="badge">
-      <img src="https://mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" alt="Logo">
-      <span>Gospel Buddy</span>
+      <a href="https://www.mygospelbuddy.com/" class="badge-link">
+        <img src="https://mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" alt="Logo">
+      </a>
     </div>
-  </a>
+  </div>
   <br>
   <script src="https://mygospelbuddy.com/scripting/js/script.min.js"></script>
 </body>
