@@ -34,6 +34,7 @@ async function searchAndDisplay() {
 
         const byConference = document.getElementById("conferenceToggle").checked;
         const tableMode = document.getElementById("tableModeToggle").checked;
+        const per1000Words = document.getElementById("per1000Words").checked;
         let allCounts = {};
         let yearLookup = {};
 
@@ -42,13 +43,19 @@ async function searchAndDisplay() {
                 let counts = {};
                 data.forEach(row => {
                     const text = row['text'].toLowerCase();
+                    const wordCount = text.split(/\s+/).length; // Total number of words in the talk
                     const year = row['year'];
                     const month = row['month'];
                     const conferenceId = row['conference-id'];
 
                     const regex = new RegExp(`\\b${searchWord}\\b`, 'gi');
                     const matches = text.match(regex);
-                    const count = matches ? matches.length : 0;
+                    let count = matches ? matches.length : 0;
+
+                    if (per1000Words) {
+                        count = (count / wordCount) * 1000; // Normalize by 1000 words
+                        count = Math.round(count * 10) / 10; // Round to nearest 1 decimal point
+                    }
 
                     const key = byConference ? `${month} ${year}` : year.toString();
                     if (!counts[key]) counts[key] = 0;
@@ -93,6 +100,22 @@ function combineCounts(allCounts, searchGroups) {
     });
     return combinedCounts;
 }
+
+
+function getPointSize() {
+    const screenWidth = window.innerWidth;
+
+    if (screenWidth <= 100) { 
+        return 1;
+    } else if (screenWidth <= 300) { 
+        return 2;
+    } else if (screenWidth <= 500) { 
+        return 3;
+    } else { 
+        return 5;
+    }
+}
+
 
 function drawScatterPlot(allCounts, yearLookup, byConference) {
     const plotContainer = document.getElementById('plotContainer');
@@ -159,6 +182,7 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
     });
 
     let points = [];
+    const pointSize = getPointSize(); // Calculate the point size based on screen width
 
     currentSearchWords.forEach((group, groupIdx) => {
         const groupKey = group.join(' || ');
@@ -170,14 +194,14 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
                 const x = margin.left + index * xScale;
                 const y = canvas.height - margin.bottom - (counts[key] * yScale);
                 ctx.beginPath();
-                ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                ctx.arc(x, y, pointSize, 0, 2 * Math.PI); // Use the dynamic point size
                 ctx.fill();
 
                 // Store the center, radius, and key for each point
                 points.push({
                     centerX: x,
                     centerY: y,
-                    radius: 5,
+                    radius: pointSize, // Use the dynamic point size
                     key: key,
                     searchGroup: groupKey
                 });
@@ -201,7 +225,9 @@ function drawScatterPlot(allCounts, yearLookup, byConference) {
     });
 }
 
+
 function drawTable(allCounts, yearLookup, byConference) {
+    const per1000Words = document.getElementById("per1000Words").checked;
     const tableContainer = document.getElementById('plotContainer');
     tableContainer.innerHTML = ''; // Clear existing content
 
@@ -232,7 +258,11 @@ function drawTable(allCounts, yearLookup, byConference) {
         tableHTML += `<td style="padding: 5px;">${yearLookup[key]}</td>`;
         currentSearchWords.forEach(group => {
             const groupKey = group.join(' || ');
-            tableHTML += `<td class="clickable-cell" style="padding: 5px; background-color: #FFF5E6;">${allCounts[groupKey][key] || 0}</td>`;
+            let displayCount = allCounts[groupKey][key] || 0;
+            if (per1000Words) {
+                displayCount = displayCount.toFixed(1); // Ensure one decimal point
+            }
+            tableHTML += `<td class="clickable-cell" style="padding: 5px; background-color: #FFF5E6;">${displayCount}</td>`;
         });
         tableHTML += '</tr>';
     });
@@ -257,6 +287,7 @@ function drawTable(allCounts, yearLookup, byConference) {
         });
     });
 }
+
 
 function updateLegend(searchWords) {
     const legendContainer = document.getElementById('legendContainer');
@@ -406,19 +437,44 @@ function clearSearch() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    const inputField = document.getElementById("wordInput");
-    inputField.addEventListener("keydown", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            searchAndDisplay();
-        }
-    });
-    document.getElementById("conferenceToggle").addEventListener("change", searchAndDisplay);
-    document.getElementById("tableModeToggle").addEventListener("change", searchAndDisplay);
-    drawScatterPlot({}, {}, false);
+  const per1000WordsRadio = document.getElementById("per1000Words");
+  const perTalkRadio = document.getElementById("perTalk");
 
-    document.getElementById("clearButton").addEventListener("click", clearSearch);
+  // Ensure mutual exclusivity
+  per1000WordsRadio.addEventListener("change", function() {
+    if (per1000WordsRadio.checked) {
+      perTalkRadio.checked = false;
+      console.log("check changed");
+      searchAndDisplay();
+    }
+  });
+
+  perTalkRadio.addEventListener("change", function() {
+    if (perTalkRadio.checked) {
+      per1000WordsRadio.checked = false;
+      console.log("check changed");
+      searchAndDisplay();
+    }
+  });
+
+  // Other existing event listeners...
+  const inputField = document.getElementById("wordInput");
+  inputField.addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      searchAndDisplay();
+    }
+  });
+  document.getElementById("conferenceToggle").addEventListener("change", searchAndDisplay);
+  document.getElementById("tableModeToggle").addEventListener("change", searchAndDisplay);
+  drawScatterPlot({}, {}, false);
+
+  document.getElementById("clearButton").addEventListener("click", clearSearch);
 });
+
+
+
+
 
 function determineLabelSpacing(count) {
     if (count <= 10) {
