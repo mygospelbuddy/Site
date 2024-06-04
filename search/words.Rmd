@@ -1,4 +1,5 @@
 ---
+title: "Conference Text Search"
 output:
   html_document:
     includes:
@@ -11,6 +12,11 @@ output:
   body {
     text-align: center;
   }
+
+  h1.title {
+    display: none;
+  }
+
   #plotContainer {
     position: relative;
     width: 100%;
@@ -19,17 +25,18 @@ output:
     margin: auto;
     overflow: hidden; /* Ensures no overflow */
   }
+
   canvas {
     width: 100% !important;
     height: auto !important;
     max-height: 100%;
   }
-  
+
   .dropdown {
     position: relative;
     display: inline-block;
   }
-  
+
   .dropbtn {
       background-color: #00000; /* Gray background */
       color: black; /* Black text */
@@ -38,13 +45,13 @@ output:
       border: 1px solid black; /* Black border */
       cursor: pointer;
   }
-  
+
   .dropbtn::after {
       content: '\25BC'; /* Black down-pointing triangle */
       font-size: 12px;
       color: black;
   }
-  
+
   .dropdown-content {
       display: none;
       position: absolute;
@@ -55,18 +62,18 @@ output:
       left: 50%;
       transform: translateX(-50%);
   }
-  
+
   .dropdown-content label {
       color: black;
-      padding: 12px 16px;
-      text-decoration: none;
+      padding: 4px 8px; /* Reduced padding */
+      margin: 0; /* No margin */
       display: block;
   }
-  
+
   .dropdown:hover .dropdown-content {
       display: block;
   }
-  
+
   .clickable-cell {
       background-color: #FFF5E6;
       cursor: pointer;
@@ -91,11 +98,18 @@ output:
 <button onclick="searchAndDisplay()">Search</button>
 
 <div class="dropdown">
-  <button id="dropdownButton" class="dropbtn"></button>
-  <div id="dropdownContent" class="dropdown-content">
-  <label>by conference  <input type="checkbox" id="conferenceToggle"></label>
-  <label for="tableModeToggle">Table-Mode  <input type="checkbox" id="tableModeToggle"></label>
-  </div>
+<button id="dropdownButton" class="dropbtn"></button>
+<div id="dropdownContent" class="dropdown-content">
+  <label>by conference <input type="checkbox" id="conferenceToggle"></label>
+  <label for="tableModeToggle">Table-Mode <input type="checkbox" id="tableModeToggle"></label>
+  <br>
+  <label for="per1000Words">
+  <input type="radio" id="per1000Words" name="wordCountMode" checked>Per 1000 words
+  </label>
+  <label for="perTalk">
+  <input type="radio" id="perTalk" name="wordCountMode">Per talk
+  </label>
+</div>
 </div>
 
 <br>
