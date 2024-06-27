@@ -1,0 +1,19 @@
+---
+title: "Building the Gospel Buddy"
+output:
+  html_document:
+    includes:
+      in_header: "https://www.mygospelbuddy.com/docs/header.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+---
+
+## Testing
+
+this is some regular text 
+
+
+### Testing
+
+[Can a Prophet Inspire Change?](https://kameronyork.com/projects/conference/inspire-change.html)
+
+#### Testing
