@@ -1,0 +1,1025 @@
+---
+title: "General Conference Bingo"
+output:
+  html_document:
+    includes:
+      in_header: "../docs/header.html"
+      after_body: "../docs/footer.html"
+---
+
+<style>
+h1.title {
+display: none;
+}
+
+.gb-bingo-card-shell {
+background: #ffffff;
+border: 1px solid rgba(148, 163, 184, 0.28);
+border-radius: 18px;
+padding: 18px;
+box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+}
+
+.gb-bingo-preview-wrap {
+display: flex;
+justify-content: center;
+}
+
+.gb-bingo-card {
+width: min(820px, 100%);
+background: #ffffff;
+border: 2px solid #0f172a;
+padding: 18px;
+color: #0f172a;
+}
+
+.gb-bingo-card__header {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 12px;
+margin-bottom: 14px;
+}
+
+.gb-bingo-card__title {
+margin: 0;
+font-size: 1.8rem;
+font-weight: 800;
+line-height: 1.1;
+letter-spacing: 0.03em;
+text-transform: uppercase;
+}
+
+.gb-bingo-card__meta {
+margin: 6px 0 0;
+font-size: 0.95rem;
+color: #475569;
+font-weight: 600;
+}
+
+.gb-bingo-card__stamp {
+border: 1.5px solid #0f172a;
+border-radius: 999px;
+padding: 8px 12px;
+font-size: 0.78rem;
+font-weight: 800;
+text-transform: uppercase;
+letter-spacing: 0.08em;
+white-space: nowrap;
+}
+
+.gb-bingo-grid {
+display: grid;
+grid-template-columns: repeat(5, minmax(0, 1fr));
+border-top: 1.5px solid #0f172a;
+border-left: 1.5px solid #0f172a;
+}
+
+.gb-bingo-cell {
+aspect-ratio: 1 / 1;
+border-right: 1.5px solid #0f172a;
+border-bottom: 1.5px solid #0f172a;
+padding: 10px 8px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+background: #ffffff;
+}
+
+.gb-bingo-cell--free {
+background: #f8fafc;
+}
+
+.gb-bingo-cell__icon {
+min-height: 1.2em;
+margin-bottom: 6px;
+font-size: 1.35rem;
+line-height: 1;
+font-weight: 700;
+}
+
+.gb-bingo-cell__word {
+font-size: 0.98rem;
+line-height: 1.15;
+font-weight: 800;
+text-transform: uppercase;
+word-break: break-word;
+}
+
+.gb-bingo-cell__subword {
+display: block;
+margin-top: 4px;
+font-size: 0.72rem;
+font-weight: 700;
+letter-spacing: 0.04em;
+text-transform: uppercase;
+}
+
+.gb-generator-grid {
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 14px;
+align-items: end;
+}
+
+.gb-generator-grid__count {
+min-width: 160px;
+}
+
+.gb-config-note {
+margin-top: 12px;
+color: #64748b;
+font-size: 0.84rem;
+line-height: 1.5;
+}
+
+.gb-pdf-render-stage {
+position: fixed;
+left: -99999px;
+top: 0;
+width: 816px;
+pointer-events: none;
+opacity: 0;
+}
+
+.gb-bingo-empty {
+padding: 36px 18px;
+text-align: center;
+color: #64748b;
+font-style: italic;
+}
+
+.gb-inline-toggle-row {
+display: flex;
+flex-wrap: wrap;
+gap: 10px;
+align-items: center;
+}
+
+.gb-label-with-tip {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+}
+
+.gb-label-with-tip .gb-field__label {
+margin: 0;
+}
+
+@media (max-width: 900px) {
+.gb-generator-grid {
+grid-template-columns: 1fr;
+}
+
+.gb-generator-grid__count {
+min-width: 0;
+}
+
+.gb-bingo-card__header {
+flex-direction: column;
+align-items: flex-start;
+}
+
+.gb-bingo-card__stamp {
+white-space: normal;
+}
+}
+
+@media (max-width: 680px) {
+.gb-bingo-card {
+padding: 12px;
+}
+
+.gb-bingo-cell {
+padding: 7px 5px;
+}
+
+.gb-bingo-cell__icon {
+font-size: 1.05rem;
+margin-bottom: 4px;
+}
+
+.gb-bingo-cell__word {
+font-size: 0.74rem;
+}
+
+.gb-bingo-cell__subword {
+font-size: 0.62rem;
+}
+}
+
+@media print {
+body * {
+visibility: hidden !important;
+}
+
+#bingoPrintArea,
+#bingoPrintArea * {
+visibility: visible !important;
+}
+
+#bingoPrintArea {
+position: absolute;
+left: 0;
+top: 0;
+width: 100%;
+margin: 0;
+padding: 0;
+}
+
+#bingoPrintArea .gb-bingo-card-shell {
+box-shadow: none;
+border: none;
+padding: 0;
+margin: 0;
+}
+
+#bingoPrintArea .gb-bingo-card {
+width: 100%;
+max-width: none;
+margin: 0;
+}
+}
+</style>
+
+<link rel="stylesheet" href="../search/search-common.css">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<div class="gb-search-shell" id="conferenceBingoApp">
+
+<nav class="gb-search-nav" aria-label="Gospel Buddy tools">
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/">Reference Search</a>
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">Search Guide</a>
+<a class="gb-search-nav__link gb-search-nav__link--active" href="https://www.mygospelbuddy.com/blog/general-conference-bingo.html">Conference Bingo</a>
+</nav>
+
+<section class="gb-search-hero gb-search-hero--compact">
+<h1 class="gb-search-hero__title">General Conference Bingo</h1>
+<p class="gb-search-hero__subtitle">Generate printable General Conference bingo cards from the words that show up again and again in conference talks.</p>
+</section>
+
+<section class="gb-search-card gb-search-card--settings-top">
+<details class="gb-settings-dropdown">
+<summary class="gb-settings-dropdown__summary">
+<span class="gb-settings-dropdown__title">Bingo settings</span>
+<span class="gb-settings-dropdown__meta">Difficulty, year range, and print options</span>
+</summary>
+
+<div class="gb-settings-dropdown__body">
+
+<div class="gb-form-grid gb-form-grid--2 gb-form-grid--aligned">
+<div class="gb-field">
+<label class="gb-field__label" for="bingoYearFrom">Year from</label>
+<input id="bingoYearFrom" class="gb-input" type="number" inputmode="numeric" placeholder="2000">
+</div>
+
+<div class="gb-field">
+<label class="gb-field__label" for="bingoYearTo">Year to</label>
+<input id="bingoYearTo" class="gb-input" type="number" inputmode="numeric" placeholder="2025">
+</div>
+</div>
+
+<div class="gb-form-grid gb-form-grid--3 gb-form-grid--aligned">
+<div class="gb-field">
+<div class="gb-label-with-tip">
+<label class="gb-field__label" for="bingoDifficulty">Difficulty</label>
+<button type="button" class="gb-info-chip" aria-label="Difficulty help" title="Easy uses the most common acceptable conference words. Medium pulls from moderately common words. Hard focuses on less frequent but still recognizable conference words. Random mixes all three difficulty pools.">ⓘ</button>
+</div>
+<select id="bingoDifficulty" class="gb-select">
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+<option value="random">Random</option>
+</select>
+</div>
+
+<div class="gb-field">
+<span class="gb-field__label">Free space</span>
+<label class="gb-checkbox" for="bingoUseFreeSpace">
+<input id="bingoUseFreeSpace" type="checkbox" checked>
+<span>Use a free center square</span>
+</label>
+</div>
+
+<div class="gb-field">
+<span class="gb-field__label">Icons</span>
+<label class="gb-checkbox" for="bingoUseIcons">
+<input id="bingoUseIcons" type="checkbox" checked>
+<span>Show icons above words</span>
+</label>
+</div>
+</div>
+
+<div class="gb-btn-row gb-btn-row--settings">
+<button type="button" class="gb-btn gb-btn--ghost" id="bingoResetButton">Reset settings to defaults</button>
+</div>
+
+</div>
+</details>
+</section>
+
+<section class="gb-search-card gb-search-card--search">
+<div class="gb-search-card__heading gb-search-card__heading--compact">
+<div>
+<h2 class="gb-search-card__title">Generate bingo cards</h2>
+<p class="gb-search-card__subtitle">Preview one card on screen, print it, or generate a PDF batch of random cards.</p>
+</div>
+</div>
+
+<div class="gb-generator-grid">
+<div class="gb-btn-row">
+<button type="button" class="gb-btn gb-btn--primary" id="bingoGenerateButton">Generate new card</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="bingoPrintButton" disabled>Print current card</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="bingoPdfButton" disabled>Create PDF batch</button>
+</div>
+
+<div class="gb-field gb-generator-grid__count">
+<label class="gb-field__label" for="bingoPdfCount">PDF pages</label>
+<select id="bingoPdfCount" class="gb-select">
+<option value="1">1 card</option>
+<option value="2">2 cards</option>
+<option value="3">3 cards</option>
+<option value="4">4 cards</option>
+<option value="5">5 cards</option>
+<option value="6">6 cards</option>
+<option value="7">7 cards</option>
+<option value="8">8 cards</option>
+<option value="9">9 cards</option>
+<option value="10">10 cards</option>
+</select>
+</div>
+</div>
+
+<div id="bingoStatus" class="gb-status" aria-live="polite"></div>
+<div class="gb-config-note">Tip: the preview card is the exact card used when you print the current page. PDF batches generate fresh random cards using the same settings.</div>
+</section>
+
+<section class="gb-search-card">
+<div class="gb-search-card__heading gb-search-card__heading--compact">
+<div>
+<h2 class="gb-search-card__title">Current bingo card</h2>
+<p class="gb-search-card__subtitle" id="bingoSummary">Loading conference words…</p>
+</div>
+</div>
+
+<div id="bingoPrintArea" class="gb-bingo-preview-wrap">
+<div class="gb-bingo-empty">Preparing conference word pools…</div>
+</div>
+</section>
+
+<div id="pdfRenderStage" class="gb-pdf-render-stage" aria-hidden="true"></div>
+
+</div>
+
+<script>
+const BINGO_CONFIG = {
+datasetUrl: 'https://kameronyork.com/datasets/general-conference-talks.json',
+defaultYearFrom: 2000,
+defaultDifficulty: 'easy',
+defaultUseFreeSpace: true,
+defaultUseIcons: true,
+maxPdfCards: 10,
+minWordLength: 3,
+minAverageMentionsPerConference: 1.5,
+defaultIcon: '□',
+iconMap: {
+faith: '✦',
+hope: '✦',
+charity: '♡',
+love: '♡',
+temple: '⌂',
+missionary: '✉',
+pioneer: '▲',
+apostle: '✚',
+prophet: '✚',
+jesus: '✝',
+christ: '✝',
+god: '◆',
+lord: '◆',
+gospel: '◆',
+church: '▣',
+prayer: '☼',
+pray: '☼',
+covenant: '◆',
+scripture: '▤',
+service: '■',
+family: '♥',
+mercy: '♡',
+grace: '✦',
+kindness: '♡',
+forgiveness: '✦',
+repentance: '◆',
+resurrection: '✦',
+atonement: '✝',
+salvation: '✦',
+obedience: '■',
+humility: '▽',
+revelation: '✧',
+priesthood: '✚',
+ministering: '■',
+hopeful: '✦',
+grateful: '♡'
+},
+stopWords: [
+'a','about','above','according','after','again','against','all','almost','alone','along','already','also','although',
+'always','am','among','an','and','another','any','anyone','anything','are','around','as','at','away',
+'back','be','because','become','been','before','being','below','between','both','but','by',
+'came','can','cannot','could','day','dear','did','do','does','doing','done','down','during',
+'each','even','ever','every','everything','far','few','find','first','for','from','full','further',
+'gave','get','give','given','go','goes','going','gone','good','great','had','has','hath','have','having',
+'he','her','here','hers','him','his','how','i','if','in','into','is','it','its','itself',
+'just','keep','know','known','large','last','let','like','little','long','made','make','many','may','me',
+'might','more','most','much','must','my','myself','near','need','neither','never','new','no','nor','not','now',
+'observe','of','off','often','old','on','once','one','only','onto','or','other','our','ours','ourselves','out','over','own',
+'part','people','perhaps','place','put','rather','really','receive','received','say','saying','says','see','seem','seemed',
+'shall','should','since','so','some','something','sometimes','still','such','take','than','that','the','their','theirs',
+'them','themselves','then','there','therefore','these','they','thing','things','this','those','though','through','thy','thine',
+'time','to','today','together','too','true','truly','under','unto','up','upon','us','very','was','way','we','well','went',
+'were','what','when','where','whether','which','while','who','whole','whom','why','will','with','within','without','world','would','ye','yet','you','your','yours',
+'brother','brothers','brethren','sister','sisters','beloved','conference','session','speaker','president','elder','bishop','stake','ward','churches','saint','saints','amen',
+'morning','afternoon','evening','testimony','testimonies','scriptures','unto','thou','thee','thyself','thereof','therein','therewith','wherefore','thereby','therefrom'
+]
+};
+
+const state = {
+rawTalks: [],
+processedTalks: [],
+yearRange: { min: null, max: null },
+cache: new Map(),
+currentCard: null,
+ready: false
+};
+
+const elements = {};
+
+document.addEventListener('DOMContentLoaded', () => {
+cacheElements();
+bindEvents();
+prepareConferenceData().catch((error) => {
+console.error(error);
+setStatus('error', 'Gospel Buddy could not prepare the conference word pools. Please try refreshing the page.');
+});
+});
+
+function cacheElements() {
+elements.yearFrom = document.getElementById('bingoYearFrom');
+elements.yearTo = document.getElementById('bingoYearTo');
+elements.difficulty = document.getElementById('bingoDifficulty');
+elements.useFreeSpace = document.getElementById('bingoUseFreeSpace');
+elements.useIcons = document.getElementById('bingoUseIcons');
+elements.pdfCount = document.getElementById('bingoPdfCount');
+elements.generate = document.getElementById('bingoGenerateButton');
+elements.print = document.getElementById('bingoPrintButton');
+elements.pdf = document.getElementById('bingoPdfButton');
+elements.reset = document.getElementById('bingoResetButton');
+elements.status = document.getElementById('bingoStatus');
+elements.summary = document.getElementById('bingoSummary');
+elements.printArea = document.getElementById('bingoPrintArea');
+elements.pdfStage = document.getElementById('pdfRenderStage');
+}
+
+function bindEvents() {
+elements.generate.addEventListener('click', () => generateAndRenderCard(true));
+elements.print.addEventListener('click', printCurrentCard);
+elements.pdf.addEventListener('click', exportPdfBatch);
+elements.reset.addEventListener('click', resetSettings);
+}
+
+async function prepareConferenceData() {
+setStatus('info', 'Preparing conference word pools…', true);
+
+const response = await fetch(BINGO_CONFIG.datasetUrl, {
+cache: 'force-cache',
+credentials: 'omit'
+});
+
+if (!response.ok) {
+throw new Error(`Dataset request failed with status ${response.status}`);
+}
+
+const data = await response.json();
+
+if (!Array.isArray(data) || data.length === 0) {
+throw new Error('The conference talks dataset did not return any talks.');
+}
+
+state.rawTalks = data;
+state.processedTalks = data
+.filter((row) => row && typeof row.text === 'string' && Number.isFinite(Number(row.year)))
+.map((row) => {
+const year = Number(row.year);
+const month = String(row.month || '').trim() || 'Unknown';
+const conferenceKey = `${year}-${month}`;
+return {
+year,
+month,
+conferenceKey,
+wordCounts: buildWordCounts(row.text)
+};
+});
+
+const years = state.processedTalks.map((talk) => talk.year).filter((year) => Number.isFinite(year));
+state.yearRange.min = Math.min(...years);
+state.yearRange.max = Math.max(...years);
+
+const defaultFrom = Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min);
+elements.yearFrom.value = String(defaultFrom);
+elements.yearTo.value = String(state.yearRange.max);
+elements.yearFrom.min = String(state.yearRange.min);
+elements.yearFrom.max = String(state.yearRange.max);
+elements.yearTo.min = String(state.yearRange.min);
+elements.yearTo.max = String(state.yearRange.max);
+elements.difficulty.value = BINGO_CONFIG.defaultDifficulty;
+elements.useFreeSpace.checked = BINGO_CONFIG.defaultUseFreeSpace;
+elements.useIcons.checked = BINGO_CONFIG.defaultUseIcons;
+elements.pdfCount.value = '1';
+
+state.ready = true;
+elements.print.disabled = false;
+elements.pdf.disabled = false;
+
+setStatus('success', 'Conference word pools are ready.');
+generateAndRenderCard(false);
+}
+
+function buildWordCounts(text) {
+const counts = new Map();
+const tokens = tokenizeText(text);
+
+for (const token of tokens) {
+counts.set(token, (counts.get(token) || 0) + 1);
+}
+
+return counts;
+}
+
+function tokenizeText(text) {
+const cleaned = String(text || '')
+.toLowerCase()
+.replace(/[\u2018\u2019]/g, "'")
+.replace(/[^a-z'\s-]/g, ' ');
+
+const rawTokens = cleaned.split(/\s+/).filter(Boolean);
+const acceptedTokens = [];
+
+for (let token of rawTokens) {
+token = token.replace(/^-+|-+$/g, '');
+token = token.replace(/^'+|'+$/g, '');
+if (!token) {
+continue;
+}
+
+const normalized = normalizeWord(token);
+if (!normalized) {
+continue;
+}
+
+if (normalized.length < BINGO_CONFIG.minWordLength) {
+continue;
+}
+
+if (BINGO_CONFIG.stopWords.includes(normalized)) {
+continue;
+}
+
+if (!/^[a-z]+$/.test(normalized)) {
+continue;
+}
+
+acceptedTokens.push(normalized);
+}
+
+return acceptedTokens;
+}
+
+function normalizeWord(word) {
+let normalized = String(word || '').toLowerCase().trim();
+
+if (!normalized) {
+return '';
+}
+
+normalized = normalized.replace(/^'+|'+$/g, '');
+normalized = normalized.replace(/^[^a-z]+|[^a-z]+$/g, '');
+
+if (!normalized) {
+return '';
+}
+
+if (normalized.endsWith("'s")) {
+normalized = normalized.slice(0, -2);
+}
+
+if (normalized.endsWith('ies') && normalized.length > 4) {
+normalized = normalized.slice(0, -3) + 'y';
+} else if (/(ches|shes|sses|xes|zes)$/.test(normalized) && normalized.length > 4) {
+normalized = normalized.slice(0, -2);
+} else if (normalized.endsWith('s') && normalized.length > 4 && !normalized.endsWith('ss')) {
+normalized = normalized.slice(0, -1);
+}
+
+return normalized;
+}
+
+function getSettings() {
+const yearFrom = clampNumber(elements.yearFrom.value, state.yearRange.min, state.yearRange.max, Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min));
+const yearTo = clampNumber(elements.yearTo.value, state.yearRange.min, state.yearRange.max, state.yearRange.max);
+
+return {
+yearFrom: Math.min(yearFrom, yearTo),
+yearTo: Math.max(yearFrom, yearTo),
+difficulty: elements.difficulty.value || BINGO_CONFIG.defaultDifficulty,
+useFreeSpace: elements.useFreeSpace.checked,
+useIcons: elements.useIcons.checked,
+pdfCount: clampNumber(elements.pdfCount.value, 1, BINGO_CONFIG.maxPdfCards, 1)
+};
+}
+
+function resetSettings() {
+if (state.yearRange.min === null || state.yearRange.max === null) {
+return;
+}
+
+elements.yearFrom.value = String(Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min));
+elements.yearTo.value = String(state.yearRange.max);
+elements.difficulty.value = BINGO_CONFIG.defaultDifficulty;
+elements.useFreeSpace.checked = BINGO_CONFIG.defaultUseFreeSpace;
+elements.useIcons.checked = BINGO_CONFIG.defaultUseIcons;
+elements.pdfCount.value = '1';
+generateAndRenderCard(false);
+}
+
+function clampNumber(value, min, max, fallback) {
+const numeric = Number(value);
+if (!Number.isFinite(numeric)) {
+return fallback;
+}
+return Math.min(Math.max(Math.round(numeric), min), max);
+}
+
+function getWordStatsForRange(yearFrom, yearTo) {
+const cacheKey = `${yearFrom}-${yearTo}`;
+if (state.cache.has(cacheKey)) {
+return state.cache.get(cacheKey);
+}
+
+const talks = state.processedTalks.filter((talk) => talk.year >= yearFrom && talk.year <= yearTo);
+const conferenceKeys = Array.from(new Set(talks.map((talk) => talk.conferenceKey)));
+const conferenceCount = conferenceKeys.length;
+
+if (conferenceCount === 0) {
+const emptyResult = { stats: [], conferenceCount: 0, talkCount: 0 };
+state.cache.set(cacheKey, emptyResult);
+return emptyResult;
+}
+
+const statMap = new Map();
+
+for (const talk of talks) {
+for (const [word, count] of talk.wordCounts.entries()) {
+if (!statMap.has(word)) {
+statMap.set(word, {
+word,
+totalCount: 0,
+talkCount: 0,
+conferenceCounts: new Map()
+});
+}
+
+const entry = statMap.get(word);
+entry.totalCount += count;
+entry.talkCount += 1;
+entry.conferenceCounts.set(talk.conferenceKey, (entry.conferenceCounts.get(talk.conferenceKey) || 0) + count);
+}
+}
+
+const minTotalCount = Math.max(4, Math.ceil(conferenceCount * BINGO_CONFIG.minAverageMentionsPerConference));
+
+const stats = Array.from(statMap.values())
+.map((entry) => {
+const conferenceMentionCount = entry.conferenceCounts.size;
+const avgPerConference = entry.totalCount / conferenceCount;
+return {
+word: entry.word,
+totalCount: entry.totalCount,
+talkCount: entry.talkCount,
+conferenceMentionCount,
+avgPerConference
+};
+})
+.filter((entry) => entry.totalCount >= minTotalCount)
+.sort((left, right) => {
+if (right.avgPerConference !== left.avgPerConference) {
+return right.avgPerConference - left.avgPerConference;
+}
+if (right.totalCount !== left.totalCount) {
+return right.totalCount - left.totalCount;
+}
+return left.word.localeCompare(right.word);
+});
+
+const result = {
+stats,
+conferenceCount,
+talkCount: talks.length
+};
+
+state.cache.set(cacheKey, result);
+return result;
+}
+
+function getDifficultyPool(stats, difficulty) {
+const eligible = stats.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.minAverageMentionsPerConference);
+
+let easy = eligible.filter((entry) => entry.avgPerConference >= 6);
+let medium = eligible.filter((entry) => entry.avgPerConference >= 3.5 && entry.avgPerConference < 6);
+let hard = eligible.filter((entry) => entry.avgPerConference >= 2 && entry.avgPerConference < 3.5);
+
+if (easy.length < 40) {
+easy = eligible.slice(0, Math.min(140, eligible.length));
+}
+
+if (medium.length < 40) {
+medium = eligible.slice(Math.min(40, eligible.length), Math.min(260, eligible.length));
+}
+
+if (hard.length < 40) {
+hard = eligible
+.filter((entry) => entry.avgPerConference >= 1.5 && entry.avgPerConference < 4.5)
+.slice(0, Math.min(180, eligible.length));
+}
+
+const random = uniqueByWord([...easy, ...medium, ...hard]);
+
+const pools = {
+easy: uniqueByWord(easy),
+medium: uniqueByWord(medium),
+hard: uniqueByWord(hard),
+random
+};
+
+return pools[difficulty] || pools.easy;
+}
+
+function uniqueByWord(entries) {
+const seen = new Set();
+const unique = [];
+
+for (const entry of entries) {
+if (!entry || !entry.word || seen.has(entry.word)) {
+continue;
+}
+seen.add(entry.word);
+unique.push(entry);
+}
+
+return unique;
+}
+
+function shuffle(items) {
+const copy = [...items];
+for (let index = copy.length - 1; index > 0; index -= 1) {
+const swapIndex = Math.floor(Math.random() * (index + 1));
+[copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+}
+return copy;
+}
+
+function prettyDifficulty(value) {
+switch (value) {
+case 'easy':
+return 'Easy';
+case 'medium':
+return 'Medium';
+case 'hard':
+return 'Hard';
+case 'random':
+return 'Random';
+default:
+return 'Easy';
+}
+}
+
+function getIconForWord(word) {
+return BINGO_CONFIG.iconMap[word] || BINGO_CONFIG.defaultIcon;
+}
+
+function createCardData(settings) {
+const { stats, conferenceCount, talkCount } = getWordStatsForRange(settings.yearFrom, settings.yearTo);
+
+if (conferenceCount === 0 || talkCount === 0) {
+throw new Error('No conference talks were found in that year range.');
+}
+
+const pool = getDifficultyPool(stats, settings.difficulty);
+const requiredWords = settings.useFreeSpace ? 24 : 25;
+
+if (pool.length < requiredWords) {
+throw new Error('There are not enough eligible conference words in that year range. Try widening the year range or choosing an easier difficulty.');
+}
+
+const picked = shuffle(pool).slice(0, requiredWords);
+const cells = picked.map((entry) => ({
+word: entry.word,
+icon: settings.useIcons ? getIconForWord(entry.word) : '',
+isFree: false
+}));
+
+if (settings.useFreeSpace) {
+cells.splice(12, 0, {
+word: 'FREE',
+icon: settings.useIcons ? '★' : '',
+isFree: true
+});
+}
+
+return {
+title: `${prettyDifficulty(settings.difficulty)} Conference Bingo`,
+difficulty: prettyDifficulty(settings.difficulty),
+yearFrom: settings.yearFrom,
+yearTo: settings.yearTo,
+conferenceCount,
+talkCount,
+cells
+};
+}
+
+function createCardElement(card, options = {}) {
+const shell = document.createElement('div');
+shell.className = 'gb-bingo-card-shell';
+
+const cardElement = document.createElement('article');
+cardElement.className = 'gb-bingo-card';
+
+const header = document.createElement('div');
+header.className = 'gb-bingo-card__header';
+
+const heading = document.createElement('div');
+
+const title = document.createElement('h3');
+title.className = 'gb-bingo-card__title';
+title.textContent = card.title;
+
+const meta = document.createElement('p');
+meta.className = 'gb-bingo-card__meta';
+meta.textContent = `${card.difficulty} difficulty`;
+
+heading.append(title, meta);
+
+const stamp = document.createElement('div');
+stamp.className = 'gb-bingo-card__stamp';
+stamp.textContent = 'General Conference Bingo';
+
+header.append(heading, stamp);
+
+const grid = document.createElement('div');
+grid.className = 'gb-bingo-grid';
+
+for (const cell of card.cells) {
+const cellElement = document.createElement('div');
+cellElement.className = `gb-bingo-cell${cell.isFree ? ' gb-bingo-cell--free' : ''}`;
+
+const icon = document.createElement('div');
+icon.className = 'gb-bingo-cell__icon';
+icon.textContent = cell.icon || '';
+
+const word = document.createElement('div');
+word.className = 'gb-bingo-cell__word';
+word.textContent = cell.word;
+
+cellElement.append(icon, word);
+grid.appendChild(cellElement);
+}
+
+cardElement.append(header, grid);
+shell.appendChild(cardElement);
+return shell;
+}
+
+function renderCurrentCard(card, settings) {
+elements.printArea.innerHTML = '';
+elements.printArea.appendChild(createCardElement(card));
+elements.summary.textContent = `${card.difficulty} difficulty • ${card.conferenceCount} conference(s) analyzed • ${card.talkCount} talk(s) in range • ${settings.yearFrom}–${settings.yearTo}`;
+state.currentCard = { card, settings };
+}
+
+function setStatus(type, message, showSpinner = false) {
+elements.status.className = `gb-status gb-status--${type} is-visible`;
+elements.status.innerHTML = `${showSpinner ? '<span class="gb-status__spinner" aria-hidden="true"></span>' : ''}${message}`;
+}
+
+function clearStatus() {
+elements.status.className = 'gb-status';
+elements.status.innerHTML = '';
+}
+
+function generateAndRenderCard(showReadyMessage) {
+if (!state.ready) {
+setStatus('info', 'Conference word pools are still loading…', true);
+return;
+}
+
+const settings = getSettings();
+
+try {
+setStatus('info', 'Building your bingo card…', true);
+const card = createCardData(settings);
+renderCurrentCard(card, settings);
+if (showReadyMessage) {
+setStatus('success', 'New bingo card ready to print.');
+} else {
+clearStatus();
+}
+} catch (error) {
+console.error(error);
+elements.printArea.innerHTML = '<div class="gb-bingo-empty">No card could be generated with those settings.</div>';
+elements.summary.textContent = 'Adjust the settings and try again.';
+setStatus('error', error.message || 'Gospel Buddy could not generate a bingo card.');
+}
+}
+
+function printCurrentCard() {
+if (!state.currentCard) {
+return;
+}
+window.print();
+}
+
+async function exportPdfBatch() {
+if (!state.ready || !state.currentCard) {
+return;
+}
+
+const settings = getSettings();
+const totalCards = settings.pdfCount;
+const { jsPDF } = window.jspdf;
+
+setStatus('info', `Creating ${totalCards} bingo PDF page${totalCards === 1 ? '' : 's'}…`, true);
+elements.pdfStage.innerHTML = '';
+
+try {
+const pdf = new jsPDF({
+orientation: 'portrait',
+unit: 'pt',
+format: 'letter'
+});
+
+for (let index = 0; index < totalCards; index += 1) {
+const card = createCardData(settings);
+const node = createCardElement(card, { exportMode: true });
+elements.pdfStage.appendChild(node);
+
+await waitForNextFrame();
+
+const canvas = await html2canvas(node, {
+backgroundColor: '#ffffff',
+scale: 2,
+useCORS: true
+});
+
+const imgData = canvas.toDataURL('image/png');
+const pageWidth = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
+const margin = 28;
+
+const ratio = Math.min(
+(pageWidth - margin * 2) / canvas.width,
+(pageHeight - margin * 2) / canvas.height
+);
+
+const renderWidth = canvas.width * ratio;
+const renderHeight = canvas.height * ratio;
+const offsetX = (pageWidth - renderWidth) / 2;
+const offsetY = (pageHeight - renderHeight) / 2;
+
+if (index > 0) {
+pdf.addPage();
+}
+
+pdf.addImage(imgData, 'PNG', offsetX, offsetY, renderWidth, renderHeight, undefined, 'FAST');
+node.remove();
+}
+
+const safeDifficulty = prettyDifficulty(settings.difficulty).toLowerCase().replace(/\s+/g, '-');
+pdf.save(`general-conference-bingo-${safeDifficulty}.pdf`);
+setStatus('success', `PDF ready: ${totalCards} bingo page${totalCards === 1 ? '' : 's'} generated.`);
+} catch (error) {
+console.error(error);
+setStatus('error', 'Gospel Buddy could not create the PDF batch. Please try again.');
+} finally {
+elements.pdfStage.innerHTML = '';
+}
+}
+
+function waitForNextFrame() {
+return new Promise((resolve) => {
+window.requestAnimationFrame(() => {
+window.requestAnimationFrame(resolve);
+});
+});
+}
+</script>
