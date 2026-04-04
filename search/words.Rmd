@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Conference Text Search</title>
-  <link rel="stylesheet" href="search-common.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>h1.title { display:none; }</style>
-</head>
-<body>
+---
+title: "Conference Text Search"
+output:
+  html_document:
+    includes:
+      in_header: "https://www.mygospelbuddy.com/docs/header.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+---
+
 <style>
 h1.title {
   display: none;
@@ -166,6 +164,3 @@ h1.title {
 
 <script src="search-common.js"></script>
 <script src="words-search.js"></script>
-
-</body>
-</html>

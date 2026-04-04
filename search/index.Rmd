@@ -1,14 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Reference Search</title>
-  <link rel="stylesheet" href="search-common.css">
-  
-  <style>h1.title { display:none; }</style>
-</head>
-<body>
+---
+title: "Reference Search"
+output:
+  html_document:
+    includes:
+      in_header: "https://www.mygospelbuddy.com/docs/header.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+---
+
 <style>
 h1.title {
   display: none;
@@ -190,6 +188,3 @@ h1.title {
 <script src="search-common.js"></script>
 <script src="scriptureDisplay.js"></script>
 <script src="search.js"></script>
-
-</body>
-</html>
