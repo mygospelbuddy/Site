@@ -1,5 +1,5 @@
 ---
-title: "Using Conference Text Search"
+title: "Using Gospel Buddy Search"
 output:
   html_document:
     includes:
@@ -8,119 +8,138 @@ output:
 ---
 
 <style>
-  /* Center alignment for the title, text under the title, and buttons */
-  h1, .subtitle-text, .download-button {
-    text-align: center;
-  }
-
-  /* Left alignment for paragraphs and their titles in the middle of the document */
-  h4 {
-    text-align: left;
-  }
-</style>
-
-<div class="subtitle-text">
-  <p>How to use search operators and find insights from General Conference talks.</p>
-</div>
-<br>
-
-<style>
-  .download-button {
-    display: inline-block; /* Use inline-block to allow setting width */
-    width: 180px; /* Set fixed width */
-    height: 50px;
-    margin-right: 10px;
-    background-color: #0073e6; /* Blue color */
-    color: #ffffff; /* White text color */
-    padding: 10px 10px; /* Adjust padding as needed */
-    border-radius: 5px; /* Rounded corners */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold;
-    text-align: center; /* Center text horizontally */
-    line-height: 30px; /* Center text vertically */
-  }
-
-  .download-button img {
-    width: 20px; /* Adjust image size as needed */
-    margin-right: 10px; /* Add space between image and text */
-  }
-  /* Apply styling to larger images */
-  .large-image {
-    width: 75%; /* Set the width of the images to 75% of their current size */
-    display: block; /* Center the images */
-    margin: 0 auto; /* Center the images */
-    border: 2px solid #f0f0f0;
-  }
-
-  /* Apply styling to Chrome and Edge icons */
-  .download-button img {
-    width: 20px; /* Adjust image size as needed */
-    margin-right: 10px; /* Add space between image and text */
-  }
-
-  @media (max-width: 600px) {
-  .download-button {
-    display: block; /* Change to block-level element */
-    margin: 0 auto; /* Center the buttons horizontally */
-    width: 180px; /* Set fixed width */
-    height: 50px;
-    margin-bottom: 10px; /* Add spacing between buttons */
-    background-color: #0073e6; /* Blue color */
-    color: #ffffff; /* White text color */
-    padding: 10px 10px; /* Adjust padding as needed */
-    border-radius: 5px; /* Rounded corners */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold;
-    text-align: center; /* Center text horizontally */
-    line-height: 30px; /* Center text vertically */
-  }
+h1.title {
+  display: none;
 }
 </style>
 
-#### How does the Conference Text Search work?
+<link rel="stylesheet" href="../search/search-common.css">
 
-Searching on the <b>conference text</b> search page allows you to find words or phrases within all general conference talks available on the Church's website. To make a search <a href="https://www.mygospelbuddy.com/search/words">click here</a>
+<div class="gb-search-shell">
+  <nav class="gb-search-nav" aria-label="Search tools">
+    <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/">Reference Search</a>
+    <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
+    <a class="gb-search-nav__link gb-search-nav__link--active" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">Search Guide</a>
+  </nav>
 
-Using the conference text search page can also help you find conference talks to study. A scatter plot is generated displaying how many times that word or phrase has been used in conference talks either by year or by conference. Clicking on a point in the scatter plot will generate a table of all General Conference talks which include that word or phrase within that year or conference.
+  <section class="gb-search-hero">
+    <h1 class="gb-search-hero__title">Using Gospel Buddy Search</h1>
+    <p class="gb-search-hero__subtitle">This guide covers both website search tools and explains the new settings dropdown, cleaner search pages, and the fastest ways to find what you want.</p>
+  </section>
 
-The setting pane allow users to change how they're searching. One setting changes the search function from grouping by year to grouping by individual conference.  Another setting allows the user to enter "Table Mode". Table mode generates the data of the search in table format instead of in a scatter plot. Searching in this way make copying values to Excel and clicking through to conference talks easier on mobile devices.
+  <section class="gb-search-card">
+    <h2 class="gb-search-card__title">What are the two search pages?</h2>
+    <p class="gb-search-card__subtitle"><strong>Reference Search</strong> helps you find General Conference talks tied to a scripture reference. <strong>Conference Text Search</strong> helps you track how words and phrases appear across conference over time.</p>
+    <ul class="gb-search-help__list">
+      <li><a href="https://www.mygospelbuddy.com/search/">Open Reference Search</a></li>
+      <li><a href="https://www.mygospelbuddy.com/search/words">Open Conference Text Search</a></li>
+    </ul>
+  </section>
 
-The search page also has advanced ways to search. To learn how to compare multiple search terms and combine related search terms read the sections below!
+  <section class="gb-search-card">
+    <h2 class="gb-search-card__title">Reference Search</h2>
+    <p class="gb-search-card__subtitle">Reference Search now opens with a cleaner layout. The extra options live inside a <strong>Search settings</strong> dropdown above the search area, so the page stays simpler until you need more control.</p>
 
+    <h3 class="gb-search-help__title">The three search modes</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Single verse</strong> is the simplest option. Choose a book, chapter, and verse. Leave verse set to <strong>All verses</strong> to search the whole chapter.</li>
+      <li><strong>Verse range</strong> lets you choose one continuous range inside a single chapter. End verses earlier than the start verse are disabled automatically.</li>
+      <li><strong>Advanced text</strong> is the best option when you want abbreviations, chapter ranges, or cross-chapter references inside one book.</li>
+    </ul>
 
-#### How to run a Comparison Search:
+    <h3 class="gb-search-help__title">Reference examples</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Alma 32</strong> for a whole chapter</li>
+      <li><strong>Alma 32-33</strong> for a chapter range inside one book</li>
+      <li><strong>Genesis 1:31-2:3</strong> for a cross-chapter range</li>
+      <li><strong>1 Ne. 3:7</strong>, <strong>D&amp;C 4</strong>, and <strong>JS-H 1:19</strong> for common abbreviations</li>
+    </ul>
 
-An important feature of this page is comparing two or more search terms.  To compare terms you will wrap each unique term within a pair of parentheses.  To compare mentions of Joseph Smith to mentions of Brigham Young you will enter the search in this format: (Joseph Smith) (Brigham Young).  This search will result in two series plotted on the chart area each in a unique color.
+    <h3 class="gb-search-help__title">Why the dropdown modes stay inside one chapter</h3>
+    <p class="gb-search-help__copy">The dropdown modes are meant to be fast and easy. When you need more complex ranges, the advanced text option gives you that flexibility without making the main page feel harder to use.</p>
 
-<br>
-<div class=large-image>
- <img src="https://www.mygospelbuddy.com/docs/assets/comparison-search.png" alt="Running a comparison search on the gospel buddy website">
+    <h3 class="gb-search-help__title">What the settings dropdown does</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Apostles only</strong> limits results to apostles.</li>
+      <li><strong>Count mode</strong> switches between total footnote mentions and distinct talks.</li>
+      <li><strong>Minimum quoted percentage</strong> filters lighter references out of the results.</li>
+      <li>Year, conference, speaker, and page-size options help refine large result sets.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">How the percentages are calculated</h3>
+    <ul class="gb-search-help__list">
+      <li>Single-verse searches show the quoted percentage for that verse in each talk.</li>
+      <li>Multi-verse searches show how much of the selected verse set appears in each talk.</li>
+      <li>The minimum quoted percentage filter is applied before the results table is built.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Troubleshooting</h3>
+    <ul class="gb-search-help__list">
+      <li>If the reference is invalid, the page now shows a clearer error with examples.</li>
+      <li>If the range is too large, narrow it to a smaller range. Extremely large queries are blocked on purpose.</li>
+      <li>If you need to cross chapters, use the advanced text mode instead of the dropdown modes.</li>
+    </ul>
+  </section>
+
+  <section class="gb-search-card">
+    <h2 class="gb-search-card__title">Conference Text Search</h2>
+    <p class="gb-search-card__subtitle">Conference Text Search keeps the scatter plot, keeps both measurement modes, and now puts the advanced options inside a settings dropdown so the page feels closer to Gospel Buddy without feeling cluttered.</p>
+
+    <h3 class="gb-search-help__title">How to search</h3>
+    <p class="gb-search-help__copy">Type your search into the main box and click <strong>Search</strong>. The information icon next to the search bar gives quick syntax help right on the page.</p>
+
+    <h3 class="gb-search-help__title">Search syntax cheat sheet</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>faith</strong> searches one word.</li>
+      <li><strong>"plan of salvation"</strong> searches one exact phrase.</li>
+      <li><strong>temple || temples</strong> combines related terms inside one series.</li>
+      <li><strong>(Joseph Smith) (Brigham Young)</strong> compares two series on one chart.</li>
+      <li><strong>temple -garment</strong> excludes talks that contain the unwanted term.</li>
+      <li><strong>redeem*</strong> uses a wildcard prefix.</li>
+      <li><strong>atonement~</strong> can be used as a fuzzy word search for a near match.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">What the settings dropdown does</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>By conference</strong> splits April and October apart instead of combining them by year.</li>
+      <li><strong>Table mode</strong> swaps the chart for a simpler numeric view.</li>
+      <li><strong>Per talk</strong> uses raw matches. <strong>Per 1000 words</strong> normalizes for talk length.</li>
+      <li><strong>Chart type</strong> lets you switch between scatter, line, and bar views.</li>
+      <li><strong>Case sensitive</strong> makes matching stricter.</li>
+      <li>Year, conference, and speaker filters let you focus before searching.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">By year vs by conference</h3>
+    <p class="gb-search-help__copy">By year combines April and October together. By conference keeps each conference separate so you can see more detail over time.</p>
+
+    <h3 class="gb-search-help__title">Per talk vs per 1000 words</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Per talk</strong> uses raw matches.</li>
+      <li><strong>Per 1000 words</strong> normalizes the count so talks of different lengths are easier to compare.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Display modes</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Scatter</strong> is the default and is the fastest way to spot spikes over time.</li>
+      <li><strong>Line</strong> helps when you want a smoother trend view.</li>
+      <li><strong>Bar</strong> can make conference-to-conference differences easier to compare.</li>
+      <li><strong>Table mode</strong> is still available and can be easier to use on mobile or for copying values.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Talking through the results</h3>
+    <ul class="gb-search-help__list">
+      <li>Click a point on the chart or a clickable table cell to open the extension-style talks table below the chart.</li>
+      <li>The talks table includes bars, counts, sorting, and direct links to the talks.</li>
+      <li>You can export both chart data and talk results.</li>
+      <li>Searches can now be shared more easily because the page uses URL parameters.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Troubleshooting</h3>
+    <ul class="gb-search-help__list">
+      <li>If nothing happens, make sure you clicked <strong>Search</strong>. The page no longer runs searches as you type.</li>
+      <li>If a search looks broken, check the loading or error message under the search bar.</li>
+      <li>If your chart is too busy, use speaker, year, or conference filters first.</li>
+      <li>If you need exact wording, use quotes.</li>
+    </ul>
+  </section>
 </div>
-<br>
-<br>
-
-When running a comparison search the legend generated below the chart area will be important.  Each unique search term will appear with it's corresponding color within the legend.
-
-#### How to run a Combined Search:
-
-Combining related search terms is possible using a combined search.  For instance, searching the term, "temple" will not include the plural version, "temples". Combining these terms will generate a plot in which the points display the sum of "temple" and "temples". To run this combined search you will use "||" as the OR operand. In our temple example the search would be entered as: temple || temples.
-
-<br>
-<div class=large-image>
- <img src="https://www.mygospelbuddy.com/docs/assets/combined-search.png" alt="Running a combined search on the gospel buddy website">
-</div>
-<br>
-<br>
-
-#### Can I use Combined Searches within a Comparison search?
-
-Yes. Combining search terms within comparison searches is easy. If you'd like to compare all mentions of Russell M. Nelson to all mentions of Brigham Young you might want to combine multiple terms for each. Russell M. Nelson is sometimes referred to as, "President Nelson" within conference talks. We will follow the same logic for Brigham Young. This search would be entered as: (Russell M. Nelson || President Nelson) (Brigham Young || President Young)
-
-<br>
-<div class=large-image>
- <img src="https://www.mygospelbuddy.com/docs/assets/advanced-search.png" alt="Running an advanced search on the gospel buddy website">
-</div>
-<br>
-<br>
-
-
