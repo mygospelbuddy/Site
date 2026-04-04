@@ -918,7 +918,6 @@
 
 .gb-settings-card-mini {
   background: #ffffff;
-  border: 1px solid rgba(148, 163, 184, 0.22);
   border-radius: var(--gb-radius-md);
   padding: 16px 18px;
 }
@@ -939,6 +938,7 @@
   display: grid;
   gap: 8px;
   margin-bottom: 14px;
+  margin-top: 5px;
 }
 
 .gb-setting-pill-row__label {
