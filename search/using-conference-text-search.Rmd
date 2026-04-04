@@ -1,0 +1,124 @@
+---
+title: "Using Gospel Buddy Search"
+output:
+  html_document:
+    includes:
+      in_header: "https://www.mygospelbuddy.com/docs/header2.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+---
+
+<style>
+h1.title {
+  display: none;
+}
+</style>
+
+<link rel="stylesheet" href="../search/search-common.css">
+
+<div class="gb-search-shell">
+  <nav class="gb-search-nav" aria-label="Search tools">
+    <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/">Reference Search</a>
+    <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
+    <a class="gb-search-nav__link gb-search-nav__link--active" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">Search Guide</a>
+  </nav>
+
+  <section class="gb-search-hero">
+    <h1 class="gb-search-hero__title">Using Gospel Buddy Search</h1>
+    <p class="gb-search-hero__subtitle">This guide explains both website search tools: the Reference Search for scriptures and the Conference Text Search for words and phrases.</p>
+  </section>
+
+  <section class="gb-search-card">
+    <h2 class="gb-search-card__title">What are the two search pages?</h2>
+    <p class="gb-search-card__subtitle"><strong>Reference Search</strong> helps you find General Conference talks tied to a scripture reference. <strong>Conference Text Search</strong> helps you track how words and phrases show up in conference over time.</p>
+    <ul class="gb-search-help__list">
+      <li><a href="https://www.mygospelbuddy.com/search/">Open Reference Search</a></li>
+      <li><a href="https://www.mygospelbuddy.com/search/words">Open Conference Text Search</a></li>
+    </ul>
+  </section>
+
+  <section class="gb-search-card">
+    <h2 class="gb-search-card__title">How Reference Search works</h2>
+    <p class="gb-search-card__subtitle">Reference Search now has three input modes so first-time users can search more easily without losing the advanced text box.</p>
+
+    <h3 class="gb-search-help__title">Quick verse</h3>
+    <p class="gb-search-help__copy">Choose a book, chapter, and verse from dropdowns. Leave the verse set to <strong>All verses</strong> to search the whole chapter.</p>
+
+    <h3 class="gb-search-help__title">Verse range</h3>
+    <p class="gb-search-help__copy">Choose one continuous verse range inside a single chapter. End verses earlier than the selected start verse are disabled automatically.</p>
+
+    <h3 class="gb-search-help__title">Advanced text</h3>
+    <p class="gb-search-help__copy">Use this mode when you want abbreviations, chapter ranges, or cross-chapter references inside one book.</p>
+
+    <h3 class="gb-search-help__title">Reference input examples</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Alma 32</strong> for a whole chapter</li>
+      <li><strong>Alma 32-33</strong> for a chapter range inside one book</li>
+      <li><strong>Genesis 1:31-2:3</strong> for a cross-chapter range</li>
+      <li><strong>1 Ne. 3:7</strong> for a common abbreviation</li>
+      <li><strong>D&amp;C 4</strong> and <strong>JS-H 1:19</strong> are also supported</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Why the dropdown modes stay inside one chapter</h3>
+    <p class="gb-search-help__copy">The dropdown modes are designed to stay simple and fast. When you need to go beyond one chapter, the advanced text input is the better tool.</p>
+
+    <h3 class="gb-search-help__title">How the percentages are calculated</h3>
+    <ul class="gb-search-help__list">
+      <li>Single-verse searches show the quoted percentage for that verse in each talk.</li>
+      <li>Multi-verse searches show how much of the selected verse set appears in each talk.</li>
+      <li>The <strong>Minimum quoted percentage</strong> filter removes lighter references before the results table is built.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Troubleshooting</h3>
+    <ul class="gb-search-help__list">
+      <li>If the reference is invalid, the page now shows a clearer error with examples.</li>
+      <li>If the range is too large, narrow it to a smaller chapter range or switch to a more focused query.</li>
+      <li>Whole-book dropdown searches are intentionally blocked because they become too broad to be useful.</li>
+    </ul>
+
+    <p class="gb-inline-note">Screenshot note: this is a good place to add a screenshot of the Reference Search page after you publish the redesign.</p>
+  </section>
+
+  <section class="gb-search-card">
+    <h2 class="gb-search-card__title">How Conference Text Search works</h2>
+    <p class="gb-search-card__subtitle">Conference Text Search keeps the scatter plot, keeps both measurement modes, and adds better syntax help, sharing, exports, and clearer settings.</p>
+
+    <h3 class="gb-search-help__title">Search syntax cheat sheet</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>faith</strong> searches one word.</li>
+      <li><strong>"plan of salvation"</strong> searches one exact phrase.</li>
+      <li><strong>temple || temples</strong> combines related terms inside one series.</li>
+      <li><strong>(Joseph Smith) (Brigham Young)</strong> compares two series on the same chart.</li>
+      <li><strong>temple -garment</strong> excludes talks that contain the unwanted term.</li>
+      <li><strong>redeem*</strong> uses a wildcard prefix.</li>
+      <li><strong>atonement~</strong> can be used as a fuzzy word search if you want a near match.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">By year vs by conference</h3>
+    <p class="gb-search-help__copy">By year combines April and October together. By conference keeps each conference separate so you can see the rise and fall of a phrase in finer detail.</p>
+
+    <h3 class="gb-search-help__title">Per talk vs per 1000 words</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Per talk</strong> uses raw matches.</li>
+      <li><strong>Per 1000 words</strong> normalizes the count so talks of different lengths are easier to compare.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">What the display modes do</h3>
+    <ul class="gb-search-help__list">
+      <li><strong>Scatter</strong> is the default and is the fastest way to spot peaks over time.</li>
+      <li><strong>Line</strong> helps when you want a smoother trend view.</li>
+      <li><strong>Bar</strong> makes conference-to-conference differences easier to read.</li>
+      <li><strong>Table mode</strong> is still available and is often easier to copy or use on mobile.</li>
+    </ul>
+
+    <h3 class="gb-search-help__title">Tips for better searches</h3>
+    <ul class="gb-search-help__list">
+      <li>Use quotes when you care about exact wording.</li>
+      <li>Use parentheses when you want multiple series on one chart.</li>
+      <li>Use the year, month, and speaker filters before searching if you already know the slice of conference you want.</li>
+      <li>Use the export buttons when you want to save chart data or the talks table.</li>
+      <li>The page now supports URL parameters, so a finished search can be shared more easily.</li>
+    </ul>
+
+    <p class="gb-inline-note">Screenshot note: this is a good place to add a screenshot of the Conference Text Search page and another screenshot of the click-through talks table.</p>
+  </section>
+</div>
