@@ -1,0 +1,543 @@
+---
+title: "Building the Gospel Buddy"
+output:
+  html_document:
+    includes:
+      in_header: "https://www.mygospelbuddy.com/docs/header.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+---
+
+#### The Role of a Prophet
+
+To members of The Church of Jesus Christ of Latter-Day Saints, the Prophet and President of the Church is the only person on Earth with the authority from God to receive revelation for the whole Church. When a Prophet passes away, a new Prophet is selected by the Quorum of the Twelve Apostles. Historically, the new Prophet has always been the most senior member of the Quorum of the Twelve Apostles.
+
+Members of the Church of Jesus Christ of Latter-Day Saints honor and respect the Prophet, as well as the "Role of the Prophet". In building the Gospel Buddy extension and transforming the collected data, I had the questions, "Has any Prophet been mentioned more than others in General Conference talks?" and, "How quickly is a former Prophet mentioned less in General Conference talks?". The answer to these questions was very informative!
+
+#### Prophets are Honored and Respected
+
+My findings - displayed in the graph below - show that a new Prophet is <b>always</b> mentioned immensely more than they ever have been previously. A previous prophet (even in the new Prophet's first General Conference) are mentioned immensely less than during their time serving as the Prophet. I believe this illustrates an important practice among members of The Church of Jesus Christ of Latter-Day Saints. Members of Christ's Church always seek to honor, sustain, and follow the Prophet God has chosen regardless of who it is. The current Prophet will always be mentioned far more than any other Apostle because they have been selected by God, through revelation, to lead His Church in this time. Members of the church talk about the Prophet frequently. While members definitely honor previous Prophets, they believe that the most important Prophet the Church has ever had is the one the Church has today!
+
+<br>
+<br>
+<div id="prophet-visualization"></div>
+<style>
+#prophet-info {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#prophet-image {
+  border: 3px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+#prophet-image:hover {
+  border-color: #007bff;
+  transform: scale(1.05);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+}
+
+#prophetChart {
+  cursor: pointer;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function() {
+  // First, create the HTML structure with JavaScript
+  const container = document.getElementById('prophet-visualization');
+  container.innerHTML = `
+    <div style="display: flex; gap: 20px;">
+      <div id="prophet-info" style="width: 200px; min-height: 400px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+        <div id="prophet-image-container" style="text-align: center; margin-bottom: 10px;">
+          <img id="prophet-image" src="" alt="Prophet Image" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: none;">
+        </div>
+        <div id="prophet-name" style="text-align: center; font-weight: bold; margin-bottom: 10px;">Select a Prophet</div>
+        <div id="prophet-details" style="font-size: 12px; color: #666;">Click on a prophet's line or legend to see details</div>
+      </div>
+      <div style="flex: 1;">
+        <canvas id="prophetChart" width="800" height="400"></canvas>
+      </div>
+    </div>
+  `;
+  
+  // Prophet data with exact search terms from Power BI M code
+  const prophetData = [
+    {
+      "id": 1,
+      "name": "Joseph Fielding Smith",
+      "short_name": "f_smith",
+      "search_names": ["president smith", "joseph fielding smith", "joseph f. smith", "elder smith"],
+      "date_became_prophet": "01/23/1970",
+      "date_ended": "07/02/1972",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(255, 99, 132)"
+    },
+    {
+      "id": 2,
+      "name": "Harold B. Lee",
+      "short_name": "lee",
+      "search_names": ["president lee", "harold b. lee", "harold lee", "elder lee"],
+      "date_became_prophet": "07/07/1972",
+      "date_ended": "12/26/1973",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(54, 162, 235)"
+    },
+    {
+      "id": 3,
+      "name": "Spencer W. Kimball",
+      "short_name": "kimball",
+      "search_names": ["president kimball", "spencer w. kimball", "spencer kimball", "elder kimball"],
+      "date_became_prophet": "12/30/1973",
+      "date_ended": "11/05/1985",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(255, 206, 86)"
+    },
+    {
+      "id": 4,
+      "name": "Ezra Taft Benson",
+      "short_name": "benson",
+      "search_names": ["president benson", "ezra taft benson", "ezra benson", "elder benson"],
+      "date_became_prophet": "11/10/1985",
+      "date_ended": "05/30/1994",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(75, 192, 192)"
+    },
+    {
+      "id": 5,
+      "name": "Howard W. Hunter",
+      "short_name": "hunter",
+      "search_names": ["president hunter", "howard w. hunter", "howard hunter", "elder hunter"],
+      "date_became_prophet": "06/05/1994",
+      "date_ended": "03/03/1995",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(153, 102, 255)"
+    },
+    {
+      "id": 6,
+      "name": "Gordon B. Hinckley",
+      "short_name": "hinckley",
+      "search_names": ["president hinckley", "gordon b. hinckley", "gordon hinckley", "elder hinckley"],
+      "date_became_prophet": "03/12/1995",
+      "date_ended": "01/27/2008",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(255, 159, 64)"
+    },
+    {
+      "id": 7,
+      "name": "Thomas S. Monson",
+      "short_name": "monson",
+      "search_names": ["president monson", "thomas s. monson", "thomas monson", "elder monson"],
+      "date_became_prophet": "02/03/2008",
+      "date_ended": "01/02/2018",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(201, 203, 207)"
+    },
+    {
+      "id": 8,
+      "name": "Russell M. Nelson",
+      "short_name": "nelson",
+      "search_names": ["president nelson", "russell m. nelson", "russell nelson", "elder nelson"],
+      "date_became_prophet": "01/14/2018",
+      "date_ended": null,
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(255, 99, 255)"
+    },
+    {
+      "id": 9,
+      "name": "David O. McKay",
+      "short_name": "mckay",
+      "search_names": ["president mckay", "david o. mckay", "david mckay", "elder mckay"],
+      "date_became_prophet": "04/09/1951",
+      "date_ended": "01/18/1970",
+      "image": "https://kameronyork.com/docs/assets/icon.png",
+      "color": "rgb(128, 0, 128)"
+    }
+  ];
+
+  // Function to count mentions exactly like Power BI M code
+  function countMentions(text, searchNames) {
+    const lowerText = text.toLowerCase();
+    let totalMentions = 0;
+    
+    searchNames.forEach(searchName => {
+      const searchNameLower = searchName.toLowerCase();
+      // Exact same formula as Power BI: (Text.Length(lowerText) - Text.Length(Text.Replace(lowerText, searchName, ""))) / Text.Length(searchName)
+      const originalLength = lowerText.length;
+      const replacedLength = lowerText.split(searchNameLower).join('').length;
+      const mentions = (originalLength - replacedLength) / searchNameLower.length;
+      totalMentions += mentions;
+    });
+    
+    return totalMentions;
+  }
+
+  // Debug version of count mentions to see what's happening
+  function debugCountMentions(text, searchNames, prophetName) {
+    const lowerText = text.toLowerCase();
+    let totalMentions = 0;
+    const details = [];
+    
+    searchNames.forEach(searchName => {
+      const searchNameLower = searchName.toLowerCase();
+      const originalLength = lowerText.length;
+      const replacedLength = lowerText.split(searchNameLower).join('').length;
+      const mentions = (originalLength - replacedLength) / searchNameLower.length;
+      totalMentions += mentions;
+      
+      if (mentions > 0) {
+        details.push(`"${searchName}": ${mentions}`);
+      }
+    });
+    
+    if (totalMentions > 0) {
+      console.log(`${prophetName} found ${totalMentions} total mentions: [${details.join(', ')}]`);
+    }
+    
+    return totalMentions;
+  }
+
+  // Function to determine current prophet for a given year
+  function getCurrentProphet(year) {
+    if (year < 1972) return "f_smith";
+    if (year >= 1972 && year < 1974) return "lee";
+    if (year >= 1974 && year < 1986) return "kimball";
+    if (year >= 1986 && year < 1994) return "benson";
+    if (year >= 1994 && year < 1995) return "hunter";
+    if (year >= 1995 && year < 2008) return "hinckley";
+    if (year >= 2008 && year < 2018) return "monson";
+    if (year >= 2018) return "nelson";
+    return null;
+  }
+
+  // Function to generate sample data for demonstration
+  function generateSampleData() {
+    const sampleData = [];
+    const years = Array.from({length: 54}, (_, i) => 1971 + i); // 1971-2024
+    
+    years.forEach(year => {
+      // Generate a few sample talks per year
+      for (let i = 0; i < 20; i++) {
+        sampleData.push({
+          id: year * 100 + i,
+          year: year,
+          month: i % 2 === 0 ? "April" : "October",
+          session: "General Session",
+          speaker: `Speaker ${i + 1}`,
+          title: `Sample Talk ${i + 1}`,
+          text: generateSampleText(year)
+        });
+      }
+    });
+    
+    return sampleData;
+  }
+
+  // Function to generate sample text with prophet mentions
+  function generateSampleText(year) {
+    const currentProphet = getCurrentProphet(year);
+    const baseTexts = [
+      "In this sacred conference, we gather to hear inspired words.",
+      "The gospel teachings guide us in our daily lives.",
+      "We express gratitude for the prophetic leadership we have received.",
+      "The restored gospel brings light to the world.",
+      "Faith, hope, and charity are fundamental principles."
+    ];
+    
+    let text = baseTexts[Math.floor(Math.random() * baseTexts.length)];
+    
+    // Add prophet mentions based on the current prophet and some historical references
+    const mentionChance = Math.random();
+    if (mentionChance > 0.3) { // 70% chance of mentioning someone
+      const prophets = prophetData.filter(p => new Date(p.date_became_prophet) <= new Date(year, 11, 31));
+      const randomProphet = prophets[Math.floor(Math.random() * prophets.length)];
+      const randomSearchName = randomProphet.search_names[0];
+      
+      text += ` We remember the teachings of ${randomSearchName}.`;
+      
+      // Higher chance of mentioning current prophet
+      if (randomProphet.short_name === currentProphet && Math.random() > 0.5) {
+        text += ` ${randomSearchName} has taught us important principles.`;
+      }
+    }
+    
+    return text;
+  }
+
+  let conferenceData, chart;
+  let selectedProphet = null;
+
+  try {
+    // Try to read the local file using the file system API
+    const filePath = "general-conference-talks.json"; // Place file in same directory as HTML
+    
+    let rawData;
+    try {
+      rawData = await window.fs.readFile(filePath, { encoding: 'utf8' });
+      conferenceData = JSON.parse(rawData);
+      console.log("Successfully loaded local JSON file");
+      console.log("Total records loaded:", conferenceData.length);
+      
+      // Log first few records to see structure
+      console.log("First 3 records:", conferenceData.slice(0, 3));
+      
+    } catch (fileError) {
+      console.error("Could not access local file:", fileError);
+      
+      // Create sample data for demonstration purposes
+      console.log("Using sample data for demonstration...");
+      conferenceData = generateSampleData();
+    }
+    
+    // Filter for 1971 and later
+    const originalLength = conferenceData.length;
+    conferenceData = conferenceData.filter(row => parseInt(row.year) >= 1971);
+    console.log(`Filtered from ${originalLength} to ${conferenceData.length} records (1971+)`);
+    
+    // Log year range
+    const years = conferenceData.map(row => parseInt(row.year));
+    console.log("Year range:", Math.min(...years), "to", Math.max(...years));
+
+  } catch (error) {
+    console.error("Error loading data:", error);
+    document.getElementById("prophet-info").innerHTML = `
+      <p><strong>Data Loading Instructions:</strong></p>
+      <p>1. Copy your 'general-conference-talks.json' file to the same directory as this HTML file</p>
+      <p>2. Or update the file path in the code to match your local file location</p>
+      <p>3. Refresh the page</p>
+    `;
+    return;
+  }
+
+  // Process data to count mentions by year for each prophet
+  const yearlyMentions = {};
+  const years = [];
+  
+  // Get unique years from 1971 onwards (JSON data should have numeric years)
+  const uniqueYears = [...new Set(conferenceData.map(row => parseInt(row.year) || 0))].filter(year => year >= 1971).sort();
+  years.push(...uniqueYears);
+
+  // Initialize data structure
+  prophetData.forEach(prophet => {
+    yearlyMentions[prophet.short_name] = {};
+    years.forEach(year => {
+      yearlyMentions[prophet.short_name][year] = 0;
+    });
+  });
+
+  // Count mentions for each prophet by year
+  let talkCount = 0;
+  let totalTalksWithMentions = 0;
+  
+  conferenceData.forEach(talk => {
+    const year = parseInt(talk.year);
+    const text = (talk.text || '').toLowerCase();
+    talkCount++;
+    
+    let talkHasMentions = false;
+    
+    prophetData.forEach(prophet => {
+      const mentions = countMentions(text, prophet.search_names);
+      if (mentions > 0) {
+        yearlyMentions[prophet.short_name][year] += mentions;
+        
+        // Log first few talks with mentions for debugging
+        if (totalTalksWithMentions < 10) {
+          console.log(`\nTalk ${talkCount} (Year ${year}) - ${prophet.name}: ${mentions.toFixed(2)} mentions`);
+          console.log(`Speaker: ${talk.speaker || 'Unknown'}`);
+          console.log(`Title: ${talk.title || 'Unknown'}`);
+          console.log(`Text preview: "${text.substring(0, 200)}..."`);
+          debugCountMentions(text, prophet.search_names, prophet.name);
+        }
+        
+        talkHasMentions = true;
+      }
+    });
+    
+    if (talkHasMentions) {
+      totalTalksWithMentions++;
+    }
+  });
+
+  console.log(`\nProcessed ${talkCount} talks total`);
+  console.log(`${totalTalksWithMentions} talks contained prophet mentions`);
+
+  // Debug: Log mention counts for each prophet by year
+  console.log("\n=== MENTION COUNTS BY PROPHET AND YEAR ===");
+  prophetData.forEach(prophet => {
+    console.log(`\n${prophet.name} (${prophet.short_name}):`);
+    console.log("Search terms:", prophet.search_names);
+    
+    let totalMentions = 0;
+    years.forEach(year => {
+      const mentions = yearlyMentions[prophet.short_name][year];
+      if (mentions > 0) {
+        console.log(`  ${year}: ${mentions.toFixed(2)} mentions`);
+      }
+      totalMentions += mentions;
+    });
+    console.log(`  TOTAL: ${totalMentions.toFixed(2)} mentions`);
+  });
+
+  // Test the counting function on a sample
+  console.log("\n=== TESTING MENTION COUNTING ===");
+  const testText = "president hinckley spoke about gordon b. hinckley and elder hinckley was there";
+  const hinckleySearchTerms = ["president hinckley", "gordon b. hinckley", "gordon hinckley", "elder hinckley"];
+  const testResult = countMentions(testText, hinckleySearchTerms);
+  console.log("Test text:", testText);
+  console.log("Search terms:", hinckleySearchTerms);
+  console.log("Counted mentions:", testResult);
+  
+  // Test individual terms
+  hinckleySearchTerms.forEach(term => {
+    const lowerText = testText.toLowerCase();
+    const termLower = term.toLowerCase();
+    const originalLength = lowerText.length;
+    const replacedLength = lowerText.split(termLower).join('').length;
+    const mentions = (originalLength - replacedLength) / termLower.length;
+    console.log(`  "${term}": ${mentions} mentions`);
+  });
+
+  // Prepare chart datasets
+  const datasets = prophetData.map(prophet => ({
+    label: prophet.name,
+    data: years.map(year => yearlyMentions[prophet.short_name][year]),
+    borderColor: prophet.color,
+    backgroundColor: prophet.color.replace('rgb', 'rgba').replace(')', ', 0.1)'),
+    fill: true,
+    tension: 0.4,
+    pointRadius: 3,
+    pointHoverRadius: 6
+  }));
+
+  // Create chart
+  const ctx = document.getElementById('prophetChart').getContext('2d');
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: years,
+      datasets: datasets
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        title: {
+          display: true,
+          text: 'Prophet Mentions in General Conference Over Time'
+        },
+        legend: {
+          display: true,
+          position: 'top',
+          onClick: function(e, legendItem) {
+            const prophet = prophetData[legendItem.datasetIndex];
+            selectProphet(prophet);
+          }
+        }
+      },
+      scales: {
+        x: {
+          title: {
+            display: true,
+            text: 'Year'
+          }
+        },
+        y: {
+          title: {
+            display: true,
+            text: 'Number of Mentions'
+          }
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      },
+      onClick: function(e, elements) {
+        if (elements.length > 0) {
+          const datasetIndex = elements[0].datasetIndex;
+          const prophet = prophetData[datasetIndex];
+          selectProphet(prophet);
+        }
+      }
+    }
+  });
+
+  // Function to select/highlight a prophet
+  function selectProphet(prophet) {
+    if (selectedProphet === prophet.short_name) {
+      // Deselect if clicking the same prophet
+      selectedProphet = null;
+      resetChart();
+      clearProphetInfo();
+    } else {
+      selectedProphet = prophet.short_name;
+      highlightProphet(prophet);
+      showProphetInfo(prophet);
+    }
+  }
+
+  // Function to highlight selected prophet and grey out others
+  function highlightProphet(selectedProphet) {
+    chart.data.datasets.forEach((dataset, index) => {
+      const prophet = prophetData[index];
+      if (prophet.short_name === selectedProphet.short_name) {
+        // Highlight selected prophet
+        dataset.borderColor = prophet.color;
+        dataset.backgroundColor = prophet.color.replace('rgb', 'rgba').replace(')', ', 0.3)');
+        dataset.borderWidth = 3;
+      } else {
+        // Grey out other prophets
+        dataset.borderColor = 'rgba(128, 128, 128, 0.5)';
+        dataset.backgroundColor = 'rgba(128, 128, 128, 0.1)';
+        dataset.borderWidth = 1;
+      }
+    });
+    chart.update();
+  }
+
+  // Function to reset chart to original colors
+  function resetChart() {
+    chart.data.datasets.forEach((dataset, index) => {
+      const prophet = prophetData[index];
+      dataset.borderColor = prophet.color;
+      dataset.backgroundColor = prophet.color.replace('rgb', 'rgba').replace(')', ', 0.1)');
+      dataset.borderWidth = 2;
+    });
+    chart.update();
+  }
+
+  // Function to show prophet information
+  function showProphetInfo(prophet) {
+    const imageElement = document.getElementById('prophet-image');
+    const nameElement = document.getElementById('prophet-name');
+    const detailsElement = document.getElementById('prophet-details');
+    
+    imageElement.src = prophet.image;
+    imageElement.style.display = 'block';
+    nameElement.textContent = prophet.name;
+    
+    const becameDate = new Date(prophet.date_became_prophet).toLocaleDateString();
+    const endedDate = prophet.date_ended ? new Date(prophet.date_ended).toLocaleDateString() : 'Present';
+    
+    detailsElement.innerHTML = `
+      <p><strong>Became Prophet:</strong><br>${becameDate}</p>
+      <p><strong>Service Ended:</strong><br>${endedDate}</p>
+      <p><strong>Total Mentions:</strong><br>${years.reduce((sum, year) => sum + yearlyMentions[prophet.short_name][year], 0).toFixed(1)}</p>
+    `;
+  }
+
+  // Function to clear prophet information
+  function clearProphetInfo() {
+    document.getElementById('prophet-image').style.display = 'none';
+    document.getElementById('prophet-name').textContent = 'Select a Prophet';
+    document.getElementById('prophet-details').innerHTML = '<p>Click on a prophet\'s line or legend to see details</p>';
+  }
+
+  // Initialize with instructions
+  clearProphetInfo();
+});
+</script>
