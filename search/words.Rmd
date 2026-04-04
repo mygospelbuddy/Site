@@ -9,7 +9,7 @@ output:
 
 <style>
 h1.title {
-  display: none;
+display: none;
 }
 </style>
 
@@ -24,11 +24,6 @@ h1.title {
 <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">Search Guide</a>
 </nav>
 
-<section class="gb-search-hero gb-search-hero--compact">
-<h1 class="gb-search-hero__title">Conference Text Search</h1>
-<p class="gb-search-hero__subtitle">Track words and phrases across General Conference with a cleaner Gospel Buddy-style layout.</p>
-</section>
-
 <section class="gb-search-card gb-search-card--settings-top">
 <details class="gb-settings-dropdown">
 <summary class="gb-settings-dropdown__summary">
@@ -38,17 +33,17 @@ h1.title {
 
 <div class="gb-settings-dropdown__body">
 
-  <div class="gb-settings-top-row">
-    <section class="gb-settings-card-mini">
-      <h3 class="gb-settings-card-mini__title">Results</h3>
+<div class="gb-settings-top-row">
+<section class="gb-settings-card-mini">
+<h3 class="gb-settings-card-mini__title">Results</h3>
 
-<label class="gb-setting-pill-row" for="wordsByConference">
+<div class="gb-setting-pill-row">
 <span class="gb-setting-pill-row__label">Group results</span>
 <label class="gb-checkbox-pill" for="wordsByConference">
 <input id="wordsByConference" type="checkbox">
 <span>By conference</span>
 </label>
-</label>
+</div>
 
 <div class="gb-setting-pill-block">
 <span class="gb-setting-pill-row__label">Measurement</span>
@@ -90,9 +85,9 @@ h1.title {
 </label>
 </div>
 </section>
-  </div>
+</div>
 
-  <section class="gb-settings-card-mini gb-settings-card-mini--filters">
+<section class="gb-settings-card-mini gb-settings-card-mini--filters">
 <h3 class="gb-settings-card-mini__title">Filters</h3>
 
 <div class="gb-form-grid gb-form-grid--2 gb-form-grid--aligned">
@@ -122,11 +117,11 @@ h1.title {
 <input id="wordsSpeaker" class="gb-input" type="text" placeholder="President Nelson">
 </div>
 </div>
-  </section>
+</section>
 
-  <div class="gb-btn-row gb-btn-row--settings">
-    <button type="button" class="gb-btn gb-btn--ghost" id="wordsResetDefaults">Reset settings to defaults</button>
-  </div>
+<div class="gb-btn-row gb-btn-row--settings">
+<button type="button" class="gb-btn gb-btn--ghost" id="wordsResetDefaults">Reset settings to defaults</button>
+</div>
 
 </div>
 </details>
