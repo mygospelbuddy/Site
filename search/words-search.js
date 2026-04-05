@@ -1,3 +1,4 @@
+
 (function(window, document) {
   'use strict';
 
@@ -19,9 +20,9 @@
 
   const state = {
     chart: null,
-    rawTalks: null,
     currentGroups: [],
     currentAggregation: null,
+    currentSettings: null,
     currentTalkRows: [],
     currentTalkRenderer: null
   };
@@ -142,6 +143,9 @@
     clearAggregateTable();
     clearTalkRows();
     destroyChart();
+    state.currentGroups = [];
+    state.currentAggregation = null;
+    state.currentSettings = null;
   }
 
   function resetDefaults() {
@@ -158,6 +162,9 @@
     destroyChart();
     refs.exportAggregate.disabled = true;
     refs.exportTalks.disabled = true;
+    state.currentGroups = [];
+    state.currentAggregation = null;
+    state.currentSettings = null;
     updateUrlFromState();
   }
 
@@ -178,12 +185,6 @@
     refs.yearTo.value = params.yearTo || '';
     refs.month.value = params.month || '';
     refs.speaker.value = params.speaker || '';
-
-    if (refs.input.value) {
-      window.setTimeout(function() {
-        runSearch();
-      }, 0);
-    }
   }
 
   function updateUrlFromState() {
@@ -205,109 +206,37 @@
     return refs.metricPerTalk.checked ? 'perTalk' : 'per1000';
   }
 
-  async function ensureTalksLoaded(showLoading) {
-    if (state.rawTalks) {
-      return state.rawTalks;
-    }
-
+  async function fetchTalks(showLoading, loadingMessage) {
     if (showLoading) {
-      refs.status.show('Loading conference text data...', 'info', true);
+      refs.status.show(loadingMessage || 'Loading conference text data...', 'info', true);
     }
 
-    const rawTalks = await window.GBCommon.fetchJsonCached(TALKS_URL, { cacheKey: 'general-conference-talks' });
-    state.rawTalks = Array.isArray(rawTalks) ? rawTalks.map(prepareTalkRecord) : [];
-    return state.rawTalks;
-  }
-
-  function prepareTalkRecord(talk) {
-    return {
-      title: String(talk.title || 'Untitled talk'),
-      speaker: String(talk.speaker || 'Unknown speaker'),
-      year: Number(talk.year || 0),
-      month: String(talk.month || ''),
-      conferenceLabel: String(talk.month || '') + ' ' + String(talk.year || ''),
-      hyperlink: String(talk.hyperlink || ''),
-      talkId: Number(talk['talk-id'] || talk.talk_id || 0),
-      text: String(talk.text || ''),
-      _normalizedLower: null,
-      _normalizedCase: null,
-      _wordFreqLower: null,
-      _wordFreqCase: null,
-      _wordCount: null
-    };
-  }
-
-  function normalizeTalkText(value, preserveCase) {
-    const normalized = String(value || '')
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
-      .replace(/[—–-]/g, ' ')
-      .replace(/[^A-Za-z0-9*'" ]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    return preserveCase ? normalized : normalized.toLowerCase();
-  }
-
-  function getTalkText(talk, caseSensitive) {
-    if (caseSensitive) {
-      if (talk._normalizedCase == null) {
-        talk._normalizedCase = normalizeTalkText(talk.text, true);
-      }
-      return talk._normalizedCase;
+    const response = await fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' });
+    if (!response.ok) {
+      throw new Error('Conference text data could not be loaded right now.');
     }
 
-    if (talk._normalizedLower == null) {
-      talk._normalizedLower = normalizeTalkText(talk.text, false);
-    }
-    return talk._normalizedLower;
-  }
-
-  function getTalkWordFrequency(talk, caseSensitive) {
-    if (caseSensitive) {
-      if (!talk._wordFreqCase) {
-        talk._wordFreqCase = buildWordFrequency(getTalkText(talk, true));
-      }
-      return talk._wordFreqCase;
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Conference text data was not in the expected format.');
     }
 
-    if (!talk._wordFreqLower) {
-      talk._wordFreqLower = buildWordFrequency(getTalkText(talk, false));
-    }
-    return talk._wordFreqLower;
-  }
-
-  function getTalkWordCount(talk) {
-    if (talk._wordCount == null) {
-      const normalizedLower = getTalkText(talk, false);
-      talk._wordCount = normalizedLower ? normalizedLower.split(' ').length : 1;
-    }
-    return talk._wordCount;
-  }
-
-  function buildWordFrequency(normalizedText) {
-    const frequency = new Map();
-    if (!normalizedText) {
-      return frequency;
-    }
-
-    normalizedText.split(' ').forEach(function(word) {
-      frequency.set(word, (frequency.get(word) || 0) + 1);
-    });
-
-    return frequency;
+    return data;
   }
 
   async function runSearch() {
     const query = refs.input.value.trim();
     if (!query) {
-      refs.status.show('Enter a word, phrase, or search expression before clicking Search.', 'error', false);
+      refs.status.show('Enter a word or phrase before clicking Search.', 'error', false);
       clearLegend();
       clearAggregateTable();
       clearTalkRows();
       destroyChart();
       refs.exportAggregate.disabled = true;
       refs.exportTalks.disabled = true;
+      state.currentGroups = [];
+      state.currentAggregation = null;
+      state.currentSettings = null;
       return;
     }
 
@@ -315,15 +244,17 @@
     refs.status.show('Searching conference text...', 'info', true);
 
     try {
-      const talks = await ensureTalksLoaded(true);
+      const talks = await fetchTalks(false);
       const groups = parseComparisonGroups(query);
       const settings = getSettings();
-      const filteredTalks = applyTalkFilters(talks, settings);
-      const aggregation = buildAggregation(filteredTalks, groups, settings);
+      const aggregation = buildAggregation(talks, groups, settings);
+
       state.currentGroups = groups;
       state.currentAggregation = aggregation;
+      state.currentSettings = settings;
 
       renderLegend(groups);
+
       if (settings.tableMode) {
         destroyChart();
         renderAggregateTable(aggregation, groups, settings);
@@ -343,6 +274,9 @@
       clearTalkRows();
       refs.exportAggregate.disabled = true;
       refs.exportTalks.disabled = true;
+      state.currentGroups = [];
+      state.currentAggregation = null;
+      state.currentSettings = null;
       refs.status.show(error && error.message ? error.message : 'Something went wrong while searching conference text.', 'error', false);
     } finally {
       refs.searchButton.disabled = false;
@@ -363,35 +297,21 @@
     };
   }
 
-  function applyTalkFilters(talks, settings) {
-    return talks.filter(function(talk) {
-      if (settings.yearFrom && talk.year < settings.yearFrom) {
-        return false;
-      }
-      if (settings.yearTo && talk.year > settings.yearTo) {
-        return false;
-      }
-      if (settings.month && talk.month !== settings.month) {
-        return false;
-      }
-      if (settings.speaker && talk.speaker.toLowerCase().indexOf(settings.speaker) === -1) {
-        return false;
-      }
-      return true;
-    });
-  }
-
   function parseComparisonGroups(input) {
-    const normalized = input.trim();
+    const trimmed = String(input || '').trim();
+    if (!trimmed) {
+      throw new Error('Enter at least one search term or phrase.');
+    }
+
     const groups = [];
     let buffer = '';
     let depth = 0;
     let inQuote = false;
-    let sawGroups = false;
 
-    for (let index = 0; index < normalized.length; index += 1) {
-      const char = normalized[index];
-      if (char === '"' && normalized[index - 1] !== '\\') {
+    for (let index = 0; index < trimmed.length; index += 1) {
+      const char = trimmed[index];
+
+      if (char === '"' && trimmed[index - 1] !== '\\') {
         inQuote = !inQuote;
         buffer += char;
         continue;
@@ -399,11 +319,10 @@
 
       if (!inQuote && char === '(') {
         if (depth === 0) {
-          sawGroups = true;
           if (buffer.trim()) {
-            groups.push(buffer.trim());
-            buffer = '';
+            throw new Error('Use parentheses only for comparison groups, like (faith) (charity).');
           }
+          buffer = '';
           depth = 1;
           continue;
         }
@@ -411,7 +330,7 @@
       } else if (!inQuote && char === ')') {
         if (depth === 1) {
           if (buffer.trim()) {
-            groups.push(buffer.trim());
+            groups.push(parseSingleGroup(buffer.trim()));
           }
           buffer = '';
           depth = 0;
@@ -429,192 +348,82 @@
       throw new Error('Close every quote and parenthesis before running the text search.');
     }
 
+    if (!groups.length) {
+      return [parseSingleGroup(trimmed)];
+    }
+
     if (buffer.trim()) {
-      groups.push(buffer.trim());
+      throw new Error('Comparison groups should be wrapped in parentheses.');
     }
 
-    const cleanGroups = (sawGroups ? groups.filter(Boolean) : [normalized]).map(function(group) {
-      return parseGroupExpression(group);
-    });
-
-    if (!cleanGroups.length) {
-      throw new Error('Enter at least one search term or phrase.');
-    }
-
-    return cleanGroups;
+    return groups;
   }
 
-  function parseGroupExpression(rawGroup) {
-    const tokens = tokenizeGroup(rawGroup);
-    const clauses = [];
-    let currentClause = { include: [], exclude: [] };
-
-    tokens.forEach(function(token) {
-      if (token.type === 'OR') {
-        if (currentClause.include.length || currentClause.exclude.length) {
-          clauses.push(currentClause);
-        }
-        currentClause = { include: [], exclude: [] };
-        return;
+  function parseSingleGroup(rawGroup) {
+    const terms = splitByOr(rawGroup).map(function(term) {
+      const clean = String(term || '').trim();
+      if (!clean) {
+        return null;
       }
+      return {
+        raw: clean,
+        quoted: /^".*"$/.test(clean),
+        value: stripOuterQuotes(clean)
+      };
+    }).filter(Boolean);
 
-      if (token.negative) {
-        currentClause.exclude.push(buildPattern(token));
-      } else {
-        currentClause.include.push(buildPattern(token));
-      }
-    });
-
-    if (currentClause.include.length || currentClause.exclude.length) {
-      clauses.push(currentClause);
-    }
-
-    const validClauses = clauses.filter(function(clause) {
-      return clause.include.length > 0;
-    });
-
-    if (!validClauses.length) {
-      throw new Error('Each comparison group needs at least one positive search term.');
+    if (!terms.length) {
+      throw new Error('Each comparison group needs at least one search term.');
     }
 
     return {
-      raw: rawGroup.trim(),
-      label: rawGroup.trim(),
-      clauses: validClauses
+      label: rawGroup,
+      terms: terms
     };
   }
 
-  function tokenizeGroup(rawGroup) {
-    const tokens = [];
-    let index = 0;
+  function splitByOr(rawGroup) {
+    const parts = [];
+    let buffer = '';
+    let inQuote = false;
 
-    while (index < rawGroup.length) {
+    for (let index = 0; index < rawGroup.length; index += 1) {
       const char = rawGroup[index];
-      if (/\s/.test(char)) {
+
+      if (char === '"' && rawGroup[index - 1] !== '\\') {
+        inQuote = !inQuote;
+        buffer += char;
+        continue;
+      }
+
+      if (!inQuote && rawGroup.slice(index, index + 2) === '||') {
+        parts.push(buffer);
+        buffer = '';
         index += 1;
         continue;
       }
 
-      if (rawGroup.slice(index, index + 2) === '||') {
-        tokens.push({ type: 'OR' });
-        index += 2;
-        continue;
-      }
-
-      if (/^OR\b/i.test(rawGroup.slice(index))) {
-        const orMatch = rawGroup.slice(index).match(/^OR\b/i);
-        tokens.push({ type: 'OR' });
-        index += orMatch[0].length;
-        continue;
-      }
-
-      let negative = false;
-      if (char === '-') {
-        negative = true;
-        index += 1;
-        while (/\s/.test(rawGroup[index] || '')) {
-          index += 1;
-        }
-      }
-
-      if (rawGroup[index] === '"') {
-        let endIndex = index + 1;
-        let phrase = '';
-        while (endIndex < rawGroup.length) {
-          const nextChar = rawGroup[endIndex];
-          if (nextChar === '"' && rawGroup[endIndex - 1] !== '\\') {
-            break;
-          }
-          phrase += nextChar;
-          endIndex += 1;
-        }
-        if (endIndex >= rawGroup.length) {
-          throw new Error('Close every quoted phrase before searching.');
-        }
-        tokens.push({
-          type: 'TERM',
-          raw: phrase,
-          quoted: true,
-          negative: negative
-        });
-        index = endIndex + 1;
-        continue;
-      }
-
-      let tokenText = '';
-      while (index < rawGroup.length) {
-        const nextChar = rawGroup[index];
-        if (/\s/.test(nextChar) || rawGroup.slice(index, index + 2) === '||') {
-          break;
-        }
-        tokenText += nextChar;
-        index += 1;
-      }
-
-      if (tokenText.toUpperCase() === 'AND') {
-        continue;
-      }
-
-      tokens.push({
-        type: 'TERM',
-        raw: tokenText,
-        quoted: false,
-        negative: negative
-      });
+      buffer += char;
     }
 
-    return tokens;
+    if (buffer.trim()) {
+      parts.push(buffer);
+    }
+
+    return parts;
   }
 
-  function buildPattern(token) {
-    const raw = token.raw.trim();
-    if (!raw) {
-      throw new Error('Empty search terms are not allowed.');
+  function stripOuterQuotes(value) {
+    const trimmed = String(value || '').trim();
+    if (/^".*"$/.test(trimmed)) {
+      return trimmed.slice(1, -1);
     }
-
-    let fuzzy = false;
-    let wildcard = false;
-    let value = raw;
-
-    if (!token.quoted && value.endsWith('~')) {
-      fuzzy = true;
-      value = value.slice(0, -1);
-    }
-
-    if (!token.quoted && value.includes('*')) {
-      wildcard = true;
-    }
-
-    const normalized = normalizeQueryValue(value, false);
-    const normalizedCase = normalizeQueryValue(value, true);
-
-    return {
-      id: [token.quoted ? 'phrase' : 'term', normalized, fuzzy ? 'fuzzy' : '', wildcard ? 'wildcard' : ''].join('|'),
-      raw: raw,
-      normalized: normalized,
-      normalizedCase: normalizedCase,
-      quoted: token.quoted,
-      fuzzy: fuzzy,
-      wildcard: wildcard
-    };
-  }
-
-  function normalizeQueryValue(value, preserveCase) {
-    const normalized = String(value || '')
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
-      .replace(/[—–-]/g, ' ')
-      .replace(/[^A-Za-z0-9*'" ]+/g, ' ')
-      .replace(/\s+/g, ' ')
-      .trim();
-
-    return preserveCase ? normalized : normalized.toLowerCase();
+    return trimmed;
   }
 
   function buildAggregation(talks, groups, settings) {
     const bucketMap = new Map();
     const bucketOrder = new Map();
-    const talkMatches = new Map();
     const series = groups.map(function(group, groupIndex) {
       return {
         label: group.label,
@@ -624,47 +433,38 @@
     });
 
     talks.forEach(function(talk) {
-      const bucketKey = settings.byConference ? talk.conferenceLabel : String(talk.year);
-      const orderValue = settings.byConference ? (talk.year * 10 + conferenceMonthOrder(talk.month)) : talk.year;
+      if (!passesFilters(talk, settings)) {
+        return;
+      }
+
+      const text = prepareText(String(talk.text || ''), settings.caseSensitive);
+      const wordCount = Math.max(1, countWords(text));
+      const bucketKey = settings.byConference
+        ? String(talk.month || '') + ' ' + String(talk.year || '')
+        : String(talk.year || '');
 
       if (!bucketOrder.has(bucketKey)) {
-        bucketOrder.set(bucketKey, orderValue);
+        bucketOrder.set(bucketKey, settings.byConference
+          ? Number(talk.year || 0) * 10 + conferenceMonthOrder(String(talk.month || ''))
+          : Number(talk.year || 0));
         bucketMap.set(bucketKey, bucketKey);
       }
 
       groups.forEach(function(group, groupIndex) {
-        const evaluation = evaluateGroup(group, talk, settings.caseSensitive);
-        if (!evaluation.match || evaluation.count <= 0) {
+        let count = 0;
+        group.terms.forEach(function(term) {
+          count += countTermInText(text, term, settings.caseSensitive);
+        });
+
+        if (count <= 0) {
           return;
         }
 
         const adjustedCount = settings.metricMode === 'per1000'
-          ? Math.round((evaluation.count / Math.max(1, getTalkWordCount(talk))) * 1000 * 10) / 10
-          : evaluation.count;
+          ? roundToOneDecimal((count / wordCount) * 1000)
+          : count;
 
         series[groupIndex].counts[bucketKey] = (series[groupIndex].counts[bucketKey] || 0) + adjustedCount;
-
-        const talkKey = group.label + '|' + bucketKey;
-        if (!talkMatches.has(talkKey)) {
-          talkMatches.set(talkKey, []);
-        }
-
-        talkMatches.get(talkKey).push({
-          title: talk.title,
-          href: talk.hyperlink,
-          speaker: talk.speaker,
-          year: talk.year,
-          month: talk.month,
-          talkId: talk.talkId,
-          metricValue: adjustedCount,
-          rawCount: evaluation.count,
-          metricDisplay: settings.metricMode === 'per1000'
-            ? adjustedCount.toFixed(1)
-            : String(evaluation.count),
-          meta: settings.metricMode === 'per1000'
-            ? evaluation.count + ' matches · ' + adjustedCount.toFixed(1) + ' per 1000 words'
-            : evaluation.count + ' ' + (evaluation.count === 1 ? 'match' : 'matches')
-        });
       });
     });
 
@@ -675,9 +475,70 @@
     return {
       bucketKeys: bucketKeys,
       bucketLabels: bucketMap,
-      talkMatches: talkMatches,
       series: series
     };
+  }
+
+  function passesFilters(talk, settings) {
+    const year = Number(talk.year || 0);
+    const month = String(talk.month || '');
+    const speaker = String(talk.speaker || '').toLowerCase();
+
+    if (settings.yearFrom && year < settings.yearFrom) {
+      return false;
+    }
+    if (settings.yearTo && year > settings.yearTo) {
+      return false;
+    }
+    if (settings.month && month !== settings.month) {
+      return false;
+    }
+    if (settings.speaker && speaker.indexOf(settings.speaker) === -1) {
+      return false;
+    }
+    return true;
+  }
+
+  function prepareText(value, caseSensitive) {
+    const normalized = String(value || '')
+      .replace(/[“”]/g, '"')
+      .replace(/[‘’]/g, "'")
+      .replace(/[—–-]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+
+    return caseSensitive ? normalized : normalized.toLowerCase();
+  }
+
+  function countWords(text) {
+    if (!text) {
+      return 0;
+    }
+    return text.split(/\s+/).length;
+  }
+
+  function countTermInText(text, term, caseSensitive) {
+    const value = term.value.trim();
+    if (!value || !text) {
+      return 0;
+    }
+
+    const query = caseSensitive ? value : value.toLowerCase();
+    const escaped = window.GBCommon.escapeRegExp(query);
+    let regex;
+
+    if (term.quoted || query.indexOf(' ') !== -1) {
+      regex = new RegExp('\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b', caseSensitive ? 'g' : 'gi');
+    } else {
+      regex = new RegExp('\\b' + escaped + '\\b', caseSensitive ? 'g' : 'gi');
+    }
+
+    const matches = text.match(regex);
+    return matches ? matches.length : 0;
+  }
+
+  function roundToOneDecimal(value) {
+    return Math.round(Number(value || 0) * 10) / 10;
   }
 
   function conferenceMonthOrder(month) {
@@ -688,118 +549,6 @@
       return 10;
     }
     return 1;
-  }
-
-  function evaluateGroup(group, talk, caseSensitive) {
-    const countCache = new Map();
-
-    function getCount(pattern) {
-      if (countCache.has(pattern.id)) {
-        return countCache.get(pattern.id);
-      }
-      const count = countPattern(talk, pattern, caseSensitive);
-      countCache.set(pattern.id, count);
-      return count;
-    }
-
-    let matched = false;
-    group.clauses.forEach(function(clause) {
-      if (matched) {
-        return;
-      }
-      const includesPass = clause.include.every(function(pattern) {
-        return getCount(pattern) > 0;
-      });
-      const excludesPass = clause.exclude.every(function(pattern) {
-        return getCount(pattern) === 0;
-      });
-      if (includesPass && excludesPass) {
-        matched = true;
-      }
-    });
-
-    if (!matched) {
-      return { match: false, count: 0 };
-    }
-
-    const seen = new Set();
-    let total = 0;
-    group.clauses.forEach(function(clause) {
-      clause.include.forEach(function(pattern) {
-        if (!seen.has(pattern.id)) {
-          seen.add(pattern.id);
-          total += getCount(pattern);
-        }
-      });
-    });
-
-    return { match: true, count: total };
-  }
-
-  function countPattern(talk, pattern, caseSensitive) {
-    if (pattern.fuzzy && !pattern.quoted && !pattern.wildcard) {
-      return countFuzzyMatches(talk, pattern, caseSensitive);
-    }
-
-    const sourceText = getTalkText(talk, caseSensitive);
-    const query = caseSensitive ? pattern.normalizedCase : pattern.normalized;
-    if (!query || !sourceText) {
-      return 0;
-    }
-
-    let regex;
-    if (pattern.wildcard) {
-      const regexBody = query.split('*').map(window.GBCommon.escapeRegExp).join('[A-Za-z0-9]*');
-      regex = new RegExp('\\b' + regexBody + '\\b', caseSensitive ? 'g' : 'gi');
-    } else if (pattern.quoted || query.indexOf(' ') !== -1) {
-      regex = new RegExp('\\b' + window.GBCommon.escapeRegExp(query).replace(/\s+/g, '\\s+') + '\\b', caseSensitive ? 'g' : 'gi');
-    } else {
-      regex = new RegExp('\\b' + window.GBCommon.escapeRegExp(query) + '\\b', caseSensitive ? 'g' : 'gi');
-    }
-
-    const matches = sourceText.match(regex);
-    return matches ? matches.length : 0;
-  }
-
-  function countFuzzyMatches(talk, pattern, caseSensitive) {
-    const query = caseSensitive ? pattern.normalizedCase : pattern.normalized;
-    const frequency = getTalkWordFrequency(talk, caseSensitive);
-    let total = 0;
-
-    frequency.forEach(function(count, word) {
-      if (Math.abs(word.length - query.length) > 1) {
-        return;
-      }
-      if (levenshtein(word, query) <= 1) {
-        total += count;
-      }
-    });
-
-    return total;
-  }
-
-  function levenshtein(left, right) {
-    const matrix = [];
-    for (let i = 0; i <= right.length; i += 1) {
-      matrix[i] = [i];
-    }
-    for (let j = 0; j <= left.length; j += 1) {
-      matrix[0][j] = j;
-    }
-    for (let row = 1; row <= right.length; row += 1) {
-      for (let col = 1; col <= left.length; col += 1) {
-        if (right.charAt(row - 1) === left.charAt(col - 1)) {
-          matrix[row][col] = matrix[row - 1][col - 1];
-        } else {
-          matrix[row][col] = Math.min(
-            matrix[row - 1][col - 1] + 1,
-            matrix[row][col - 1] + 1,
-            matrix[row - 1][col] + 1
-          );
-        }
-      }
-    }
-    return matrix[right.length][left.length];
   }
 
   function renderLegend(groups) {
@@ -825,8 +574,12 @@
     clearAggregateTable();
     destroyChart();
 
+    if (!window.Chart) {
+      return;
+    }
+
     const ctx = refs.plotCanvas.getContext('2d');
-    if (!ctx || !window.Chart) {
+    if (!ctx) {
       return;
     }
 
@@ -890,9 +643,8 @@
           const element = elements[0];
           const datasetIndex = element.datasetIndex;
           const dataIndex = element.index;
-          const group = groups[datasetIndex];
           const bucketKey = aggregation.bucketKeys[dataIndex];
-          displayTalkMatches(bucketKey, group, settings);
+          displayTalkMatches(bucketKey, groups[datasetIndex], settings);
         }
       }
     });
@@ -950,41 +702,96 @@
     }
   }
 
-  function displayTalkMatches(bucketKey, group, settings) {
-    const talkKey = group.label + '|' + bucketKey;
-    const talks = (state.currentAggregation && state.currentAggregation.talkMatches.get(talkKey)) || [];
-    const metricHeader = settings.metricMode === 'per1000' ? 'Per 1000' : 'Matches';
-    const maxValue = talks.reduce(function(maximum, talk) {
-      return Math.max(maximum, Number(talk.metricValue || 0));
-    }, 0) || 1;
+  async function displayTalkMatches(bucketKey, group, settings) {
+    refs.status.show('Loading matching talks...', 'info', true);
 
-    const rows = talks.map(function(talk) {
-      return {
-        title: talk.title,
-        href: talk.href,
-        speaker: talk.speaker,
-        year: talk.year,
-        month: talk.month,
-        metricPercent: Math.round((Number(talk.metricValue || 0) / maxValue) * 100),
-        metricDisplay: settings.metricMode === 'per1000' ? Number(talk.metricValue || 0).toFixed(1) : String(talk.metricValue || 0),
-        meta: talk.meta,
+    try {
+      const talks = await fetchTalks(false);
+      const rows = buildTalkRowsForBucket(talks, bucketKey, group, settings);
+      renderTalkRows(bucketKey, group, settings, rows);
+      refs.exportTalks.disabled = rows.length === 0;
+      refs.status.hide();
+    } catch (error) {
+      clearTalkRows();
+      refs.exportTalks.disabled = true;
+      refs.status.show(error && error.message ? error.message : 'Matching talks could not be loaded.', 'error', false);
+    }
+  }
+
+  function buildTalkRowsForBucket(talks, bucketKey, group, settings) {
+    const rows = [];
+
+    talks.forEach(function(talk) {
+      if (!passesFilters(talk, settings)) {
+        return;
+      }
+
+      const talkBucketKey = settings.byConference
+        ? String(talk.month || '') + ' ' + String(talk.year || '')
+        : String(talk.year || '');
+
+      if (talkBucketKey !== bucketKey) {
+        return;
+      }
+
+      const text = prepareText(String(talk.text || ''), settings.caseSensitive);
+      const wordCount = Math.max(1, countWords(text));
+      let count = 0;
+
+      group.terms.forEach(function(term) {
+        count += countTermInText(text, term, settings.caseSensitive);
+      });
+
+      if (count <= 0) {
+        return;
+      }
+
+      const metricValue = settings.metricMode === 'per1000'
+        ? roundToOneDecimal((count / wordCount) * 1000)
+        : count;
+
+      rows.push({
+        title: String(talk.title || 'Untitled talk'),
+        href: String(talk.hyperlink || ''),
+        speaker: String(talk.speaker || 'Unknown speaker'),
+        year: Number(talk.year || 0),
+        month: String(talk.month || ''),
+        metricPercent: 0,
+        metricDisplay: settings.metricMode === 'per1000' ? metricValue.toFixed(1) : String(count),
+        meta: settings.metricMode === 'per1000'
+          ? count + ' matches · ' + metricValue.toFixed(1) + ' per 1000 words'
+          : count + ' ' + (count === 1 ? 'match' : 'matches'),
         sort: {
-          newest: talk.year * 100000 + conferenceMonthOrder(talk.month) * 1000 + Number(talk.talkId || 0),
-          metric: Number(talk.metricValue || 0),
-          speaker: talk.speaker,
-          title: talk.title
+          newest: Number(talk.year || 0) * 100000 + conferenceMonthOrder(String(talk.month || '')) * 1000 + Number(talk['talk-id'] || talk.talk_id || 0),
+          metric: metricValue,
+          speaker: String(talk.speaker || ''),
+          title: String(talk.title || '')
         },
         export: {
-          Metric: settings.metricMode === 'per1000' ? Number(talk.metricValue || 0).toFixed(1) : String(talk.metricValue || 0),
-          RawMatches: String(talk.rawCount || 0),
-          Year: talk.year,
-          Month: talk.month,
-          Speaker: talk.speaker,
-          Title: talk.title,
-          Link: talk.href
+          Metric: settings.metricMode === 'per1000' ? metricValue.toFixed(1) : String(count),
+          RawMatches: String(count),
+          Year: Number(talk.year || 0),
+          Month: String(talk.month || ''),
+          Speaker: String(talk.speaker || ''),
+          Title: String(talk.title || ''),
+          Link: String(talk.hyperlink || '')
         }
-      };
+      });
     });
+
+    const maxValue = rows.reduce(function(maximum, row) {
+      return Math.max(maximum, Number(row.sort.metric || 0));
+    }, 0) || 1;
+
+    rows.forEach(function(row) {
+      row.metricPercent = Math.round((Number(row.sort.metric || 0) / maxValue) * 100);
+    });
+
+    return rows;
+  }
+
+  function renderTalkRows(bucketKey, group, settings, rows) {
+    const metricHeader = settings.metricMode === 'per1000' ? 'Per 1000' : 'Matches';
 
     const sortOptions = [
       { value: 'metric', label: settings.metricMode === 'per1000' ? 'Highest rate first' : 'Most matches first' },
@@ -1024,8 +831,6 @@
     }
 
     state.currentTalkRows = rows.slice();
-    refs.exportTalks.disabled = rows.length === 0;
-
     state.currentTalkRenderer = window.GBCommon.renderTalkResults(refs.talks, {
       idPrefix: 'word-talks',
       title: group.label + ' — ' + bucketKey,
