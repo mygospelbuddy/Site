@@ -1,9 +1,8 @@
-
 (function(window, document) {
   'use strict';
 
-  const TALKS_URL = 'https://kameronyork.com/datasets/general-conference-talks.json';
-  const DEFAULTS = {
+  var TALKS_URL = 'https://kameronyork.com/datasets/general-conference-talks.json';
+  var DEFAULTS = {
     query: '',
     byConference: false,
     tableMode: false,
@@ -16,18 +15,15 @@
     speaker: ''
   };
 
-  const SERIES_COLORS = ['#E74C3C', '#191970', '#229954', '#F39C12', '#7D3C98', '#0096c7', '#d97706', '#475569'];
-
-  const state = {
-    chart: null,
+  var SERIES_COLORS = ['#E74C3C', '#191970', '#229954', '#F39C12', '#7D3C98', '#0096c7', '#d97706', '#475569'];
+  var refs = {};
+  var state = {
     currentGroups: [],
     currentAggregation: null,
     currentSettings: null,
     currentTalkRows: [],
-    currentTalkRenderer: null
+    currentPoints: []
   };
-
-  const refs = {};
 
   document.addEventListener('DOMContentLoaded', initialize);
 
@@ -36,6 +32,7 @@
     bindEvents();
     applyDefaults();
     loadFromUrl();
+    renderEmptyCanvas();
     if (window.GBCommon && typeof window.GBCommon.initTooltips === 'function') {
       window.GBCommon.initTooltips();
     }
@@ -46,7 +43,7 @@
     refs.searchButton = document.getElementById('wordSearchButton');
     refs.clearButton = document.getElementById('wordClearButton');
     refs.resetButton = document.getElementById('wordsResetDefaults');
-    refs.status = window.GBCommon.createStatusController('wordStatus');
+    refs.status = window.GBCommon && window.GBCommon.createStatusController ? window.GBCommon.createStatusController('wordStatus') : createFallbackStatusController();
     refs.byConference = document.getElementById('wordsByConference');
     refs.tableMode = document.getElementById('wordsTableMode');
     refs.metricPer1000 = document.getElementById('wordsMetricPer1000');
@@ -63,6 +60,24 @@
     refs.talks = document.getElementById('talksTableContainer');
     refs.exportAggregate = document.getElementById('wordsExportAggregate');
     refs.exportTalks = document.getElementById('wordsExportTalks');
+  }
+
+  function createFallbackStatusController() {
+    var statusEl = document.getElementById('wordStatus');
+    return {
+      show: function(message) {
+        if (statusEl) {
+          statusEl.textContent = message;
+          statusEl.style.display = 'block';
+        }
+      },
+      hide: function() {
+        if (statusEl) {
+          statusEl.textContent = '';
+          statusEl.style.display = 'none';
+        }
+      }
+    };
   }
 
   function bindEvents() {
@@ -110,13 +125,16 @@
       });
     }
 
+    if (refs.plotCanvas) {
+      refs.plotCanvas.addEventListener('click', handleCanvasClick);
+    }
+
     if (refs.metricPer1000 && refs.metricPerTalk) {
       refs.metricPer1000.addEventListener('change', function() {
         if (refs.metricPer1000.checked) {
           refs.metricPerTalk.checked = false;
         }
       });
-
       refs.metricPerTalk.addEventListener('change', function() {
         if (refs.metricPerTalk.checked) {
           refs.metricPer1000.checked = false;
@@ -126,311 +144,237 @@
   }
 
   function applyDefaults() {
-    refs.input.value = DEFAULTS.query;
-    refs.byConference.checked = DEFAULTS.byConference;
-    refs.tableMode.checked = DEFAULTS.tableMode;
-    refs.metricPer1000.checked = DEFAULTS.metricMode === 'per1000';
-    refs.metricPerTalk.checked = DEFAULTS.metricMode === 'perTalk';
-    refs.chartType.value = DEFAULTS.chartType;
-    refs.caseSensitive.checked = DEFAULTS.caseSensitive;
-    refs.yearFrom.value = DEFAULTS.yearFrom;
-    refs.yearTo.value = DEFAULTS.yearTo;
-    refs.month.value = DEFAULTS.month;
-    refs.speaker.value = DEFAULTS.speaker;
-    refs.exportAggregate.disabled = true;
-    refs.exportTalks.disabled = true;
+    if (refs.input) { refs.input.value = DEFAULTS.query; }
+    if (refs.byConference) { refs.byConference.checked = DEFAULTS.byConference; }
+    if (refs.tableMode) { refs.tableMode.checked = DEFAULTS.tableMode; }
+    if (refs.metricPer1000) { refs.metricPer1000.checked = DEFAULTS.metricMode === 'per1000'; }
+    if (refs.metricPerTalk) { refs.metricPerTalk.checked = DEFAULTS.metricMode === 'perTalk'; }
+    if (refs.chartType) { refs.chartType.value = DEFAULTS.chartType; }
+    if (refs.caseSensitive) { refs.caseSensitive.checked = DEFAULTS.caseSensitive; }
+    if (refs.yearFrom) { refs.yearFrom.value = DEFAULTS.yearFrom; }
+    if (refs.yearTo) { refs.yearTo.value = DEFAULTS.yearTo; }
+    if (refs.month) { refs.month.value = DEFAULTS.month; }
+    if (refs.speaker) { refs.speaker.value = DEFAULTS.speaker; }
+    if (refs.exportAggregate) { refs.exportAggregate.disabled = true; }
+    if (refs.exportTalks) { refs.exportTalks.disabled = true; }
     clearLegend();
     clearAggregateTable();
     clearTalkRows();
-    destroyChart();
     state.currentGroups = [];
     state.currentAggregation = null;
     state.currentSettings = null;
+    state.currentTalkRows = [];
+    state.currentPoints = [];
   }
 
   function resetDefaults() {
     applyDefaults();
     updateUrlFromState();
+    renderEmptyCanvas();
   }
 
   function clearQuery() {
-    refs.input.value = '';
+    if (refs.input) { refs.input.value = ''; }
     refs.status.hide();
     clearLegend();
     clearAggregateTable();
     clearTalkRows();
-    destroyChart();
-    refs.exportAggregate.disabled = true;
-    refs.exportTalks.disabled = true;
     state.currentGroups = [];
     state.currentAggregation = null;
     state.currentSettings = null;
+    state.currentTalkRows = [];
+    state.currentPoints = [];
+    if (refs.exportAggregate) { refs.exportAggregate.disabled = true; }
+    if (refs.exportTalks) { refs.exportTalks.disabled = true; }
     updateUrlFromState();
+    renderEmptyCanvas();
   }
 
   function loadFromUrl() {
-    const params = window.GBCommon.readUrlParams();
-    if (!Object.keys(params).length) {
+    if (!window.GBCommon || typeof window.GBCommon.readUrlParams !== 'function') {
+      return;
+    }
+    var params = window.GBCommon.readUrlParams();
+    if (!params || !Object.keys(params).length) {
       return;
     }
 
-    refs.input.value = params.query || '';
-    refs.byConference.checked = params.byConference === '1';
-    refs.tableMode.checked = params.tableMode === '1';
-    refs.metricPer1000.checked = (params.metric || DEFAULTS.metricMode) !== 'perTalk';
-    refs.metricPerTalk.checked = (params.metric || DEFAULTS.metricMode) === 'perTalk';
-    refs.chartType.value = ['scatter', 'line', 'bar'].includes(params.chartType) ? params.chartType : DEFAULTS.chartType;
-    refs.caseSensitive.checked = params.caseSensitive === '1';
-    refs.yearFrom.value = params.yearFrom || '';
-    refs.yearTo.value = params.yearTo || '';
-    refs.month.value = params.month || '';
-    refs.speaker.value = params.speaker || '';
+    if (refs.input) { refs.input.value = params.query || ''; }
+    if (refs.byConference) { refs.byConference.checked = params.byConference === '1'; }
+    if (refs.tableMode) { refs.tableMode.checked = params.tableMode === '1'; }
+    if (refs.metricPer1000) { refs.metricPer1000.checked = (params.metric || DEFAULTS.metricMode) !== 'perTalk'; }
+    if (refs.metricPerTalk) { refs.metricPerTalk.checked = (params.metric || DEFAULTS.metricMode) === 'perTalk'; }
+    if (refs.chartType) {
+      refs.chartType.value = (params.chartType === 'line' || params.chartType === 'bar' || params.chartType === 'scatter') ? params.chartType : DEFAULTS.chartType;
+    }
+    if (refs.caseSensitive) { refs.caseSensitive.checked = params.caseSensitive === '1'; }
+    if (refs.yearFrom) { refs.yearFrom.value = params.yearFrom || ''; }
+    if (refs.yearTo) { refs.yearTo.value = params.yearTo || ''; }
+    if (refs.month) { refs.month.value = params.month || ''; }
+    if (refs.speaker) { refs.speaker.value = params.speaker || ''; }
   }
 
   function updateUrlFromState() {
+    if (!window.GBCommon || typeof window.GBCommon.updateUrl !== 'function') {
+      return;
+    }
     window.GBCommon.updateUrl({
-      query: refs.input.value,
-      byConference: refs.byConference.checked ? 1 : '',
-      tableMode: refs.tableMode.checked ? 1 : '',
+      query: refs.input ? refs.input.value : '',
+      byConference: refs.byConference && refs.byConference.checked ? 1 : '',
+      tableMode: refs.tableMode && refs.tableMode.checked ? 1 : '',
       metric: getMetricMode(),
-      chartType: refs.chartType.value !== DEFAULTS.chartType ? refs.chartType.value : '',
-      caseSensitive: refs.caseSensitive.checked ? 1 : '',
-      yearFrom: refs.yearFrom.value,
-      yearTo: refs.yearTo.value,
-      month: refs.month.value,
-      speaker: refs.speaker.value
+      chartType: refs.chartType && refs.chartType.value !== DEFAULTS.chartType ? refs.chartType.value : '',
+      caseSensitive: refs.caseSensitive && refs.caseSensitive.checked ? 1 : '',
+      yearFrom: refs.yearFrom ? refs.yearFrom.value : '',
+      yearTo: refs.yearTo ? refs.yearTo.value : '',
+      month: refs.month ? refs.month.value : '',
+      speaker: refs.speaker ? refs.speaker.value : ''
     });
   }
 
   function getMetricMode() {
-    return refs.metricPerTalk.checked ? 'perTalk' : 'per1000';
+    return refs.metricPerTalk && refs.metricPerTalk.checked ? 'perTalk' : 'per1000';
   }
 
+  function getSettings() {
+    return {
+      byConference: !!(refs.byConference && refs.byConference.checked),
+      tableMode: !!(refs.tableMode && refs.tableMode.checked),
+      metricMode: getMetricMode(),
+      chartType: refs.chartType ? refs.chartType.value : 'scatter',
+      caseSensitive: !!(refs.caseSensitive && refs.caseSensitive.checked),
+      yearFrom: refs.yearFrom && refs.yearFrom.value ? Number(refs.yearFrom.value) : null,
+      yearTo: refs.yearTo && refs.yearTo.value ? Number(refs.yearTo.value) : null,
+      month: refs.month && refs.month.value ? refs.month.value : '',
+      speaker: refs.speaker ? String(refs.speaker.value || '').trim().toLowerCase() : ''
+    };
+  }
 
   async function fetchTalks(showLoading, loadingMessage) {
     if (showLoading) {
       refs.status.show(loadingMessage || 'Loading conference text data...', 'info', true);
     }
-
-    const response = await fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' });
+    var response = await fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' });
     if (!response.ok) {
       throw new Error('Conference text data could not be loaded right now.');
     }
-
-    const data = await response.json();
+    var data = await response.json();
     if (!Array.isArray(data)) {
       throw new Error('Conference text data was not in the expected format.');
     }
-
     return data;
   }
 
   async function runSearch() {
-    const query = refs.input.value.trim();
+    var query = refs.input ? String(refs.input.value || '').trim() : '';
     if (!query) {
       refs.status.show('Enter a word or phrase before clicking Search.', 'error', false);
       clearLegend();
       clearAggregateTable();
       clearTalkRows();
-      destroyChart();
-      refs.exportAggregate.disabled = true;
-      refs.exportTalks.disabled = true;
-      state.currentGroups = [];
-      state.currentAggregation = null;
-      state.currentSettings = null;
+      renderEmptyCanvas();
       return;
     }
 
-    refs.searchButton.disabled = true;
+    if (refs.searchButton) { refs.searchButton.disabled = true; }
     refs.status.show('Searching conference text...', 'info', true);
 
     try {
-      const talks = await fetchTalks(false);
-      const groups = parseComparisonGroups(query);
-      const settings = getSettings();
-      const aggregation = buildAggregation(talks, groups, settings);
+      var talks = await fetchTalks(false);
+      var groups = parseGroupsLite(query);
+      var settings = getSettings();
+      var aggregation = buildAggregationLite(talks, groups, settings);
 
       state.currentGroups = groups;
       state.currentAggregation = aggregation;
       state.currentSettings = settings;
+      state.currentTalkRows = [];
 
       renderLegend(groups);
 
       if (settings.tableMode) {
-        destroyChart();
         renderAggregateTable(aggregation, groups, settings);
       } else {
         clearAggregateTable();
-        renderChart(aggregation, groups, settings);
+        renderCanvasChart(aggregation, groups, settings);
       }
 
-      refs.exportAggregate.disabled = aggregation.bucketKeys.length === 0;
       clearTalkRows();
+      if (refs.exportAggregate) { refs.exportAggregate.disabled = aggregation.bucketKeys.length === 0; }
+      if (refs.exportTalks) { refs.exportTalks.disabled = true; }
       refs.status.hide();
       updateUrlFromState();
     } catch (error) {
-      destroyChart();
       clearLegend();
       clearAggregateTable();
       clearTalkRows();
-      refs.exportAggregate.disabled = true;
-      refs.exportTalks.disabled = true;
-      state.currentGroups = [];
-      state.currentAggregation = null;
-      state.currentSettings = null;
+      renderEmptyCanvas();
+      if (refs.exportAggregate) { refs.exportAggregate.disabled = true; }
+      if (refs.exportTalks) { refs.exportTalks.disabled = true; }
       refs.status.show(error && error.message ? error.message : 'Something went wrong while searching conference text.', 'error', false);
     } finally {
-      refs.searchButton.disabled = false;
+      if (refs.searchButton) { refs.searchButton.disabled = false; }
     }
   }
 
-  function getSettings() {
-    return {
-      byConference: refs.byConference.checked,
-      tableMode: refs.tableMode.checked,
-      metricMode: getMetricMode(),
-      chartType: refs.chartType.value,
-      caseSensitive: refs.caseSensitive.checked,
-      yearFrom: refs.yearFrom.value ? Number(refs.yearFrom.value) : null,
-      yearTo: refs.yearTo.value ? Number(refs.yearTo.value) : null,
-      month: refs.month.value || '',
-      speaker: String(refs.speaker.value || '').trim().toLowerCase()
-    };
-  }
-
-  function parseComparisonGroups(input) {
-    const trimmed = String(input || '').trim();
+  function parseGroupsLite(input) {
+    var trimmed = String(input || '').trim();
     if (!trimmed) {
-      throw new Error('Enter at least one search term or phrase.');
+      throw new Error('Enter at least one search term.');
     }
-
-    const groups = [];
-    let buffer = '';
-    let depth = 0;
-    let inQuote = false;
-
-    for (let index = 0; index < trimmed.length; index += 1) {
-      const char = trimmed[index];
-
-      if (char === '"' && trimmed[index - 1] !== '\\') {
-        inQuote = !inQuote;
-        buffer += char;
-        continue;
-      }
-
-      if (!inQuote && char === '(') {
-        if (depth === 0) {
-          if (buffer.trim()) {
-            throw new Error('Use parentheses only for comparison groups, like (faith) (charity).');
-          }
-          buffer = '';
-          depth = 1;
-          continue;
+    var groups = [];
+    var matches = trimmed.match(/\([^()]+\)/g);
+    if (matches && matches.length) {
+      matches.forEach(function(chunk) {
+        var raw = chunk.slice(1, -1).trim();
+        if (raw) {
+          groups.push(makeGroup(raw));
         }
-        depth += 1;
-      } else if (!inQuote && char === ')') {
-        if (depth === 1) {
-          if (buffer.trim()) {
-            groups.push(parseSingleGroup(buffer.trim()));
-          }
-          buffer = '';
-          depth = 0;
-          continue;
-        }
-        if (depth > 1) {
-          depth -= 1;
-        }
-      }
-
-      buffer += char;
+      });
+    } else {
+      groups.push(makeGroup(trimmed));
     }
-
-    if (inQuote || depth !== 0) {
-      throw new Error('Close every quote and parenthesis before running the text search.');
-    }
-
     if (!groups.length) {
-      return [parseSingleGroup(trimmed)];
+      throw new Error('Enter at least one search term.');
     }
-
-    if (buffer.trim()) {
-      throw new Error('Comparison groups should be wrapped in parentheses.');
-    }
-
     return groups;
   }
 
-  function parseSingleGroup(rawGroup) {
-    const terms = splitByOr(rawGroup).map(function(term) {
-      const clean = String(term || '').trim();
-      if (!clean) {
-        return null;
-      }
-      return {
-        raw: clean,
-        quoted: /^".*"$/.test(clean),
-        value: stripOuterQuotes(clean)
-      };
+  function makeGroup(raw) {
+    var parts = String(raw || '').split('||').map(function(part) {
+      return String(part || '').trim();
     }).filter(Boolean);
-
-    if (!terms.length) {
+    if (!parts.length) {
       throw new Error('Each comparison group needs at least one search term.');
     }
-
     return {
-      label: rawGroup,
-      terms: terms
+      label: raw,
+      terms: parts.map(function(part) {
+        return {
+          raw: part,
+          quoted: /^".*"$/.test(part),
+          value: stripOuterQuotes(part)
+        };
+      })
     };
   }
 
-  function splitByOr(rawGroup) {
-    const parts = [];
-    let buffer = '';
-    let inQuote = false;
-
-    for (let index = 0; index < rawGroup.length; index += 1) {
-      const char = rawGroup[index];
-
-      if (char === '"' && rawGroup[index - 1] !== '\\') {
-        inQuote = !inQuote;
-        buffer += char;
-        continue;
-      }
-
-      if (!inQuote && rawGroup.slice(index, index + 2) === '||') {
-        parts.push(buffer);
-        buffer = '';
-        index += 1;
-        continue;
-      }
-
-      buffer += char;
-    }
-
-    if (buffer.trim()) {
-      parts.push(buffer);
-    }
-
-    return parts;
-  }
-
   function stripOuterQuotes(value) {
-    const trimmed = String(value || '').trim();
+    var trimmed = String(value || '').trim();
     if (/^".*"$/.test(trimmed)) {
       return trimmed.slice(1, -1);
     }
     return trimmed;
   }
 
-  function buildAggregation(talks, groups, settings) {
-    const bucketMap = new Map();
-    const bucketOrder = new Map();
-    const series = groups.map(function(group, groupIndex) {
-      return {
-        label: group.label,
-        color: SERIES_COLORS[groupIndex % SERIES_COLORS.length],
-        counts: {}
-      };
+  function buildAggregationLite(talks, groups, settings) {
+    var bucketOrder = {};
+    var bucketLabels = {};
+    var bucketKeys = [];
+    var countsByGroup = {};
+
+    groups.forEach(function(group) {
+      countsByGroup[group.label] = {};
     });
 
     talks.forEach(function(talk) {
@@ -438,104 +382,95 @@
         return;
       }
 
-      const text = prepareText(String(talk.text || ''), settings.caseSensitive);
-      const wordCount = Math.max(1, countWords(text));
-      const bucketKey = settings.byConference
+      var bucketKey = settings.byConference
         ? String(talk.month || '') + ' ' + String(talk.year || '')
         : String(talk.year || '');
 
-      if (!bucketOrder.has(bucketKey)) {
-        bucketOrder.set(bucketKey, settings.byConference
+      if (!bucketLabels[bucketKey]) {
+        bucketLabels[bucketKey] = bucketKey;
+        bucketOrder[bucketKey] = settings.byConference
           ? Number(talk.year || 0) * 10 + conferenceMonthOrder(String(talk.month || ''))
-          : Number(talk.year || 0));
-        bucketMap.set(bucketKey, bucketKey);
+          : Number(talk.year || 0);
+        bucketKeys.push(bucketKey);
       }
 
-      groups.forEach(function(group, groupIndex) {
-        let count = 0;
-        group.terms.forEach(function(term) {
-          count += countTermInText(text, term, settings.caseSensitive);
-        });
+      var preparedText = prepareText(String(talk.text || ''), settings.caseSensitive);
+      var wordCount = Math.max(1, preparedText.split(/\s+/).length);
 
-        if (count <= 0) {
+      groups.forEach(function(group) {
+        var groupCount = 0;
+        group.terms.forEach(function(term) {
+          groupCount += countTermInText(preparedText, term, settings.caseSensitive);
+        });
+        if (!groupCount) {
           return;
         }
-
-        const adjustedCount = settings.metricMode === 'per1000'
-          ? roundToOneDecimal((count / wordCount) * 1000)
-          : count;
-
-        series[groupIndex].counts[bucketKey] = (series[groupIndex].counts[bucketKey] || 0) + adjustedCount;
+        var value = settings.metricMode === 'per1000'
+          ? roundToOneDecimal((groupCount / wordCount) * 1000)
+          : groupCount;
+        countsByGroup[group.label][bucketKey] = (countsByGroup[group.label][bucketKey] || 0) + value;
       });
     });
 
-    const bucketKeys = Array.from(bucketMap.keys()).sort(function(left, right) {
-      return bucketOrder.get(left) - bucketOrder.get(right);
+    bucketKeys.sort(function(a, b) {
+      return (bucketOrder[a] || 0) - (bucketOrder[b] || 0);
     });
 
     return {
       bucketKeys: bucketKeys,
-      bucketLabels: bucketMap,
-      series: series
+      bucketLabels: bucketLabels,
+      series: groups.map(function(group, index) {
+        return {
+          label: group.label,
+          color: SERIES_COLORS[index % SERIES_COLORS.length],
+          counts: countsByGroup[group.label] || {}
+        };
+      })
     };
   }
 
   function passesFilters(talk, settings) {
-    const year = Number(talk.year || 0);
-    const month = String(talk.month || '');
-    const speaker = String(talk.speaker || '').toLowerCase();
+    var year = Number(talk.year || 0);
+    var month = String(talk.month || '');
+    var speaker = String(talk.speaker || '').toLowerCase();
 
-    if (settings.yearFrom && year < settings.yearFrom) {
-      return false;
-    }
-    if (settings.yearTo && year > settings.yearTo) {
-      return false;
-    }
-    if (settings.month && month !== settings.month) {
-      return false;
-    }
-    if (settings.speaker && speaker.indexOf(settings.speaker) === -1) {
-      return false;
-    }
+    if (settings.yearFrom && year < settings.yearFrom) { return false; }
+    if (settings.yearTo && year > settings.yearTo) { return false; }
+    if (settings.month && month !== settings.month) { return false; }
+    if (settings.speaker && speaker.indexOf(settings.speaker) === -1) { return false; }
     return true;
   }
 
   function prepareText(value, caseSensitive) {
-    const normalized = String(value || '')
+    var normalized = String(value || '')
       .replace(/[“”]/g, '"')
       .replace(/[‘’]/g, "'")
       .replace(/[—–-]/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
-
     return caseSensitive ? normalized : normalized.toLowerCase();
   }
 
-  function countWords(text) {
-    if (!text) {
-      return 0;
-    }
-    return text.split(/\s+/).length;
-  }
-
   function countTermInText(text, term, caseSensitive) {
-    const value = term.value.trim();
+    var value = String(term && term.value ? term.value : '').trim();
     if (!value || !text) {
       return 0;
     }
-
-    const query = caseSensitive ? value : value.toLowerCase();
-    const escaped = window.GBCommon.escapeRegExp(query);
-    let regex;
-
-    if (term.quoted || query.indexOf(' ') !== -1) {
-      regex = new RegExp('\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b', caseSensitive ? 'g' : 'gi');
-    } else {
-      regex = new RegExp('\\b' + escaped + '\\b', caseSensitive ? 'g' : 'gi');
+    var query = caseSensitive ? value : value.toLowerCase();
+    var escaped = window.GBCommon && window.GBCommon.escapeRegExp ? window.GBCommon.escapeRegExp(query) : escapeRegExp(query);
+    var pattern = (term.quoted || query.indexOf(' ') !== -1)
+      ? '\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b'
+      : '\\b' + escaped + '\\b';
+    var regex = new RegExp(pattern, caseSensitive ? 'g' : 'gi');
+    var count = 0;
+    while (regex.exec(text)) {
+      count += 1;
     }
+    return count;
+  }
 
-    const matches = text.match(regex);
-    return matches ? matches.length : 0;
+  function escapeRegExp(value) {
+    return String(value || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
   function roundToOneDecimal(value) {
@@ -543,161 +478,285 @@
   }
 
   function conferenceMonthOrder(month) {
-    if (month === 'April') {
-      return 4;
-    }
-    if (month === 'October') {
-      return 10;
-    }
+    if (month === 'April') { return 4; }
+    if (month === 'October') { return 10; }
     return 1;
   }
 
   function renderLegend(groups) {
+    if (!refs.legend) { return; }
     refs.legend.innerHTML = '';
     groups.forEach(function(group, index) {
-      const item = document.createElement('div');
+      var item = document.createElement('div');
       item.className = 'gb-legend__item';
-      item.innerHTML = '<span class="gb-legend__swatch" style="background:' + SERIES_COLORS[index % SERIES_COLORS.length] + '"></span><span>' + window.GBCommon.escapeHtml(group.label) + '</span>';
+      item.innerHTML = '<span class="gb-legend__swatch" style="background:' + SERIES_COLORS[index % SERIES_COLORS.length] + '"></span><span>' + escapeHtml(group.label) + '</span>';
       refs.legend.appendChild(item);
     });
   }
 
   function clearLegend() {
-    refs.legend.innerHTML = '';
+    if (refs.legend) {
+      refs.legend.innerHTML = '';
+    }
   }
 
-  function renderChart(aggregation, groups, settings) {
+  function getCanvasContext() {
     if (!refs.plotCanvas) {
-      return;
+      return null;
     }
+    var canvas = refs.plotCanvas;
+    var width = canvas.clientWidth || canvas.offsetWidth || 640;
+    if (width < 280) { width = 280; }
+    canvas.width = width;
+    canvas.height = Math.round(width * 0.68);
+    canvas.style.display = 'block';
+    return canvas.getContext('2d');
+  }
 
-    refs.plotCanvas.style.display = 'block';
-    clearAggregateTable();
-    destroyChart();
+  function renderEmptyCanvas() {
+    if (!refs.plotCanvas) { return; }
+    var ctx = getCanvasContext();
+    if (!ctx) { return; }
+    var canvas = refs.plotCanvas;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#d1d5db';
+    ctx.strokeRect(0.5, 0.5, canvas.width - 1, canvas.height - 1);
+    ctx.fillStyle = '#6b7280';
+    ctx.font = '14px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Run a search to see results.', canvas.width / 2, canvas.height / 2);
+  }
 
-    if (!window.Chart) {
-      return;
-    }
+  function renderCanvasChart(aggregation, groups, settings) {
+    if (!refs.plotCanvas) { return; }
+    var ctx = getCanvasContext();
+    if (!ctx) { return; }
+    var canvas = refs.plotCanvas;
+    var margin = { top: 20, right: 14, bottom: 56, left: 42 };
+    var plotWidth = canvas.width - margin.left - margin.right;
+    var plotHeight = canvas.height - margin.top - margin.bottom;
+    var allKeys = aggregation.bucketKeys.slice();
+    var maxValue = 0;
+    state.currentPoints = [];
 
-    const ctx = refs.plotCanvas.getContext('2d');
-    if (!ctx) {
-      return;
-    }
-
-    const datasets = aggregation.series.map(function(seriesItem) {
-      const points = aggregation.bucketKeys.map(function(key) {
-        return {
-          x: key,
-          y: Number(seriesItem.counts[key] || 0)
-        };
+    aggregation.series.forEach(function(series) {
+      allKeys.forEach(function(key) {
+        maxValue = Math.max(maxValue, Number(series.counts[key] || 0));
       });
-
-      return {
-        label: seriesItem.label,
-        data: points,
-        borderColor: seriesItem.color,
-        backgroundColor: seriesItem.color,
-        showLine: settings.chartType !== 'scatter',
-        pointRadius: settings.chartType === 'bar' ? 0 : 4,
-        pointHoverRadius: settings.chartType === 'bar' ? 0 : 5,
-        tension: 0.2
-      };
     });
 
-    const chartType = settings.chartType === 'bar' ? 'bar' : 'scatter';
-    state.chart = new window.Chart(ctx, {
-      type: chartType,
-      data: {
-        labels: aggregation.bucketKeys.map(function(key) { return aggregation.bucketLabels.get(key); }),
-        datasets: datasets
-      },
-      options: {
-        maintainAspectRatio: true,
-        responsive: true,
-        animation: false,
-        parsing: chartType !== 'bar',
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: false }
-        },
-        scales: {
-          x: {
-            type: 'category',
-            ticks: {
-              maxRotation: 45,
-              minRotation: 0,
-              autoSkip: true
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = '#d1d5db';
+    ctx.strokeRect(margin.left, margin.top, plotWidth, plotHeight);
+
+    if (!allKeys.length || maxValue <= 0) {
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '14px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('No conferences matched the current search.', canvas.width / 2, canvas.height / 2);
+      return;
+    }
+
+    var ySteps = chooseYAxisStep(maxValue);
+    var xStep = allKeys.length > 1 ? plotWidth / (allKeys.length - 1) : 0;
+    var pointRadius = canvas.width < 420 ? 3 : 4;
+
+    ctx.strokeStyle = '#111827';
+    ctx.beginPath();
+    ctx.moveTo(margin.left, margin.top);
+    ctx.lineTo(margin.left, margin.top + plotHeight);
+    ctx.lineTo(margin.left + plotWidth, margin.top + plotHeight);
+    ctx.stroke();
+
+    ctx.font = '11px sans-serif';
+    ctx.fillStyle = '#374151';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    for (var y = 0; y <= maxValue + 0.0001; y += ySteps) {
+      var py = margin.top + plotHeight - ((y / maxValue) * plotHeight);
+      ctx.fillText(formatAxisValue(y, settings), margin.left - 6, py);
+      ctx.strokeStyle = '#f3f4f6';
+      ctx.beginPath();
+      ctx.moveTo(margin.left, py);
+      ctx.lineTo(margin.left + plotWidth, py);
+      ctx.stroke();
+    }
+
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    var labelEvery = chooseLabelEvery(allKeys.length);
+    allKeys.forEach(function(key, index) {
+      if (index % labelEvery !== 0) {
+        return;
+      }
+      var px = margin.left + (xStep * index);
+      ctx.save();
+      ctx.translate(px, margin.top + plotHeight + 8);
+      ctx.rotate(-Math.PI / 6);
+      ctx.fillStyle = '#374151';
+      ctx.fillText(aggregation.bucketLabels[key], 0, 0);
+      ctx.restore();
+    });
+
+    aggregation.series.forEach(function(series, seriesIndex) {
+      var color = series.color;
+      var previous = null;
+      if (settings.chartType === 'line') {
+        ctx.beginPath();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+      }
+      allKeys.forEach(function(key, index) {
+        var value = Number(series.counts[key] || 0);
+        var px = margin.left + (xStep * index);
+        var py = margin.top + plotHeight - ((value / maxValue) * plotHeight);
+
+        if (settings.chartType === 'bar') {
+          var barWidth = Math.max(6, Math.min(18, (plotWidth / Math.max(allKeys.length, 1)) * 0.7 / Math.max(aggregation.series.length, 1)));
+          var offset = (seriesIndex - (aggregation.series.length - 1) / 2) * (barWidth + 1);
+          var barHeight = (value / maxValue) * plotHeight;
+          ctx.fillStyle = color;
+          ctx.fillRect(px + offset - (barWidth / 2), margin.top + plotHeight - barHeight, barWidth, barHeight);
+          state.currentPoints.push({
+            x: px + offset,
+            y: margin.top + plotHeight - barHeight,
+            width: barWidth,
+            height: barHeight,
+            bucketKey: key,
+            groupIndex: seriesIndex,
+            mode: 'bar'
+          });
+        } else {
+          if (settings.chartType === 'line') {
+            if (!previous) {
+              ctx.moveTo(px, py);
+            } else {
+              ctx.lineTo(px, py);
             }
-          },
-          y: {
-            beginAtZero: true,
-            title: {
-              display: true,
-              text: settings.metricMode === 'per1000' ? 'Matches per 1000 words' : 'Matches'
-            }
+            previous = { x: px, y: py };
           }
-        },
-        onClick: function(event, elements) {
-          if (!elements || !elements.length) {
-            return;
-          }
-          const element = elements[0];
-          const datasetIndex = element.datasetIndex;
-          const dataIndex = element.index;
-          const bucketKey = aggregation.bucketKeys[dataIndex];
-          displayTalkMatches(bucketKey, groups[datasetIndex], settings);
+          ctx.beginPath();
+          ctx.fillStyle = color;
+          ctx.arc(px, py, pointRadius, 0, Math.PI * 2);
+          ctx.fill();
+          state.currentPoints.push({
+            x: px,
+            y: py,
+            radius: pointRadius + 6,
+            bucketKey: key,
+            groupIndex: seriesIndex,
+            mode: 'point'
+          });
         }
+      });
+      if (settings.chartType === 'line') {
+        ctx.stroke();
       }
     });
   }
 
-  function destroyChart() {
-    if (state.chart) {
-      state.chart.destroy();
-      state.chart = null;
+  function handleCanvasClick(event) {
+    if (!state.currentPoints.length || !state.currentAggregation || !state.currentSettings || (refs.tableMode && refs.tableMode.checked)) {
+      return;
+    }
+    var rect = refs.plotCanvas.getBoundingClientRect();
+    var x = event.clientX - rect.left;
+    var y = event.clientY - rect.top;
+    var hit = null;
+
+    state.currentPoints.forEach(function(point) {
+      if (hit) { return; }
+      if (point.mode === 'bar') {
+        var left = point.x - point.width / 2;
+        var right = point.x + point.width / 2;
+        var bottom = refs.plotCanvas.height - 56;
+        if (x >= left && x <= right && y >= point.y && y <= bottom) {
+          hit = point;
+        }
+      } else {
+        var dx = point.x - x;
+        var dy = point.y - y;
+        if (Math.sqrt(dx * dx + dy * dy) <= point.radius) {
+          hit = point;
+        }
+      }
+    });
+
+    if (hit) {
+      displayTalkMatches(hit.bucketKey, state.currentGroups[hit.groupIndex], state.currentSettings);
     }
   }
 
-  function renderAggregateTable(aggregation, groups, settings) {
-    refs.plotCanvas.style.display = 'none';
-    const headers = groups.map(function(group) {
-      return group.label;
-    });
+  function chooseYAxisStep(maxValue) {
+    if (maxValue <= 5) { return 1; }
+    if (maxValue <= 10) { return 2; }
+    if (maxValue <= 25) { return 5; }
+    if (maxValue <= 50) { return 10; }
+    if (maxValue <= 100) { return 20; }
+    if (maxValue <= 250) { return 50; }
+    if (maxValue <= 500) { return 100; }
+    return Math.ceil(maxValue / 5 / 100) * 100;
+  }
 
-    let html = '<div class="gb-aggregate-table-wrap"><table class="gb-aggregate-table"><thead><tr><th>' + (settings.byConference ? 'Conference' : 'Year') + '</th>';
-    headers.forEach(function(header) {
-      html += '<th>' + window.GBCommon.escapeHtml(header) + '</th>';
+  function chooseLabelEvery(length) {
+    if (length <= 8) { return 1; }
+    if (length <= 16) { return 2; }
+    if (length <= 30) { return 3; }
+    if (length <= 50) { return 5; }
+    return 8;
+  }
+
+  function formatAxisValue(value, settings) {
+    return settings.metricMode === 'per1000' ? String(roundToOneDecimal(value)) : String(Math.round(value));
+  }
+
+  function renderAggregateTable(aggregation, groups, settings) {
+    if (refs.plotCanvas) {
+      refs.plotCanvas.style.display = 'none';
+    }
+    if (!refs.aggregateTable) {
+      return;
+    }
+    var html = '<div class="gb-aggregate-table-wrap"><table class="gb-aggregate-table"><thead><tr><th>' + (settings.byConference ? 'Conference' : 'Year') + '</th>';
+    groups.forEach(function(group) {
+      html += '<th>' + escapeHtml(group.label) + '</th>';
     });
     html += '</tr></thead><tbody>';
 
     aggregation.bucketKeys.forEach(function(key) {
-      html += '<tr><td>' + window.GBCommon.escapeHtml(aggregation.bucketLabels.get(key)) + '</td>';
+      html += '<tr><td>' + escapeHtml(aggregation.bucketLabels[key]) + '</td>';
       groups.forEach(function(group, index) {
-        const value = aggregation.series[index].counts[key] || 0;
-        const displayValue = settings.metricMode === 'per1000' ? Number(value).toFixed(1) : String(value);
-        html += '<td class="is-clickable" data-bucket="' + window.GBCommon.escapeHtml(key) + '" data-group="' + index + '">' + window.GBCommon.escapeHtml(displayValue) + '</td>';
+        var value = Number(aggregation.series[index].counts[key] || 0);
+        var displayValue = settings.metricMode === 'per1000' ? value.toFixed(1) : String(Math.round(value));
+        html += '<td class="is-clickable" data-bucket="' + escapeHtml(key) + '" data-group="' + index + '">' + escapeHtml(displayValue) + '</td>';
       });
       html += '</tr>';
     });
 
     if (!aggregation.bucketKeys.length) {
-      html += '<tr><td colspan="' + String(headers.length + 1) + '" class="gb-empty-row">No conferences matched the current search.</td></tr>';
+      html += '<tr><td colspan="' + (groups.length + 1) + '" class="gb-empty-row">No conferences matched the current search.</td></tr>';
     }
 
     html += '</tbody></table></div>';
     refs.aggregateTable.innerHTML = html;
 
-    refs.aggregateTable.querySelectorAll('td.is-clickable').forEach(function(cell) {
+    Array.prototype.forEach.call(refs.aggregateTable.querySelectorAll('td.is-clickable'), function(cell) {
       cell.addEventListener('click', function() {
-        const bucketKey = cell.getAttribute('data-bucket');
-        const groupIndex = Number(cell.getAttribute('data-group'));
-        displayTalkMatches(bucketKey, groups[groupIndex], settings);
+        var bucketKey = cell.getAttribute('data-bucket');
+        var groupIndex = Number(cell.getAttribute('data-group'));
+        displayTalkMatches(bucketKey, state.currentGroups[groupIndex], state.currentSettings);
       });
     });
   }
 
   function clearAggregateTable() {
-    refs.aggregateTable.innerHTML = '';
+    if (refs.aggregateTable) {
+      refs.aggregateTable.innerHTML = '';
+    }
     if (refs.plotCanvas) {
       refs.plotCanvas.style.display = 'block';
     }
@@ -705,194 +764,163 @@
 
   async function displayTalkMatches(bucketKey, group, settings) {
     refs.status.show('Loading matching talks...', 'info', true);
-
     try {
-      const talks = await fetchTalks(false);
-      const rows = buildTalkRowsForBucket(talks, bucketKey, group, settings);
+      var talks = await fetchTalks(false);
+      var rows = buildTalkRowsForBucket(talks, bucketKey, group, settings);
+      state.currentTalkRows = rows;
       renderTalkRows(bucketKey, group, settings, rows);
-      refs.exportTalks.disabled = rows.length === 0;
+      if (refs.exportTalks) { refs.exportTalks.disabled = rows.length === 0; }
       refs.status.hide();
     } catch (error) {
       clearTalkRows();
-      refs.exportTalks.disabled = true;
+      if (refs.exportTalks) { refs.exportTalks.disabled = true; }
       refs.status.show(error && error.message ? error.message : 'Matching talks could not be loaded.', 'error', false);
     }
   }
 
-  function buildTalkRowsForBucket(talks, bucketKey, group, settings) {
-    const rows = [];
-
+  function buildTalkRowsForBucket(talks, groupBucketKey, group, settings) {
+    var rows = [];
     talks.forEach(function(talk) {
       if (!passesFilters(talk, settings)) {
         return;
       }
-
-      const talkBucketKey = settings.byConference
+      var talkBucketKey = settings.byConference
         ? String(talk.month || '') + ' ' + String(talk.year || '')
         : String(talk.year || '');
-
-      if (talkBucketKey !== bucketKey) {
+      if (talkBucketKey !== groupBucketKey) {
         return;
       }
-
-      const text = prepareText(String(talk.text || ''), settings.caseSensitive);
-      const wordCount = Math.max(1, countWords(text));
-      let count = 0;
-
+      var preparedText = prepareText(String(talk.text || ''), settings.caseSensitive);
+      var wordCount = Math.max(1, preparedText.split(/\s+/).length);
+      var count = 0;
       group.terms.forEach(function(term) {
-        count += countTermInText(text, term, settings.caseSensitive);
+        count += countTermInText(preparedText, term, settings.caseSensitive);
       });
-
-      if (count <= 0) {
+      if (!count) {
         return;
       }
-
-      const metricValue = settings.metricMode === 'per1000'
+      var metricValue = settings.metricMode === 'per1000'
         ? roundToOneDecimal((count / wordCount) * 1000)
         : count;
-
       rows.push({
         title: String(talk.title || 'Untitled talk'),
         href: String(talk.hyperlink || ''),
         speaker: String(talk.speaker || 'Unknown speaker'),
         year: Number(talk.year || 0),
         month: String(talk.month || ''),
-        metricPercent: 0,
-        metricDisplay: settings.metricMode === 'per1000' ? metricValue.toFixed(1) : String(count),
-        meta: settings.metricMode === 'per1000'
-          ? count + ' matches · ' + metricValue.toFixed(1) + ' per 1000 words'
-          : count + ' ' + (count === 1 ? 'match' : 'matches'),
-        sort: {
-          newest: Number(talk.year || 0) * 100000 + conferenceMonthOrder(String(talk.month || '')) * 1000 + Number(talk['talk-id'] || talk.talk_id || 0),
-          metric: metricValue,
-          speaker: String(talk.speaker || ''),
-          title: String(talk.title || '')
-        },
-        export: {
-          Metric: settings.metricMode === 'per1000' ? metricValue.toFixed(1) : String(count),
-          RawMatches: String(count),
-          Year: Number(talk.year || 0),
-          Month: String(talk.month || ''),
-          Speaker: String(talk.speaker || ''),
-          Title: String(talk.title || ''),
-          Link: String(talk.hyperlink || '')
-        }
+        metricValue: metricValue,
+        rawMatches: count,
+        sortNewest: Number(talk.year || 0) * 100000 + conferenceMonthOrder(String(talk.month || '')) * 1000 + Number(talk['talk-id'] || talk.talk_id || 0)
       });
     });
 
-    const maxValue = rows.reduce(function(maximum, row) {
-      return Math.max(maximum, Number(row.sort.metric || 0));
-    }, 0) || 1;
-
-    rows.forEach(function(row) {
-      row.metricPercent = Math.round((Number(row.sort.metric || 0) / maxValue) * 100);
+    rows.sort(function(a, b) {
+      if (b.metricValue !== a.metricValue) {
+        return b.metricValue - a.metricValue;
+      }
+      return b.sortNewest - a.sortNewest;
     });
 
     return rows;
   }
 
   function renderTalkRows(bucketKey, group, settings, rows) {
-    const metricHeader = settings.metricMode === 'per1000' ? 'Per 1000' : 'Matches';
-
-    const sortOptions = [
-      { value: 'metric', label: settings.metricMode === 'per1000' ? 'Highest rate first' : 'Most matches first' },
-      { value: 'newest', label: 'Newest first' },
-      { value: 'speaker', label: 'Speaker A–Z' },
-      { value: 'title', label: 'Title A–Z' }
-    ];
-
-    const sorters = {
-      metric: function(left, right) {
-        if (right.sort.metric !== left.sort.metric) {
-          return right.sort.metric - left.sort.metric;
-        }
-        return right.sort.newest - left.sort.newest;
-      },
-      newest: function(left, right) {
-        return right.sort.newest - left.sort.newest;
-      },
-      speaker: function(left, right) {
-        const compare = String(left.sort.speaker).localeCompare(String(right.sort.speaker));
-        if (compare !== 0) {
-          return compare;
-        }
-        return right.sort.newest - left.sort.newest;
-      },
-      title: function(left, right) {
-        const compare = String(left.sort.title).localeCompare(String(right.sort.title));
-        if (compare !== 0) {
-          return compare;
-        }
-        return right.sort.newest - left.sort.newest;
+    if (!refs.talks) {
+      return;
+    }
+    var maxMetric = 1;
+    rows.forEach(function(row) {
+      if (row.metricValue > maxMetric) {
+        maxMetric = row.metricValue;
       }
-    };
+    });
 
-    if (state.currentTalkRenderer) {
-      state.currentTalkRenderer.clear();
+    var html = '';
+    html += '<div class="gb-talk-results">';
+    html += '<div class="gb-talk-results__header">';
+    html += '<h3>' + escapeHtml(group.label + ' — ' + bucketKey) + '</h3>';
+    html += '<p>' + rows.length + ' matching talks</p>';
+    html += '</div>';
+    html += '<div class="gb-talk-results__table-wrap">';
+    html += '<table class="gb-aggregate-table"><thead><tr><th>' + (settings.metricMode === 'per1000' ? 'Per 1000' : 'Matches') + '</th><th>Year</th><th>Month</th><th>Speaker</th><th>Talk</th></tr></thead><tbody>';
+
+    rows.forEach(function(row) {
+      var pct = Math.max(4, Math.round((row.metricValue / maxMetric) * 100));
+      var metricDisplay = settings.metricMode === 'per1000' ? Number(row.metricValue).toFixed(1) : String(row.rawMatches);
+      html += '<tr>';
+      html += '<td><div style="position:relative;min-width:70px;padding:4px 6px;text-align:center;background:linear-gradient(90deg,#F39C12 ' + pct + '%,transparent ' + pct + '%);">' + escapeHtml(metricDisplay) + '</div></td>';
+      html += '<td>' + escapeHtml(String(row.year)) + '</td>';
+      html += '<td>' + escapeHtml(row.month) + '</td>';
+      html += '<td>' + escapeHtml(row.speaker) + '</td>';
+      html += '<td>' + (row.href ? '<a href="' + escapeAttribute(row.href) + '" target="_blank" rel="noopener">' + escapeHtml(row.title) + '</a>' : escapeHtml(row.title)) + '</td>';
+      html += '</tr>';
+    });
+
+    if (!rows.length) {
+      html += '<tr><td colspan="5" class="gb-empty-row">No talks matched that point on the chart.</td></tr>';
     }
 
-    state.currentTalkRows = rows.slice();
-    state.currentTalkRenderer = window.GBCommon.renderTalkResults(refs.talks, {
-      idPrefix: 'word-talks',
-      title: group.label + ' — ' + bucketKey,
-      note: 'Click any row to open the talk on the Church website.',
-      summaries: [
-        { label: 'Talks', value: String(rows.length), active: false },
-        { label: 'Metric', value: metricHeader, active: false }
-      ],
-      rows: rows,
-      metricHeader: metricHeader,
-      sortOptions: sortOptions,
-      defaultSort: 'metric',
-      sorters: sorters,
-      pageSize: 25,
-      emptyMessage: 'No talks matched that point on the chart.',
-      exportHeaders: ['Metric', 'RawMatches', 'Year', 'Month', 'Speaker', 'Title', 'Link'],
-      exportFileName: window.GBCommon.slugify(group.label + '-' + bucketKey) + '-text-search.csv'
-    });
+    html += '</tbody></table></div></div>';
+    refs.talks.innerHTML = html;
   }
 
   function clearTalkRows() {
-    if (state.currentTalkRenderer) {
-      state.currentTalkRenderer.clear();
-      state.currentTalkRenderer = null;
-    }
     state.currentTalkRows = [];
-    refs.talks.innerHTML = '';
+    if (refs.talks) {
+      refs.talks.innerHTML = '';
+    }
   }
 
   function exportAggregateData() {
-    if (!state.currentAggregation || !state.currentAggregation.bucketKeys.length) {
+    if (!state.currentAggregation || !state.currentAggregation.bucketKeys || !state.currentAggregation.bucketKeys.length || !window.GBCommon || typeof window.GBCommon.downloadCsv !== 'function') {
       return;
     }
-
-    const headers = [(refs.byConference.checked ? 'Conference' : 'Year')].concat(state.currentGroups.map(function(group) {
-      return group.label;
-    }));
-
-    const rows = state.currentAggregation.bucketKeys.map(function(key) {
-      const row = {};
-      row[headers[0]] = state.currentAggregation.bucketLabels.get(key);
+    var headers = [(state.currentSettings && state.currentSettings.byConference) ? 'Conference' : 'Year'];
+    state.currentGroups.forEach(function(group) { headers.push(group.label); });
+    var rows = state.currentAggregation.bucketKeys.map(function(key) {
+      var row = {};
+      row[headers[0]] = state.currentAggregation.bucketLabels[key];
       state.currentGroups.forEach(function(group, index) {
-        const value = state.currentAggregation.series[index].counts[key] || 0;
-        row[group.label] = refs.metricPer1000.checked ? Number(value).toFixed(1) : String(value);
+        var value = Number(state.currentAggregation.series[index].counts[key] || 0);
+        row[group.label] = state.currentSettings.metricMode === 'per1000' ? value.toFixed(1) : String(Math.round(value));
       });
       return row;
     });
-
     window.GBCommon.downloadCsv('conference-text-search-data.csv', headers, rows);
   }
 
   function exportTalkRows() {
-    if (!state.currentTalkRows.length) {
+    if (!state.currentTalkRows.length || !window.GBCommon || typeof window.GBCommon.downloadCsv !== 'function') {
       return;
     }
-
-    const headers = ['Metric', 'RawMatches', 'Year', 'Month', 'Speaker', 'Title', 'Link'];
-    const rows = state.currentTalkRows.map(function(row) {
-      return row.export;
+    var headers = ['Metric', 'RawMatches', 'Year', 'Month', 'Speaker', 'Title', 'Link'];
+    var rows = state.currentTalkRows.map(function(row) {
+      return {
+        Metric: state.currentSettings.metricMode === 'per1000' ? Number(row.metricValue).toFixed(1) : String(row.rawMatches),
+        RawMatches: String(row.rawMatches),
+        Year: String(row.year),
+        Month: row.month,
+        Speaker: row.speaker,
+        Title: row.title,
+        Link: row.href
+      };
     });
-
     window.GBCommon.downloadCsv('conference-text-search-talks.csv', headers, rows);
+  }
+
+  function escapeHtml(value) {
+    if (window.GBCommon && typeof window.GBCommon.escapeHtml === 'function') {
+      return window.GBCommon.escapeHtml(value);
+    }
+    return String(value || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function escapeAttribute(value) {
+    return escapeHtml(value);
   }
 })(window, document);
