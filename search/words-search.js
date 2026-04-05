@@ -1,4 +1,3 @@
-
 (function(window, document) {
   'use strict';
 
@@ -24,7 +23,9 @@
     currentAggregation: null,
     currentSettings: null,
     currentTalkRows: [],
-    currentTalkRenderer: null
+    currentTalkRenderer: null,
+    talksPromise: null,
+    talksData: null
   };
 
   const refs = {};
@@ -207,21 +208,36 @@
   }
 
   async function fetchTalks(showLoading, loadingMessage) {
-    if (showLoading) {
-      refs.status.show(loadingMessage || 'Loading conference text data...', 'info', true);
+    if (state.talksData) {
+      return state.talksData;
     }
 
-    const response = await fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' });
-    if (!response.ok) {
-      throw new Error('Conference text data could not be loaded right now.');
+    if (!state.talksPromise) {
+      if (showLoading) {
+        refs.status.show(loadingMessage || 'Loading conference text data...', 'info', true);
+      }
+
+      state.talksPromise = fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' })
+        .then(function(response) {
+          if (!response.ok) {
+            throw new Error('Conference text data could not be loaded right now.');
+          }
+          return response.json();
+        })
+        .then(function(data) {
+          if (!Array.isArray(data)) {
+            throw new Error('Conference text data was not in the expected format.');
+          }
+          state.talksData = data;
+          return data;
+        })
+        .catch(function(error) {
+          state.talksPromise = null;
+          throw error;
+        });
     }
 
-    const data = await response.json();
-    if (!Array.isArray(data)) {
-      throw new Error('Conference text data was not in the expected format.');
-    }
-
-    return data;
+    return state.talksPromise;
   }
 
   async function runSearch() {
@@ -247,7 +263,7 @@
       const talks = await fetchTalks(false);
       const groups = parseComparisonGroups(query);
       const settings = getSettings();
-      const aggregation = buildAggregation(talks, groups, settings);
+      const aggregation = buildAggregationOldStyle(talks, groups, settings);
 
       state.currentGroups = groups;
       state.currentAggregation = aggregation;
@@ -360,7 +376,8 @@
   }
 
   function parseSingleGroup(rawGroup) {
-    const terms = splitByOr(rawGroup).map(function(term) {
+    const parts = splitByOr(rawGroup);
+    const terms = parts.map(function(term) {
       const clean = String(term || '').trim();
       if (!clean) {
         return null;
@@ -421,15 +438,20 @@
     return trimmed;
   }
 
-  function buildAggregation(talks, groups, settings) {
+  function buildAggregationOldStyle(talks, groups, settings) {
     const bucketMap = new Map();
     const bucketOrder = new Map();
-    const series = groups.map(function(group, groupIndex) {
-      return {
-        label: group.label,
-        color: SERIES_COLORS[groupIndex % SERIES_COLORS.length],
-        counts: {}
-      };
+    const termCounts = Object.create(null);
+    const yearLookup = Object.create(null);
+    const allCounts = Object.create(null);
+
+    groups.forEach(function(group) {
+      group.terms.forEach(function(term) {
+        const key = term.raw;
+        if (!termCounts[key]) {
+          termCounts[key] = Object.create(null);
+        }
+      });
     });
 
     talks.forEach(function(talk) {
@@ -437,8 +459,9 @@
         return;
       }
 
-      const text = prepareText(String(talk.text || ''), settings.caseSensitive);
-      const wordCount = Math.max(1, countWords(text));
+      const originalText = String(talk.text || '');
+      const preparedText = prepareText(originalText, settings.caseSensitive);
+      const wordCount = Math.max(1, preparedText.split(/\s+/).length);
       const bucketKey = settings.byConference
         ? String(talk.month || '') + ' ' + String(talk.year || '')
         : String(talk.year || '');
@@ -448,35 +471,74 @@
           ? Number(talk.year || 0) * 10 + conferenceMonthOrder(String(talk.month || ''))
           : Number(talk.year || 0));
         bucketMap.set(bucketKey, bucketKey);
+        yearLookup[bucketKey] = bucketKey;
       }
 
-      groups.forEach(function(group, groupIndex) {
-        let count = 0;
+      groups.forEach(function(group) {
         group.terms.forEach(function(term) {
-          count += countTermInText(text, term, settings.caseSensitive);
+          const termKey = term.raw;
+          const rawMatches = countTermInText(preparedText, term, settings.caseSensitive);
+          let count = rawMatches;
+
+          if (settings.metricMode === 'per1000') {
+            count = roundToOneDecimal((rawMatches / wordCount) * 1000);
+          }
+
+          if (!termCounts[termKey][bucketKey]) {
+            termCounts[termKey][bucketKey] = 0;
+          }
+          termCounts[termKey][bucketKey] += count;
         });
-
-        if (count <= 0) {
-          return;
-        }
-
-        const adjustedCount = settings.metricMode === 'per1000'
-          ? roundToOneDecimal((count / wordCount) * 1000)
-          : count;
-
-        series[groupIndex].counts[bucketKey] = (series[groupIndex].counts[bucketKey] || 0) + adjustedCount;
       });
     });
 
+    groups.forEach(function(group) {
+      group.terms.forEach(function(term) {
+        allCounts[term.raw] = termCounts[term.raw] || Object.create(null);
+      });
+    });
+
+    const combinedCounts = combineCounts(allCounts, groups);
     const bucketKeys = Array.from(bucketMap.keys()).sort(function(left, right) {
       return bucketOrder.get(left) - bucketOrder.get(right);
+    });
+
+    const series = groups.map(function(group, groupIndex) {
+      const seriesKey = group.label;
+      return {
+        label: seriesKey,
+        color: SERIES_COLORS[groupIndex % SERIES_COLORS.length],
+        counts: combinedCounts[seriesKey] || Object.create(null)
+      };
     });
 
     return {
       bucketKeys: bucketKeys,
       bucketLabels: bucketMap,
-      series: series
+      series: series,
+      yearLookup: yearLookup
     };
+  }
+
+  function combineCounts(allCounts, groups) {
+    const combinedCounts = Object.create(null);
+
+    groups.forEach(function(group) {
+      const groupKey = group.label;
+      combinedCounts[groupKey] = Object.create(null);
+
+      group.terms.forEach(function(term) {
+        const termCounts = allCounts[term.raw] || Object.create(null);
+        Object.keys(termCounts).forEach(function(bucketKey) {
+          if (!combinedCounts[groupKey][bucketKey]) {
+            combinedCounts[groupKey][bucketKey] = 0;
+          }
+          combinedCounts[groupKey][bucketKey] += termCounts[bucketKey];
+        });
+      });
+    });
+
+    return combinedCounts;
   }
 
   function passesFilters(talk, settings) {
@@ -510,31 +572,24 @@
     return caseSensitive ? normalized : normalized.toLowerCase();
   }
 
-  function countWords(text) {
-    if (!text) {
-      return 0;
-    }
-    return text.split(/\s+/).length;
-  }
-
   function countTermInText(text, term, caseSensitive) {
-    const value = term.value.trim();
+    const value = String(term && term.value ? term.value : '').trim();
     if (!value || !text) {
       return 0;
     }
 
     const query = caseSensitive ? value : value.toLowerCase();
     const escaped = window.GBCommon.escapeRegExp(query);
-    let regex;
+    const pattern = (term.quoted || query.indexOf(' ') !== -1)
+      ? '\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b'
+      : '\\b' + escaped + '\\b';
+    const regex = new RegExp(pattern, caseSensitive ? 'g' : 'gi');
 
-    if (term.quoted || query.indexOf(' ') !== -1) {
-      regex = new RegExp('\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b', caseSensitive ? 'g' : 'gi');
-    } else {
-      regex = new RegExp('\\b' + escaped + '\\b', caseSensitive ? 'g' : 'gi');
+    let count = 0;
+    while (regex.exec(text)) {
+      count += 1;
     }
-
-    const matches = text.match(regex);
-    return matches ? matches.length : 0;
+    return count;
   }
 
   function roundToOneDecimal(value) {
@@ -735,7 +790,7 @@
       }
 
       const text = prepareText(String(talk.text || ''), settings.caseSensitive);
-      const wordCount = Math.max(1, countWords(text));
+      const wordCount = Math.max(1, text.split(/\s+/).length);
       let count = 0;
 
       group.terms.forEach(function(term) {

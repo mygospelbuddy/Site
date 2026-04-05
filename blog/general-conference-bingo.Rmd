@@ -3,8 +3,8 @@ title: "General Conference Bingo"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/docs/header2.html"
-      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+      in_header: "../docs/header.html"
+      after_body: "../docs/footer.html"
 ---
 
 <style>
@@ -194,7 +194,7 @@ line-height: 1.05;
 <details class="gb-settings-dropdown">
 <summary class="gb-settings-dropdown__summary">
 <span class="gb-settings-dropdown__title">Bingo settings</span>
-<span class="gb-settings-dropdown__meta"> </span>
+<span class="gb-settings-dropdown__meta">Difficulty, year range, and print options</span>
 </summary>
 
 <div class="gb-settings-dropdown__body">
