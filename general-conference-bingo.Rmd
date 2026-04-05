@@ -1,0 +1,1220 @@
+---
+title: "General Conference Bingo"
+output:
+  html_document:
+    includes:
+      in_header: "../docs/header.html"
+      after_body: "../docs/footer.html"
+---
+
+<style>
+h1.title {
+display: none;
+}
+
+.gb-bingo-card-shell {
+background: #ffffff;
+border: 1px solid rgba(148, 163, 184, 0.28);
+border-radius: 22px;
+padding: 20px;
+box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+.gb-bingo-preview-wrap {
+display: flex;
+justify-content: center;
+}
+
+.gb-bingo-card {
+width: min(820px, 100%);
+aspect-ratio: 8.5 / 11;
+background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+border: 2px solid #0f172a;
+padding: 24px 24px 18px;
+color: #0f172a;
+display: grid;
+grid-template-rows: auto 1fr auto;
+gap: 14px;
+box-sizing: border-box;
+}
+
+.gb-bingo-card__header,
+.gb-bingo-card__footer {
+display: flex;
+justify-content: space-between;
+align-items: flex-start;
+gap: 12px;
+}
+
+.gb-bingo-card__footer {
+align-items: flex-end;
+min-height: 26px;
+}
+
+.gb-bingo-card__eyebrow {
+margin: 0;
+font-size: 0.78rem;
+font-weight: 700;
+line-height: 1.15;
+letter-spacing: 0.02em;
+color: #475569;
+text-transform: capitalize;
+}
+
+.gb-bingo-card__title {
+margin: 0;
+font-size: 1.45rem;
+font-weight: 800;
+line-height: 1.05;
+letter-spacing: 0.01em;
+}
+
+.gb-bingo-card__logo,
+.gb-bingo-card__footer-logo {
+display: block;
+object-fit: contain;
+opacity: 0.4;
+filter: grayscale(100%);
+}
+
+.gb-bingo-card__logo {
+width: 68px;
+height: 68px;
+}
+
+.gb-bingo-card__main {
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+}
+
+.gb-bingo-grid-frame {
+width: var(--grid-size, 100%);
+height: var(--grid-size, auto);
+max-width: 100%;
+max-height: 100%;
+aspect-ratio: 1 / 1;
+display: flex;
+align-items: stretch;
+justify-content: stretch;
+}
+
+.gb-bingo-grid {
+display: grid;
+grid-template-columns: repeat(5, minmax(0, 1fr));
+grid-template-rows: repeat(5, minmax(0, 1fr));
+width: 100%;
+height: 100%;
+border: 2px solid #0f172a;
+background: #ffffff;
+}
+
+.gb-bingo-cell {
+border-right: 1.5px solid #0f172a;
+border-bottom: 1.5px solid #0f172a;
+padding: clamp(12px, 1.4vw, 16px);
+display: flex;
+align-items: center;
+justify-content: center;
+text-align: center;
+background: #ffffff;
+overflow: hidden;
+box-sizing: border-box;
+min-width: 0;
+min-height: 0;
+position: relative;
+}
+
+.gb-bingo-cell:nth-child(5n) {
+border-right: none;
+}
+
+.gb-bingo-cell:nth-last-child(-n + 5) {
+border-bottom: none;
+}
+
+.gb-bingo-cell--free {
+background: #eff6ff;
+}
+
+.gb-bingo-cell__fitbox {
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+min-width: 0;
+min-height: 0;
+}
+
+.gb-bingo-cell__word {
+display: inline-block;
+margin: 0;
+padding: 0;
+font-weight: 800;
+font-size: var(--cell-base-font-size, 18px);
+line-height: 1.05;
+letter-spacing: -0.018em;
+text-align: center;
+white-space: nowrap;
+word-break: keep-all;
+overflow-wrap: normal;
+hyphens: none;
+transform-origin: center center;
+transform: scale(var(--fit-scale, 1));
+max-width: none;
+text-rendering: geometricPrecision;
+}
+
+.gb-bingo-cell__word--phrase {
+display: block;
+width: 100%;
+white-space: normal;
+overflow-wrap: break-word;
+word-break: normal;
+line-height: 1.03;
+}
+
+.gb-bingo-card__footer-brand {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+font-size: 0.72rem;
+line-height: 1.1;
+font-weight: 700;
+color: #475569;
+opacity: 0.72;
+text-align: right;
+}
+
+.gb-bingo-card__footer-logo {
+width: 18px;
+height: 18px;
+}
+
+.gb-generator-grid {
+display: grid;
+grid-template-columns: 1fr auto;
+gap: 14px;
+align-items: end;
+}
+
+.gb-generator-grid__count {
+min-width: 170px;
+}
+
+.gb-config-note {
+margin-top: 12px;
+color: #64748b;
+font-size: 0.84rem;
+line-height: 1.5;
+}
+
+.gb-pdf-render-stage {
+position: fixed;
+left: -99999px;
+top: 0;
+width: 816px;
+pointer-events: none;
+opacity: 0;
+contain: layout style paint;
+}
+
+.gb-bingo-empty {
+padding: 36px 18px;
+text-align: center;
+color: #64748b;
+font-style: italic;
+}
+
+.gb-label-with-tip {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+}
+
+.gb-label-with-tip .gb-field__label {
+margin: 0;
+}
+
+@media (max-width: 900px) {
+.gb-generator-grid {
+grid-template-columns: 1fr;
+}
+
+.gb-generator-grid__count {
+min-width: 0;
+}
+
+.gb-bingo-card {
+padding: 18px 18px 14px;
+gap: 10px;
+}
+
+.gb-bingo-card__logo {
+width: 56px;
+height: 56px;
+}
+}
+
+@media (max-width: 680px) {
+.gb-bingo-card {
+padding: 14px 14px 12px;
+}
+
+.gb-bingo-card__title {
+font-size: 1.1rem;
+}
+
+.gb-bingo-card__eyebrow {
+font-size: 0.68rem;
+}
+
+.gb-bingo-cell {
+padding: 10px;
+}
+}
+
+.gb-bingo-cell--selected {
+background: rgba(255, 191, 0, 0.6);
+}
+</style>
+
+<link rel="stylesheet" href="../search/search-common.css">
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+<div class="gb-search-shell" id="conferenceBingoApp">
+
+<section class="gb-search-card gb-search-card--settings-top">
+<details class="gb-settings-dropdown">
+<summary class="gb-settings-dropdown__summary">
+<span class="gb-settings-dropdown__title">Bingo settings</span>
+<span class="gb-settings-dropdown__meta"> </span>
+</summary>
+
+<div class="gb-settings-dropdown__body">
+
+<div class="gb-form-grid gb-form-grid--2 gb-form-grid--aligned">
+<div class="gb-field">
+<label class="gb-field__label" for="bingoYearFrom">Year from</label>
+<input id="bingoYearFrom" class="gb-input" type="number" inputmode="numeric" placeholder="2000">
+</div>
+
+<div class="gb-field">
+<label class="gb-field__label" for="bingoYearTo">Year to</label>
+<input id="bingoYearTo" class="gb-input" type="number" inputmode="numeric" placeholder="2025">
+</div>
+</div>
+
+<div class="gb-form-grid gb-form-grid--2 gb-form-grid--aligned">
+<div class="gb-field">
+<div class="gb-label-with-tip">
+<label class="gb-field__label" for="bingoDifficulty">Difficulty</label>
+<button type="button" class="gb-info-chip" aria-label="Difficulty help" title="Easy uses the most common Gospel-focused conference words. Medium uses moderately common words. Hard uses less common but still recognizable conference words. Random mixes all three pools.">ⓘ</button>
+</div>
+<select id="bingoDifficulty" class="gb-select">
+<option value="easy">Easy</option>
+<option value="medium">Medium</option>
+<option value="hard">Hard</option>
+<option value="random">Random</option>
+</select>
+</div>
+
+<div class="gb-field">
+<span class="gb-field__label">Free space</span>
+<label class="gb-checkbox" for="bingoUseFreeSpace">
+<input id="bingoUseFreeSpace" type="checkbox" checked>
+<span>Use a free center square</span>
+</label>
+</div>
+</div>
+
+<div class="gb-btn-row gb-btn-row--settings">
+<button type="button" class="gb-btn gb-btn--ghost" id="bingoResetButton">Reset settings to defaults</button>
+</div>
+
+</div>
+</details>
+</section>
+
+<section class="gb-search-card gb-search-card--search">
+<div class="gb-search-card__heading gb-search-card__heading--compact">
+<div>
+<h2 class="gb-search-card__title">Generate bingo cards</h2>
+<p class="gb-search-card__subtitle">Preview one possible card, then generate printable bingo sheet PDFs.</p>
+</div>
+</div>
+
+<div class="gb-generator-grid">
+<div class="gb-btn-row">
+<button type="button" class="gb-btn gb-btn--primary" id="bingoGenerateButton">Generate new card</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="bingoPrintSheetsButton" disabled>Print Bingo Sheets</button>
+</div>
+
+<div class="gb-field gb-generator-grid__count">
+<label class="gb-field__label" for="bingoPdfCount">Pages</label>
+<select id="bingoPdfCount" class="gb-select">
+<option value="1">1 page</option>
+<option value="2">2 pages</option>
+<option value="3">3 pages</option>
+<option value="4">4 pages</option>
+<option value="5">5 pages</option>
+<option value="6">6 pages</option>
+<option value="7">7 pages</option>
+<option value="8">8 pages</option>
+<option value="9">9 pages</option>
+<option value="10">10 pages</option>
+</select>
+</div>
+</div>
+
+<div id="bingoStatus" class="gb-status" aria-live="polite"></div>
+<div class="gb-config-note">Preview shows one possible card from the current settings. Printed sheets are generated fresh each time from the same difficulty and year range.</div>
+</section>
+
+<section class="gb-search-card">
+<div class="gb-search-card__heading gb-search-card__heading--compact">
+<div>
+<h2 class="gb-search-card__title">Current bingo card preview</h2>
+<p class="gb-search-card__subtitle" id="bingoSummary">Loading conference words…</p>
+</div>
+</div>
+
+<div id="bingoPrintArea" class="gb-bingo-preview-wrap">
+<div class="gb-bingo-empty">Preparing conference word pools…</div>
+</div>
+</section>
+
+<div id="pdfRenderStage" class="gb-pdf-render-stage" aria-hidden="true"></div>
+
+</div>
+
+<script>
+const BINGO_CONFIG = {
+datasetUrl: 'https://kameronyork.com/datasets/general-conference-talks.json',
+allowedWordsUrl: 'https://kameronyork.com/datasets/conference-bingo-allowed-words.json',
+logoUrl: 'https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png',
+defaultYearFrom: 2000,
+defaultDifficulty: 'easy',
+defaultUseFreeSpace: true,
+maxPdfCards: 10,
+minAverageMentionsPerConference: 1.25,
+easyMinAveragePerConference: 5.5,
+mediumMinAveragePerConference: 3,
+mediumMaxAveragePerConference: 5.5,
+hardMinAveragePerConference: 1.75,
+hardMaxAveragePerConference: 3.25
+};
+
+const state = {
+rawTalks: [],
+processedTalks: [],
+yearRange: { min: null, max: null },
+cache: new Map(),
+currentCard: null,
+ready: false,
+allowedWords: new Set(),
+normalizationMap: {}
+};
+
+const elements = {};
+let cardResizeObserver = null;
+let fitRaf = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+cacheElements();
+bindEvents();
+prepareConferenceData().catch((error) => {
+console.error(error);
+setStatus('error', 'Gospel Buddy could not prepare the conference word pools. Please try refreshing the page.');
+});
+});
+
+function cacheElements() {
+elements.yearFrom = document.getElementById('bingoYearFrom');
+elements.yearTo = document.getElementById('bingoYearTo');
+elements.difficulty = document.getElementById('bingoDifficulty');
+elements.useFreeSpace = document.getElementById('bingoUseFreeSpace');
+elements.pdfCount = document.getElementById('bingoPdfCount');
+elements.generate = document.getElementById('bingoGenerateButton');
+elements.printSheets = document.getElementById('bingoPrintSheetsButton');
+elements.reset = document.getElementById('bingoResetButton');
+elements.status = document.getElementById('bingoStatus');
+elements.summary = document.getElementById('bingoSummary');
+elements.printArea = document.getElementById('bingoPrintArea');
+elements.pdfStage = document.getElementById('pdfRenderStage');
+}
+
+function bindEvents() {
+elements.generate.addEventListener('click', () => generateAndRenderCard(true));
+elements.printSheets.addEventListener('click', exportPdfBatch);
+elements.reset.addEventListener('click', resetSettings);
+
+window.addEventListener('resize', () => {
+const liveCard = elements.printArea.querySelector('.gb-bingo-card');
+if (liveCard) {
+scheduleCardFit(liveCard);
+}
+});
+}
+
+async function prepareConferenceData() {
+setStatus('info', 'Preparing conference word pools…', true);
+
+const [datasetResponse, allowedResponse] = await Promise.all([
+fetch(BINGO_CONFIG.datasetUrl, {
+cache: 'force-cache',
+credentials: 'omit'
+}),
+fetch(BINGO_CONFIG.allowedWordsUrl, {
+cache: 'force-cache',
+credentials: 'omit'
+})
+]);
+
+if (!datasetResponse.ok) {
+throw new Error(`Dataset request failed with status ${datasetResponse.status}`);
+}
+
+if (!allowedResponse.ok) {
+throw new Error(`Allowed word list request failed with status ${allowedResponse.status}`);
+}
+
+const data = await datasetResponse.json();
+const allowedConfig = await allowedResponse.json();
+
+if (!Array.isArray(data) || data.length === 0) {
+throw new Error('The conference talks dataset did not return any talks.');
+}
+
+initializeAllowedWords(allowedConfig);
+
+state.rawTalks = data;
+state.processedTalks = data
+.filter((row) => row && typeof row.text === 'string' && Number.isFinite(Number(row.year)))
+.map((row) => {
+const year = Number(row.year);
+const month = String(row.month || '').trim() || 'Unknown';
+const conferenceKey = `${year}-${month}`;
+return {
+year,
+month,
+conferenceKey,
+wordCounts: buildWordCounts(row.text)
+};
+});
+
+const years = state.processedTalks.map((talk) => talk.year).filter((year) => Number.isFinite(year));
+state.yearRange.min = Math.min(...years);
+state.yearRange.max = Math.max(...years);
+
+const defaultFrom = Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min);
+elements.yearFrom.value = String(defaultFrom);
+elements.yearTo.value = String(state.yearRange.max);
+elements.yearFrom.min = String(state.yearRange.min);
+elements.yearFrom.max = String(state.yearRange.max);
+elements.yearTo.min = String(state.yearRange.min);
+elements.yearTo.max = String(state.yearRange.max);
+elements.difficulty.value = BINGO_CONFIG.defaultDifficulty;
+elements.useFreeSpace.checked = BINGO_CONFIG.defaultUseFreeSpace;
+elements.pdfCount.value = '1';
+
+state.ready = true;
+elements.printSheets.disabled = false;
+
+setStatus('success', 'Conference word pools are ready.');
+generateAndRenderCard(false);
+}
+
+function initializeAllowedWords(config) {
+const allowedWords = Array.isArray(config && config.allowedWords) ? config.allowedWords : [];
+const normalizationMap = (config && typeof config.normalizationMap === 'object' && config.normalizationMap) ? config.normalizationMap : {};
+
+state.allowedWords = new Set(
+allowedWords
+.map((word) => String(word || '').trim().toLowerCase())
+.filter(Boolean)
+);
+
+state.normalizationMap = {};
+Object.keys(normalizationMap).forEach((key) => {
+const normalizedKey = String(key || '').trim().toLowerCase();
+const normalizedValue = String(normalizationMap[key] || '').trim().toLowerCase();
+if (normalizedKey && normalizedValue) {
+state.normalizationMap[normalizedKey] = normalizedValue;
+}
+});
+
+if (state.allowedWords.size === 0) {
+throw new Error('The allowed Gospel word list is empty.');
+}
+}
+
+function buildWordCounts(text) {
+const counts = new Map();
+const tokens = tokenizeText(text);
+
+for (const token of tokens) {
+counts.set(token, (counts.get(token) || 0) + 1);
+}
+
+return counts;
+}
+
+function tokenizeText(text) {
+const cleaned = String(text || '')
+.toLowerCase()
+.replace(/[\u2018\u2019]/g, "'")
+.replace(/[^a-z'\s-]/g, ' ')
+.replace(/-/g, ' ');
+
+const rawTokens = cleaned.split(/\s+/).filter(Boolean);
+const acceptedTokens = [];
+
+for (let token of rawTokens) {
+token = token.replace(/^'+|'+$/g, '').replace(/^-+|-+$/g, '');
+if (!token) {
+continue;
+}
+
+const normalized = normalizeWord(token);
+if (!normalized) {
+continue;
+}
+
+acceptedTokens.push(normalized);
+}
+
+return acceptedTokens;
+}
+
+function normalizeWord(word) {
+let normalized = String(word || '').toLowerCase().trim();
+
+if (!normalized) {
+return '';
+}
+
+normalized = normalized.replace(/^'+|'+$/g, '');
+normalized = normalized.replace(/^[^a-z]+|[^a-z]+$/g, '');
+
+if (!normalized) {
+return '';
+}
+
+if (normalized.endsWith("'s")) {
+normalized = normalized.slice(0, -2);
+}
+
+if (state.normalizationMap[normalized]) {
+const mapped = state.normalizationMap[normalized];
+return state.allowedWords.has(mapped) ? mapped : '';
+}
+
+if (state.allowedWords.has(normalized)) {
+return normalized;
+}
+
+const singular = singularizeWord(normalized);
+if (!singular) {
+return '';
+}
+
+if (state.normalizationMap[singular]) {
+const mapped = state.normalizationMap[singular];
+return state.allowedWords.has(mapped) ? mapped : '';
+}
+
+if (state.allowedWords.has(singular)) {
+return singular;
+}
+
+return '';
+}
+
+function singularizeWord(word) {
+if (!word) {
+return '';
+}
+
+if (word.endsWith('ies') && word.length > 4) {
+return word.slice(0, -3) + 'y';
+}
+
+if (/(ches|shes|sses|xes|zes)$/.test(word) && word.length > 4) {
+return word.slice(0, -2);
+}
+
+if (word.endsWith('s') && word.length > 4 && !word.endsWith('ss') && !word.endsWith('us')) {
+return word.slice(0, -1);
+}
+
+return word;
+}
+
+function getSettings() {
+const yearFrom = clampNumber(elements.yearFrom.value, state.yearRange.min, state.yearRange.max, Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min));
+const yearTo = clampNumber(elements.yearTo.value, state.yearRange.min, state.yearRange.max, state.yearRange.max);
+
+return {
+yearFrom: Math.min(yearFrom, yearTo),
+yearTo: Math.max(yearFrom, yearTo),
+difficulty: elements.difficulty.value || BINGO_CONFIG.defaultDifficulty,
+useFreeSpace: elements.useFreeSpace.checked,
+pdfCount: clampNumber(elements.pdfCount.value, 1, BINGO_CONFIG.maxPdfCards, 1)
+};
+}
+
+function resetSettings() {
+if (state.yearRange.min === null || state.yearRange.max === null) {
+return;
+}
+
+elements.yearFrom.value = String(Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min));
+elements.yearTo.value = String(state.yearRange.max);
+elements.difficulty.value = BINGO_CONFIG.defaultDifficulty;
+elements.useFreeSpace.checked = BINGO_CONFIG.defaultUseFreeSpace;
+elements.pdfCount.value = '1';
+generateAndRenderCard(false);
+}
+
+function clampNumber(value, min, max, fallback) {
+const numeric = Number(value);
+if (!Number.isFinite(numeric)) {
+return fallback;
+}
+return Math.min(Math.max(Math.round(numeric), min), max);
+}
+
+function getWordStatsForRange(yearFrom, yearTo) {
+const cacheKey = `${yearFrom}-${yearTo}`;
+if (state.cache.has(cacheKey)) {
+return state.cache.get(cacheKey);
+}
+
+const talks = state.processedTalks.filter((talk) => talk.year >= yearFrom && talk.year <= yearTo);
+const conferenceKeys = Array.from(new Set(talks.map((talk) => talk.conferenceKey)));
+const conferenceCount = conferenceKeys.length;
+
+if (conferenceCount === 0) {
+const emptyResult = { stats: [], conferenceCount: 0, talkCount: 0 };
+state.cache.set(cacheKey, emptyResult);
+return emptyResult;
+}
+
+const statMap = new Map();
+
+for (const talk of talks) {
+for (const [word, count] of talk.wordCounts.entries()) {
+if (!statMap.has(word)) {
+statMap.set(word, {
+word,
+totalCount: 0,
+talkCount: 0,
+conferenceCounts: new Map()
+});
+}
+
+const entry = statMap.get(word);
+entry.totalCount += count;
+entry.talkCount += 1;
+entry.conferenceCounts.set(talk.conferenceKey, (entry.conferenceCounts.get(talk.conferenceKey) || 0) + count);
+}
+}
+
+const stats = Array.from(statMap.values())
+.map((entry) => {
+const conferenceMentionCount = entry.conferenceCounts.size;
+const avgPerConference = entry.totalCount / conferenceCount;
+return {
+word: entry.word,
+totalCount: entry.totalCount,
+talkCount: entry.talkCount,
+conferenceMentionCount,
+avgPerConference
+};
+})
+.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.minAverageMentionsPerConference)
+.sort((left, right) => {
+if (right.avgPerConference !== left.avgPerConference) {
+return right.avgPerConference - left.avgPerConference;
+}
+if (right.totalCount !== left.totalCount) {
+return right.totalCount - left.totalCount;
+}
+return left.word.localeCompare(right.word);
+});
+
+const result = {
+stats,
+conferenceCount,
+talkCount: talks.length
+};
+
+state.cache.set(cacheKey, result);
+return result;
+}
+
+function getDifficultyPool(stats, difficulty) {
+const ranked = stats.slice();
+
+const easyBase = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.easyMinAveragePerConference);
+const mediumBase = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.mediumMinAveragePerConference && entry.avgPerConference < BINGO_CONFIG.mediumMaxAveragePerConference);
+const hardBase = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.hardMinAveragePerConference && entry.avgPerConference < BINGO_CONFIG.hardMaxAveragePerConference);
+
+const easy = uniqueByWord(easyBase.length >= 35 ? easyBase : ranked.slice(0, Math.min(100, ranked.length)));
+const medium = uniqueByWord(mediumBase.length >= 35 ? mediumBase : ranked.slice(Math.min(20, ranked.length), Math.min(140, ranked.length)));
+const hardFallback = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.hardMinAveragePerConference).slice(Math.min(45, ranked.length), Math.min(180, ranked.length));
+const hard = uniqueByWord(hardBase.length >= 35 ? hardBase : hardFallback);
+const random = uniqueByWord([...easy, ...medium, ...hard]);
+
+const pools = {
+easy,
+medium,
+hard,
+random
+};
+
+return pools[difficulty] || pools.easy;
+}
+
+function uniqueByWord(entries) {
+const seen = new Set();
+const unique = [];
+
+for (const entry of entries) {
+if (!entry || !entry.word || seen.has(entry.word)) {
+continue;
+}
+seen.add(entry.word);
+unique.push(entry);
+}
+
+return unique;
+}
+
+function shuffle(items) {
+const copy = [...items];
+for (let index = copy.length - 1; index > 0; index -= 1) {
+const swapIndex = Math.floor(Math.random() * (index + 1));
+[copy[index], copy[swapIndex]] = [copy[swapIndex], copy[index]];
+}
+return copy;
+}
+
+function prettyDifficulty(value) {
+switch (value) {
+case 'easy':
+return 'Easy';
+case 'medium':
+return 'Medium';
+case 'hard':
+return 'Hard';
+case 'random':
+return 'Random';
+default:
+return 'Easy';
+}
+}
+
+function toTitleCase(text) {
+return String(text || '')
+.toLowerCase()
+.replace(/\b([a-z])/g, (match) => match.toUpperCase());
+}
+
+function createCardData(settings) {
+const { stats, conferenceCount, talkCount } = getWordStatsForRange(settings.yearFrom, settings.yearTo);
+
+if (conferenceCount === 0 || talkCount === 0) {
+throw new Error('No conference talks were found in that year range.');
+}
+
+const pool = getDifficultyPool(stats, settings.difficulty);
+const requiredWords = settings.useFreeSpace ? 24 : 25;
+
+if (pool.length < requiredWords) {
+throw new Error('There are not enough eligible Gospel-focused conference words in that year range. Try widening the year range or choosing an easier difficulty.');
+}
+
+const picked = shuffle(pool).slice(0, requiredWords);
+const cells = picked.map((entry) => ({
+word: toTitleCase(entry.word),
+isFree: false
+}));
+
+if (settings.useFreeSpace) {
+cells.splice(12, 0, {
+word: 'FREE',
+isFree: true
+});
+}
+
+return {
+title: `${prettyDifficulty(settings.difficulty)} Conference Bingo`,
+difficulty: prettyDifficulty(settings.difficulty),
+yearFrom: settings.yearFrom,
+yearTo: settings.yearTo,
+conferenceCount,
+talkCount,
+cells
+};
+}
+
+function createCardElement(card) {
+const shell = document.createElement('div');
+shell.className = 'gb-bingo-card-shell';
+
+const cardElement = document.createElement('article');
+cardElement.className = 'gb-bingo-card';
+
+const header = document.createElement('div');
+header.className = 'gb-bingo-card__header';
+
+const heading = document.createElement('div');
+
+const title = document.createElement('h3');
+title.className = 'gb-bingo-card__title';
+title.textContent = 'General Conference Bingo';
+
+const meta = document.createElement('p');
+meta.className = 'gb-bingo-card__eyebrow';
+meta.textContent = `${card.difficulty} difficulty`;
+
+heading.append(title, meta);
+
+const logo = document.createElement('img');
+logo.className = 'gb-bingo-card__logo';
+logo.src = BINGO_CONFIG.logoUrl;
+logo.alt = 'Gospel Buddy logo';
+logo.crossOrigin = 'anonymous';
+logo.decoding = 'async';
+
+header.append(heading, logo);
+
+const main = document.createElement('div');
+main.className = 'gb-bingo-card__main';
+
+const gridFrame = document.createElement('div');
+gridFrame.className = 'gb-bingo-grid-frame';
+
+const grid = document.createElement('div');
+grid.className = 'gb-bingo-grid';
+
+for (const cell of card.cells) {
+const cellElement = document.createElement('div');
+cellElement.className = `gb-bingo-cell${cell.isFree ? ' gb-bingo-cell--free' : ''}`;
+
+cellElement.addEventListener('click', () => {
+cellElement.classList.toggle('gb-bingo-cell--selected');
+});
+
+const fitBox = document.createElement('div');
+fitBox.className = 'gb-bingo-cell__fitbox';
+
+const word = document.createElement('div');
+word.className = 'gb-bingo-cell__word';
+word.setAttribute('lang', 'en');
+word.textContent = cell.word;
+
+fitBox.appendChild(word);
+cellElement.appendChild(fitBox);
+grid.appendChild(cellElement);
+}
+
+gridFrame.appendChild(grid);
+main.appendChild(gridFrame);
+
+const footer = document.createElement('div');
+footer.className = 'gb-bingo-card__footer';
+
+const spacer = document.createElement('div');
+spacer.setAttribute('aria-hidden', 'true');
+
+const footerBrand = document.createElement('div');
+footerBrand.className = 'gb-bingo-card__footer-brand';
+
+const footerText = document.createElement('span');
+footerText.textContent = 'Powered by mygospelbuddy.com';
+
+const footerLogo = document.createElement('img');
+footerLogo.className = 'gb-bingo-card__footer-logo';
+footerLogo.src = BINGO_CONFIG.logoUrl;
+footerLogo.alt = '';
+footerLogo.crossOrigin = 'anonymous';
+footerLogo.decoding = 'async';
+
+footerBrand.append(footerText, footerLogo);
+footer.append(spacer, footerBrand);
+
+cardElement.append(header, main, footer);
+shell.appendChild(cardElement);
+
+scheduleCardFit(cardElement);
+
+return shell;
+}
+
+function sizeCardGrid(cardElement) {
+const main = cardElement.querySelector('.gb-bingo-card__main');
+const frame = cardElement.querySelector('.gb-bingo-grid-frame');
+
+if (!main || !frame) {
+return;
+}
+
+const mainRect = main.getBoundingClientRect();
+const gridSize = Math.floor(Math.min(mainRect.width, mainRect.height) * 0.9);
+
+if (gridSize <= 0) {
+return;
+}
+
+frame.style.setProperty('--grid-size', `${gridSize}px`);
+
+const cellSize = gridSize / 5;
+const baseFontSize = Math.max(10, Math.min(30, cellSize * 0.25));
+cardElement.style.setProperty('--cell-size', `${cellSize}px`);
+cardElement.style.setProperty('--cell-base-font-size', `${baseFontSize}px`);
+}
+
+function fitCardWords(cardElement) {
+const words = Array.from(cardElement.querySelectorAll('.gb-bingo-cell__word'));
+for (const word of words) {
+fitWordToCell(word);
+}
+}
+
+function fitWordToCell(wordElement) {
+const fitBox = wordElement.parentElement;
+const cell = fitBox ? fitBox.parentElement : null;
+
+if (!fitBox || !cell) {
+return;
+}
+
+const text = (wordElement.textContent || '').trim();
+const isPhrase = /\s/.test(text);
+
+wordElement.classList.toggle('gb-bingo-cell__word--phrase', isPhrase);
+wordElement.style.setProperty('--fit-scale', '1');
+
+const cellWidth = fitBox.clientWidth;
+const cellHeight = fitBox.clientHeight;
+
+if (!cellWidth || !cellHeight) {
+return;
+}
+
+if (isPhrase) {
+wordElement.style.width = '100%';
+wordElement.style.whiteSpace = 'normal';
+} else {
+wordElement.style.width = 'auto';
+wordElement.style.whiteSpace = 'nowrap';
+}
+
+const naturalWidth = wordElement.scrollWidth;
+const naturalHeight = wordElement.scrollHeight;
+
+if (!naturalWidth || !naturalHeight) {
+return;
+}
+
+const widthRatio = cellWidth / naturalWidth;
+const heightRatio = cellHeight / naturalHeight;
+const safeScale = Math.min(1, widthRatio, heightRatio) * 0.94;
+
+wordElement.style.setProperty('--fit-scale', String(Math.max(0.55, safeScale)));
+}
+
+function scheduleCardFit(cardElement) {
+if (!cardElement) {
+return;
+}
+
+if (fitRaf) {
+cancelAnimationFrame(fitRaf);
+}
+
+fitRaf = requestAnimationFrame(() => {
+sizeCardGrid(cardElement);
+fitCardWords(cardElement);
+});
+}
+
+function observeCardResizing(cardElement) {
+if (cardResizeObserver) {
+cardResizeObserver.disconnect();
+cardResizeObserver = null;
+}
+
+if (!window.ResizeObserver || !cardElement) {
+return;
+}
+
+cardResizeObserver = new ResizeObserver(() => {
+scheduleCardFit(cardElement);
+});
+
+cardResizeObserver.observe(cardElement);
+
+const frame = cardElement.querySelector('.gb-bingo-grid-frame');
+if (frame) {
+cardResizeObserver.observe(frame);
+}
+}
+
+function waitForImageLoad(node) {
+const images = Array.from(node.querySelectorAll('img'));
+if (images.length === 0) {
+return Promise.resolve();
+}
+
+return Promise.all(images.map((img) => {
+if (img.complete) {
+return Promise.resolve();
+}
+return new Promise((resolve) => {
+img.addEventListener('load', resolve, { once: true });
+img.addEventListener('error', resolve, { once: true });
+});
+}));
+}
+
+function renderCurrentCard(card, settings) {
+elements.printArea.innerHTML = '';
+const shell = createCardElement(card);
+elements.printArea.appendChild(shell);
+elements.summary.textContent = `Preview example • ${card.difficulty} difficulty • ${card.conferenceCount} conference(s) analyzed • ${card.talkCount} talk(s) in range • ${settings.yearFrom}–${settings.yearTo}`;
+state.currentCard = { card, settings };
+
+const liveCard = shell.querySelector('.gb-bingo-card');
+observeCardResizing(liveCard);
+
+requestAnimationFrame(() => {
+scheduleCardFit(liveCard);
+});
+}
+
+function setStatus(type, message, showSpinner = false) {
+elements.status.className = `gb-status gb-status--${type} is-visible`;
+elements.status.innerHTML = `${showSpinner ? '<span class="gb-status__spinner" aria-hidden="true"></span>' : ''}${message}`;
+}
+
+function clearStatus() {
+elements.status.className = 'gb-status';
+elements.status.innerHTML = '';
+}
+
+function generateAndRenderCard(showReadyMessage) {
+if (!state.ready) {
+setStatus('info', 'Conference word pools are still loading…', true);
+return;
+}
+
+const settings = getSettings();
+
+try {
+setStatus('info', 'Building your bingo card…', true);
+const card = createCardData(settings);
+renderCurrentCard(card, settings);
+
+if (showReadyMessage) {
+setStatus('success', 'New bingo card preview ready.');
+} else {
+clearStatus();
+}
+} catch (error) {
+console.error(error);
+elements.printArea.innerHTML = '<div class="gb-bingo-empty">No card could be generated with those settings.</div>';
+elements.summary.textContent = 'Adjust the settings and try again.';
+setStatus('error', error.message || 'Gospel Buddy could not generate a bingo card.');
+}
+}
+
+async function exportPdfBatch() {
+if (!state.ready) {
+return;
+}
+
+const settings = getSettings();
+const totalCards = settings.pdfCount;
+const { jsPDF } = window.jspdf;
+
+setStatus('info', `Creating ${totalCards} bingo PDF page${totalCards === 1 ? '' : 's'}…`, true);
+elements.pdfStage.innerHTML = '';
+
+try {
+const pdf = new jsPDF({
+orientation: 'portrait',
+unit: 'pt',
+format: 'letter'
+});
+
+for (let index = 0; index < totalCards; index += 1) {
+const card = createCardData(settings);
+const node = createCardElement(card);
+elements.pdfStage.appendChild(node);
+
+await waitForNextFrame();
+await waitForImageLoad(node);
+
+const pdfCard = node.querySelector('.gb-bingo-card');
+sizeCardGrid(pdfCard);
+fitCardWords(pdfCard);
+
+await waitForNextFrame();
+
+const canvas = await html2canvas(node, {
+backgroundColor: '#ffffff',
+scale: 2,
+useCORS: true
+});
+
+const imgData = canvas.toDataURL('image/png');
+const pageWidth = pdf.internal.pageSize.getWidth();
+const pageHeight = pdf.internal.pageSize.getHeight();
+const margin = 28;
+
+const ratio = Math.min(
+(pageWidth - margin * 2) / canvas.width,
+(pageHeight - margin * 2) / canvas.height
+);
+
+const renderWidth = canvas.width * ratio;
+const renderHeight = canvas.height * ratio;
+const offsetX = (pageWidth - renderWidth) / 2;
+const offsetY = (pageHeight - renderHeight) / 2;
+
+if (index > 0) {
+pdf.addPage();
+}
+
+pdf.addImage(imgData, 'PNG', offsetX, offsetY, renderWidth, renderHeight, undefined, 'FAST');
+node.remove();
+}
+
+const safeDifficulty = prettyDifficulty(settings.difficulty).toLowerCase().replace(/\s+/g, '-');
+const safePages = totalCards === 1 ? '1-page' : `${totalCards}-pages`;
+pdf.save(`general-conference-bingo-${safeDifficulty}-${safePages}.pdf`);
+setStatus('success', `PDF ready: ${totalCards} bingo page${totalCards === 1 ? '' : 's'} generated.`);
+} catch (error) {
+console.error(error);
+setStatus('error', 'Gospel Buddy could not create the bingo PDF. Please try again.');
+} finally {
+elements.pdfStage.innerHTML = '';
+}
+}
+
+function waitForNextFrame() {
+return new Promise((resolve) => {
+window.requestAnimationFrame(() => {
+window.requestAnimationFrame(resolve);
+});
+});
+}
+</script>
