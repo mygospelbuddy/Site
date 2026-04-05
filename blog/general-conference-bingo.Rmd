@@ -113,7 +113,7 @@ background: #ffffff;
 .gb-bingo-cell {
 border-right: 1.5px solid #0f172a;
 border-bottom: 1.5px solid #0f172a;
-padding: clamp(5px, 0.8vw, 8px);
+padding: clamp(8px, 1.1vw, 12px);
 display: flex;
 align-items: center;
 justify-content: center;
@@ -139,7 +139,6 @@ background: #eff6ff;
 }
 
 .gb-bingo-cell__word {
-display: -webkit-box;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -150,16 +149,15 @@ margin: 0;
 padding: 0;
 font-weight: 800;
 font-size: var(--cell-font-size, 16px);
-line-height: 1.06;
+line-height: 1.08;
 letter-spacing: -0.01em;
 text-align: center;
 word-break: normal;
 overflow-wrap: normal;
 hyphens: none;
 white-space: nowrap;
-text-wrap: balance;
 min-width: 0;
-transform-origin: center center;
+text-transform: capitalize;
 }
 
 .gb-bingo-cell__word--phrase {
@@ -808,6 +806,12 @@ return 'Easy';
 }
 }
 
+function toTitleCase(text) {
+return String(text || '')
+.toLowerCase()
+.replace(/\b([a-z])/g, (match) => match.toUpperCase());
+}
+
 function createCardData(settings) {
 const { stats, conferenceCount, talkCount } = getWordStatsForRange(settings.yearFrom, settings.yearTo);
 
@@ -824,7 +828,7 @@ throw new Error('There are not enough eligible Gospel-focused conference words i
 
 const picked = shuffle(pool).slice(0, requiredWords);
 const cells = picked.map((entry) => ({
-word: entry.word,
+word: toTitleCase(entry.word),
 isFree: false
 }));
 
@@ -954,7 +958,7 @@ return;
 frame.style.setProperty('--grid-size', `${gridSize}px`);
 
 const cellSize = gridSize / 5;
-const baseFontSize = Math.max(10, Math.min(28, cellSize * 0.24));
+const baseFontSize = Math.max(10, Math.min(26, cellSize * 0.22));
 cardElement.style.setProperty('--cell-font-size', `${baseFontSize}px`);
 cardElement.style.setProperty('--cell-size', `${cellSize}px`);
 }
@@ -989,22 +993,18 @@ const style = window.getComputedStyle(cell);
 const padX = parseFloat(style.paddingLeft || 0) + parseFloat(style.paddingRight || 0);
 const padY = parseFloat(style.paddingTop || 0) + parseFloat(style.paddingBottom || 0);
 
-const maxWidth = Math.max(8, cellWidth - padX - 4);
-const maxHeight = Math.max(8, cellHeight - padY - 4);
+const maxWidth = Math.max(8, cellWidth - padX - 8);
+const maxHeight = Math.max(8, cellHeight - padY - 8);
 
-const cellSizeVar = parseFloat(getComputedStyle(wordElement.closest('.gb-bingo-card')).getPropertyValue('--cell-size')) || Math.min(cellWidth, cellHeight);
-const startSize = Math.max(10, Math.min(28, cellSizeVar * (isPhrase ? 0.205 : 0.245)));
+const card = wordElement.closest('.gb-bingo-card');
+const cellSizeVar = parseFloat(getComputedStyle(card).getPropertyValue('--cell-size')) || Math.min(cellWidth, cellHeight);
+const startSize = Math.max(10, Math.min(26, cellSizeVar * (isPhrase ? 0.185 : 0.215)));
 const minSize = Math.max(8, cellSizeVar * 0.105);
 
 wordElement.style.fontSize = `${startSize}px`;
-wordElement.style.lineHeight = isPhrase ? '1.05' : '1.06';
+wordElement.style.lineHeight = isPhrase ? '1.05' : '1.08';
 wordElement.style.whiteSpace = isPhrase ? 'normal' : 'nowrap';
-
-if (isPhrase) {
 wordElement.style.width = '100%';
-} else {
-wordElement.style.width = 'auto';
-}
 
 let low = minSize;
 let high = startSize;
@@ -1027,7 +1027,6 @@ high = mid;
 
 wordElement.style.fontSize = `${best}px`;
 
-if (isPhrase) {
 let guard = 0;
 while (
 guard < 8 &&
@@ -1037,7 +1036,6 @@ best > minSize
 best = Math.max(minSize, best - 0.4);
 wordElement.style.fontSize = `${best}px`;
 guard += 1;
-}
 }
 }
 
