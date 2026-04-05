@@ -1,63 +1,6 @@
+
 (function(window, document) {
   'use strict';
-
-(function setupMobileDebug() {
-  function ensureBox() {
-    var box = document.getElementById('mobileDebugBox');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'mobileDebugBox';
-      box.style.position = 'fixed';
-      box.style.left = '8px';
-      box.style.right = '8px';
-      box.style.bottom = '8px';
-      box.style.maxHeight = '40vh';
-      box.style.overflow = 'auto';
-      box.style.background = '#111';
-      box.style.color = '#0f0';
-      box.style.font = '12px/1.4 monospace';
-      box.style.padding = '10px';
-      box.style.zIndex = '999999';
-      box.style.border = '2px solid #0f0';
-      box.style.whiteSpace = 'pre-wrap';
-      box.style.display = 'none';
-      document.addEventListener('DOMContentLoaded', function() {
-        if (!document.body.contains(box)) {
-          document.body.appendChild(box);
-        }
-      });
-    }
-    return box;
-  }
-
-  function logToBox(message) {
-    try {
-      var box = ensureBox();
-      box.style.display = 'block';
-      box.textContent += '\n' + String(message);
-    } catch (error) {}
-  }
-
-  window.__mobileDebugLog = logToBox;
-
-  window.addEventListener('error', function(event) {
-    logToBox('[error] ' + (event.message || 'Unknown error') +
-      '\nfile: ' + (event.filename || '') +
-      '\nline: ' + (event.lineno || '') + ':' + (event.colno || '') +
-      '\nstack: ' + ((event.error && event.error.stack) || ''));
-  });
-
-  window.addEventListener('unhandledrejection', function(event) {
-    var reason = event.reason;
-    logToBox('[promise] ' + (
-      reason && reason.stack ? reason.stack :
-      reason && reason.message ? reason.message :
-      String(reason)
-    ));
-  });
-
-  logToBox('[debug] script loaded');
-})();
 
   const TALKS_URL = 'https://kameronyork.com/datasets/general-conference-talks.json';
   const DEFAULTS = {
@@ -81,9 +24,7 @@
     currentAggregation: null,
     currentSettings: null,
     currentTalkRows: [],
-    currentTalkRenderer: null,
-    talksPromise: null,
-    talksData: null
+    currentTalkRenderer: null
   };
 
   const refs = {};
@@ -91,15 +32,10 @@
   document.addEventListener('DOMContentLoaded', initialize);
 
   function initialize() {
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('initialize start'); }
     cacheDom();
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('cacheDom done'); }
     bindEvents();
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('bindEvents done'); }
     applyDefaults();
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('applyDefaults done'); }
     loadFromUrl();
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('loadFromUrl done'); }
     if (window.GBCommon && typeof window.GBCommon.initTooltips === 'function') {
       window.GBCommon.initTooltips();
     }
@@ -243,7 +179,7 @@
     refs.tableMode.checked = params.tableMode === '1';
     refs.metricPer1000.checked = (params.metric || DEFAULTS.metricMode) !== 'perTalk';
     refs.metricPerTalk.checked = (params.metric || DEFAULTS.metricMode) === 'perTalk';
-    refs.chartType.value = (params.chartType === 'scatter' || params.chartType === 'line' || params.chartType === 'bar') ? params.chartType : DEFAULTS.chartType;
+    refs.chartType.value = ['scatter', 'line', 'bar'].includes(params.chartType) ? params.chartType : DEFAULTS.chartType;
     refs.caseSensitive.checked = params.caseSensitive === '1';
     refs.yearFrom.value = params.yearFrom || '';
     refs.yearTo.value = params.yearTo || '';
@@ -270,42 +206,26 @@
     return refs.metricPerTalk.checked ? 'perTalk' : 'per1000';
   }
 
+
   async function fetchTalks(showLoading, loadingMessage) {
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('fetchTalks start'); }
-    if (state.talksData) {
-      return state.talksData;
+    if (showLoading) {
+      refs.status.show(loadingMessage || 'Loading conference text data...', 'info', true);
     }
 
-    if (!state.talksPromise) {
-      if (showLoading) {
-        refs.status.show(loadingMessage || 'Loading conference text data...', 'info', true);
-      }
-
-      state.talksPromise = fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' })
-        .then(function(response) {
-          if (!response.ok) {
-            throw new Error('Conference text data could not be loaded right now.');
-          }
-          return response.json();
-        })
-        .then(function(data) {
-          if (!Array.isArray(data)) {
-            throw new Error('Conference text data was not in the expected format.');
-          }
-          state.talksData = data;
-          return data;
-        })
-        .catch(function(error) {
-          state.talksPromise = null;
-          throw error;
-        });
+    const response = await fetch(TALKS_URL, { cache: 'force-cache', credentials: 'omit' });
+    if (!response.ok) {
+      throw new Error('Conference text data could not be loaded right now.');
     }
 
-    return state.talksPromise;
+    const data = await response.json();
+    if (!Array.isArray(data)) {
+      throw new Error('Conference text data was not in the expected format.');
+    }
+
+    return data;
   }
 
   async function runSearch() {
-    if (window.__mobileDebugLog) { window.__mobileDebugLog('runSearch start: ' + String(refs.input && refs.input.value || '')); }
     const query = refs.input.value.trim();
     if (!query) {
       refs.status.show('Enter a word or phrase before clicking Search.', 'error', false);
@@ -328,7 +248,7 @@
       const talks = await fetchTalks(false);
       const groups = parseComparisonGroups(query);
       const settings = getSettings();
-      const aggregation = buildAggregationOldStyle(talks, groups, settings);
+      const aggregation = buildAggregation(talks, groups, settings);
 
       state.currentGroups = groups;
       state.currentAggregation = aggregation;
@@ -441,8 +361,7 @@
   }
 
   function parseSingleGroup(rawGroup) {
-    const parts = splitByOr(rawGroup);
-    const terms = parts.map(function(term) {
+    const terms = splitByOr(rawGroup).map(function(term) {
       const clean = String(term || '').trim();
       if (!clean) {
         return null;
@@ -503,20 +422,15 @@
     return trimmed;
   }
 
-  function buildAggregationOldStyle(talks, groups, settings) {
+  function buildAggregation(talks, groups, settings) {
     const bucketMap = new Map();
     const bucketOrder = new Map();
-    const termCounts = Object.create(null);
-    const yearLookup = Object.create(null);
-    const allCounts = Object.create(null);
-
-    groups.forEach(function(group) {
-      group.terms.forEach(function(term) {
-        const key = term.raw;
-        if (!termCounts[key]) {
-          termCounts[key] = Object.create(null);
-        }
-      });
+    const series = groups.map(function(group, groupIndex) {
+      return {
+        label: group.label,
+        color: SERIES_COLORS[groupIndex % SERIES_COLORS.length],
+        counts: {}
+      };
     });
 
     talks.forEach(function(talk) {
@@ -524,9 +438,8 @@
         return;
       }
 
-      const originalText = String(talk.text || '');
-      const preparedText = prepareText(originalText, settings.caseSensitive);
-      const wordCount = Math.max(1, preparedText.split(/\s+/).length);
+      const text = prepareText(String(talk.text || ''), settings.caseSensitive);
+      const wordCount = Math.max(1, countWords(text));
       const bucketKey = settings.byConference
         ? String(talk.month || '') + ' ' + String(talk.year || '')
         : String(talk.year || '');
@@ -536,74 +449,35 @@
           ? Number(talk.year || 0) * 10 + conferenceMonthOrder(String(talk.month || ''))
           : Number(talk.year || 0));
         bucketMap.set(bucketKey, bucketKey);
-        yearLookup[bucketKey] = bucketKey;
       }
 
-      groups.forEach(function(group) {
+      groups.forEach(function(group, groupIndex) {
+        let count = 0;
         group.terms.forEach(function(term) {
-          const termKey = term.raw;
-          const rawMatches = countTermInText(preparedText, term, settings.caseSensitive);
-          let count = rawMatches;
-
-          if (settings.metricMode === 'per1000') {
-            count = roundToOneDecimal((rawMatches / wordCount) * 1000);
-          }
-
-          if (!termCounts[termKey][bucketKey]) {
-            termCounts[termKey][bucketKey] = 0;
-          }
-          termCounts[termKey][bucketKey] += count;
+          count += countTermInText(text, term, settings.caseSensitive);
         });
+
+        if (count <= 0) {
+          return;
+        }
+
+        const adjustedCount = settings.metricMode === 'per1000'
+          ? roundToOneDecimal((count / wordCount) * 1000)
+          : count;
+
+        series[groupIndex].counts[bucketKey] = (series[groupIndex].counts[bucketKey] || 0) + adjustedCount;
       });
     });
 
-    groups.forEach(function(group) {
-      group.terms.forEach(function(term) {
-        allCounts[term.raw] = termCounts[term.raw] || Object.create(null);
-      });
-    });
-
-    const combinedCounts = combineCounts(allCounts, groups);
     const bucketKeys = Array.from(bucketMap.keys()).sort(function(left, right) {
       return bucketOrder.get(left) - bucketOrder.get(right);
-    });
-
-    const series = groups.map(function(group, groupIndex) {
-      const seriesKey = group.label;
-      return {
-        label: seriesKey,
-        color: SERIES_COLORS[groupIndex % SERIES_COLORS.length],
-        counts: combinedCounts[seriesKey] || Object.create(null)
-      };
     });
 
     return {
       bucketKeys: bucketKeys,
       bucketLabels: bucketMap,
-      series: series,
-      yearLookup: yearLookup
+      series: series
     };
-  }
-
-  function combineCounts(allCounts, groups) {
-    const combinedCounts = Object.create(null);
-
-    groups.forEach(function(group) {
-      const groupKey = group.label;
-      combinedCounts[groupKey] = Object.create(null);
-
-      group.terms.forEach(function(term) {
-        const termCounts = allCounts[term.raw] || Object.create(null);
-        Object.keys(termCounts).forEach(function(bucketKey) {
-          if (!combinedCounts[groupKey][bucketKey]) {
-            combinedCounts[groupKey][bucketKey] = 0;
-          }
-          combinedCounts[groupKey][bucketKey] += termCounts[bucketKey];
-        });
-      });
-    });
-
-    return combinedCounts;
   }
 
   function passesFilters(talk, settings) {
@@ -637,24 +511,31 @@
     return caseSensitive ? normalized : normalized.toLowerCase();
   }
 
+  function countWords(text) {
+    if (!text) {
+      return 0;
+    }
+    return text.split(/\s+/).length;
+  }
+
   function countTermInText(text, term, caseSensitive) {
-    const value = String(term && term.value ? term.value : '').trim();
+    const value = term.value.trim();
     if (!value || !text) {
       return 0;
     }
 
     const query = caseSensitive ? value : value.toLowerCase();
     const escaped = window.GBCommon.escapeRegExp(query);
-    const pattern = (term.quoted || query.indexOf(' ') !== -1)
-      ? '\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b'
-      : '\\b' + escaped + '\\b';
-    const regex = new RegExp(pattern, caseSensitive ? 'g' : 'gi');
+    let regex;
 
-    let count = 0;
-    while (regex.exec(text)) {
-      count += 1;
+    if (term.quoted || query.indexOf(' ') !== -1) {
+      regex = new RegExp('\\b' + escaped.replace(/\s+/g, '\\s+') + '\\b', caseSensitive ? 'g' : 'gi');
+    } else {
+      regex = new RegExp('\\b' + escaped + '\\b', caseSensitive ? 'g' : 'gi');
     }
-    return count;
+
+    const matches = text.match(regex);
+    return matches ? matches.length : 0;
   }
 
   function roundToOneDecimal(value) {
@@ -806,7 +687,7 @@
     html += '</tbody></table></div>';
     refs.aggregateTable.innerHTML = html;
 
-    Array.prototype.forEach.call(refs.aggregateTable.querySelectorAll('td.is-clickable'), function(cell) {
+    refs.aggregateTable.querySelectorAll('td.is-clickable').forEach(function(cell) {
       cell.addEventListener('click', function() {
         const bucketKey = cell.getAttribute('data-bucket');
         const groupIndex = Number(cell.getAttribute('data-group'));
@@ -855,7 +736,7 @@
       }
 
       const text = prepareText(String(talk.text || ''), settings.caseSensitive);
-      const wordCount = Math.max(1, text.split(/\s+/).length);
+      const wordCount = Math.max(1, countWords(text));
       let count = 0;
 
       group.terms.forEach(function(term) {
