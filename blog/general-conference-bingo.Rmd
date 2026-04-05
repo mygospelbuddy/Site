@@ -264,7 +264,7 @@ font-size: 0.68rem;
 <details class="gb-settings-dropdown">
 <summary class="gb-settings-dropdown__summary">
 <span class="gb-settings-dropdown__title">Bingo settings</span>
-<span class="gb-settings-dropdown__meta">Difficulty, year range, and print options</span>
+<span class="gb-settings-dropdown__meta"> </span>
 </summary>
 
 <div class="gb-settings-dropdown__body">
@@ -937,8 +937,8 @@ function fitWordToCell(wordElement) {
 const cell = wordElement.parentElement;
 if (!cell) return;
 
-const baseFontSize = 16;
-const minFontSize = 6;
+const baseFontSize = 14;
+const minFontSize = 3;
 const step = 0.25;
 const horizontalPaddingAllowance = 24;
 const verticalPaddingAllowance = 24;
