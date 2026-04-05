@@ -17891,9 +17891,9 @@ display: none;
 .gb-bingo-card-shell {
 background: #ffffff;
 border: 1px solid rgba(148, 163, 184, 0.28);
-border-radius: 18px;
-padding: 18px;
-box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+border-radius: 22px;
+padding: 20px;
+box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 .gb-bingo-preview-wrap {
 display: flex;
@@ -17901,74 +17901,132 @@ justify-content: center;
 }
 .gb-bingo-card {
 width: min(820px, 100%);
-background: #ffffff;
+aspect-ratio: 8.5 / 11;
+background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 border: 2px solid #0f172a;
-padding: 18px;
+padding: 24px 24px 18px;
 color: #0f172a;
+display: grid;
+grid-template-rows: auto 1fr auto;
+gap: 14px;
+box-sizing: border-box;
 }
-.gb-bingo-card__header {
+.gb-bingo-card__header,
+.gb-bingo-card__footer {
 display: flex;
 justify-content: space-between;
 align-items: flex-start;
 gap: 12px;
-margin-bottom: 14px;
+}
+.gb-bingo-card__footer {
+align-items: flex-end;
+min-height: 26px;
+}
+.gb-bingo-card__eyebrow {
+margin: 0;
+font-size: 0.78rem;
+font-weight: 700;
+line-height: 1.15;
+letter-spacing: 0.02em;
+color: #475569;
+text-transform: capitalize;
 }
 .gb-bingo-card__title {
 margin: 0;
-font-size: 1.8rem;
+font-size: 1.45rem;
 font-weight: 800;
-line-height: 1.1;
-letter-spacing: 0.03em;
-text-transform: uppercase;
+line-height: 1.05;
+letter-spacing: 0.01em;
 }
-.gb-bingo-card__meta {
-margin: 6px 0 0;
-font-size: 0.95rem;
-color: #475569;
-font-weight: 600;
+.gb-bingo-card__logo,
+.gb-bingo-card__footer-logo {
+display: block;
+object-fit: contain;
+opacity: 0.4;
+filter: grayscale(100%);
 }
-.gb-bingo-card__stamp {
-border: 1.5px solid #0f172a;
-border-radius: 999px;
-padding: 8px 12px;
-font-size: 0.78rem;
-font-weight: 800;
-text-transform: uppercase;
-letter-spacing: 0.08em;
-white-space: nowrap;
+.gb-bingo-card__logo {
+width: 68px;
+height: 68px;
+}
+.gb-bingo-card__main {
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+}
+.gb-bingo-grid-frame {
+width: var(--grid-size, 100%);
+height: var(--grid-size, auto);
+max-width: 100%;
+max-height: 100%;
+aspect-ratio: 1 / 1;
+display: flex;
+align-items: stretch;
+justify-content: stretch;
 }
 .gb-bingo-grid {
 display: grid;
 grid-template-columns: repeat(5, minmax(0, 1fr));
-border-top: 1.5px solid #0f172a;
-border-left: 1.5px solid #0f172a;
+grid-template-rows: repeat(5, minmax(0, 1fr));
+width: 100%;
+height: 100%;
+border: 2px solid #0f172a;
+background: #ffffff;
 }
 .gb-bingo-cell {
-aspect-ratio: 1 / 1;
 border-right: 1.5px solid #0f172a;
 border-bottom: 1.5px solid #0f172a;
-padding: 8px 6px;
+padding: 8px;
 display: flex;
 align-items: center;
 justify-content: center;
 text-align: center;
 background: #ffffff;
 overflow: hidden;
+box-sizing: border-box;
+min-width: 0;
+min-height: 0;
+}
+.gb-bingo-cell:nth-child(5n) {
+border-right: none;
+}
+.gb-bingo-cell:nth-last-child(-n + 5) {
+border-bottom: none;
 }
 .gb-bingo-cell--free {
-background: #f8fafc;
+background: #eff6ff;
 }
 .gb-bingo-cell__word {
 display: block;
 max-width: 100%;
-font-size: clamp(0.72rem, 1.15vw, 0.95rem);
+font-size: 16px;
 line-height: 1.08;
 font-weight: 800;
+letter-spacing: 0.01em;
 text-transform: uppercase;
-overflow-wrap: anywhere;
-word-break: break-word;
-hyphens: auto;
-text-wrap: balance;
+text-align: center;
+overflow: hidden;
+word-break: normal;
+overflow-wrap: normal;
+hyphens: none;
+white-space: nowrap;
+text-wrap: pretty;
+}
+.gb-bingo-card__footer-brand {
+display: inline-flex;
+align-items: center;
+gap: 8px;
+font-size: 0.72rem;
+line-height: 1.1;
+font-weight: 700;
+color: #475569;
+opacity: 0.72;
+text-align: right;
+}
+.gb-bingo-card__footer-logo {
+width: 18px;
+height: 18px;
 }
 .gb-generator-grid {
 display: grid;
@@ -17992,6 +18050,7 @@ top: 0;
 width: 816px;
 pointer-events: none;
 opacity: 0;
+contain: layout style paint;
 }
 .gb-bingo-empty {
 padding: 36px 18px;
@@ -18014,24 +18073,27 @@ grid-template-columns: 1fr;
 .gb-generator-grid__count {
 min-width: 0;
 }
-.gb-bingo-card__header {
-flex-direction: column;
-align-items: flex-start;
+.gb-bingo-card {
+padding: 18px 18px 14px;
+gap: 10px;
 }
-.gb-bingo-card__stamp {
-white-space: normal;
+.gb-bingo-card__logo {
+width: 56px;
+height: 56px;
 }
 }
 @media (max-width: 680px) {
 .gb-bingo-card {
-padding: 12px;
+padding: 14px 14px 12px;
 }
 .gb-bingo-cell {
-padding: 6px 4px;
+padding: 6px;
 }
-.gb-bingo-cell__word {
-font-size: 0.66rem;
-line-height: 1.05;
+.gb-bingo-card__title {
+font-size: 1.1rem;
+}
+.gb-bingo-card__eyebrow {
+font-size: 0.68rem;
 }
 }
 </style>
@@ -18564,6 +18626,7 @@ Preparing conference word pools…
 const BINGO_CONFIG = {
 datasetUrl: 'https://kameronyork.com/datasets/general-conference-talks.json',
 allowedWordsUrl: 'https://kameronyork.com/datasets/conference-bingo-allowed-words.json',
+logoUrl: 'https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png',
 defaultYearFrom: 2000,
 defaultDifficulty: 'easy',
 defaultUseFreeSpace: true,
@@ -18978,14 +19041,6 @@ return 'Easy';
 }
 }
 
-function addSoftHyphens(word) {
-const raw = String(word || '');
-if (raw.length <= 9) {
-return raw;
-}
-return raw.replace(/(.{5})(?=.{4,})/g, '$1\u00AD');
-}
-
 function createCardData(settings) {
 const { stats, conferenceCount, talkCount } = getWordStatsForRange(settings.yearFrom, settings.yearTo);
 
@@ -19038,19 +19093,28 @@ const heading = document.createElement('div');
 
 const title = document.createElement('h3');
 title.className = 'gb-bingo-card__title';
-title.textContent = card.title;
+title.textContent = 'General Conference Bingo';
 
 const meta = document.createElement('p');
-meta.className = 'gb-bingo-card__meta';
+meta.className = 'gb-bingo-card__eyebrow';
 meta.textContent = `${card.difficulty} difficulty`;
 
 heading.append(title, meta);
 
-const stamp = document.createElement('div');
-stamp.className = 'gb-bingo-card__stamp';
-stamp.textContent = 'General Conference Bingo';
+const logo = document.createElement('img');
+logo.className = 'gb-bingo-card__logo';
+logo.src = BINGO_CONFIG.logoUrl;
+logo.alt = 'Gospel Buddy logo';
+logo.crossOrigin = 'anonymous';
+logo.decoding = 'async';
 
-header.append(heading, stamp);
+header.append(heading, logo);
+
+const main = document.createElement('div');
+main.className = 'gb-bingo-card__main';
+
+const gridFrame = document.createElement('div');
+gridFrame.className = 'gb-bingo-grid-frame';
 
 const grid = document.createElement('div');
 grid.className = 'gb-bingo-grid';
@@ -19062,15 +19126,118 @@ cellElement.className = `gb-bingo-cell${cell.isFree ? ' gb-bingo-cell--free' : '
 const word = document.createElement('div');
 word.className = 'gb-bingo-cell__word';
 word.setAttribute('lang', 'en');
-word.textContent = addSoftHyphens(cell.word);
+word.textContent = cell.word;
 
 cellElement.append(word);
 grid.appendChild(cellElement);
 }
 
-cardElement.append(header, grid);
+gridFrame.appendChild(grid);
+main.appendChild(gridFrame);
+
+const footer = document.createElement('div');
+footer.className = 'gb-bingo-card__footer';
+
+const spacer = document.createElement('div');
+spacer.setAttribute('aria-hidden', 'true');
+
+const footerBrand = document.createElement('div');
+footerBrand.className = 'gb-bingo-card__footer-brand';
+
+const footerText = document.createElement('span');
+footerText.textContent = 'Powered by mygospelbuddy.com';
+
+const footerLogo = document.createElement('img');
+footerLogo.className = 'gb-bingo-card__footer-logo';
+footerLogo.src = BINGO_CONFIG.logoUrl;
+footerLogo.alt = '';
+footerLogo.crossOrigin = 'anonymous';
+footerLogo.decoding = 'async';
+
+footerBrand.append(footerText, footerLogo);
+footer.append(spacer, footerBrand);
+
+cardElement.append(header, main, footer);
 shell.appendChild(cardElement);
+
+sizeCardGrid(cardElement);
+fitCardWords(cardElement);
 return shell;
+}
+
+function sizeCardGrid(cardElement) {
+const main = cardElement.querySelector('.gb-bingo-card__main');
+const frame = cardElement.querySelector('.gb-bingo-grid-frame');
+if (!main || !frame) {
+return;
+}
+
+const mainRect = main.getBoundingClientRect();
+const gridSize = Math.floor(Math.min(mainRect.width, mainRect.height) * 0.9);
+if (gridSize > 0) {
+frame.style.setProperty('--grid-size', `${gridSize}px`);
+}
+}
+
+function fitCardWords(cardElement) {
+const words = Array.from(cardElement.querySelectorAll('.gb-bingo-cell__word'));
+for (const word of words) {
+fitWordToCell(word);
+}
+}
+
+function fitWordToCell(wordElement) {
+const cell = wordElement.parentElement;
+if (!cell) {
+return;
+}
+
+const text = (wordElement.textContent || '').trim();
+const isPhrase = /\s/.test(text);
+
+const maxWidth = Math.max(0, cell.clientWidth - 8);
+const maxHeight = Math.max(0, cell.clientHeight - 8);
+
+let fontSize = 16;
+const minFontSize = 8.5;
+
+wordElement.style.fontSize = `${fontSize}px`;
+wordElement.style.lineHeight = isPhrase ? '1.08' : '1';
+wordElement.style.whiteSpace = isPhrase ? 'normal' : 'nowrap';
+wordElement.style.wordBreak = 'normal';
+wordElement.style.overflowWrap = 'normal';
+wordElement.style.hyphens = 'none';
+
+if (isPhrase) {
+wordElement.style.textWrap = 'pretty';
+} else {
+wordElement.style.textWrap = 'nowrap';
+}
+
+while (
+fontSize > minFontSize &&
+(wordElement.scrollWidth > maxWidth || wordElement.scrollHeight > maxHeight)
+) {
+fontSize -= 0.5;
+wordElement.style.fontSize = `${fontSize}px`;
+}
+}
+
+function waitForImageLoad(node) {
+const images = Array.from(node.querySelectorAll('img'));
+if (images.length === 0) {
+return Promise.resolve();
+}
+
+return Promise.all(images.map((img) => {
+if (img.complete) {
+return Promise.resolve();
+}
+return new Promise((resolve) => {
+img.addEventListener('load', resolve, { once: true });
+img.addEventListener('error', resolve, { once: true });
+});
+}));
 }
 
 function renderCurrentCard(card, settings) {
@@ -19139,6 +19306,10 @@ const card = createCardData(settings);
 const node = createCardElement(card);
 elements.pdfStage.appendChild(node);
 
+await waitForNextFrame();
+await waitForImageLoad(node);
+sizeCardGrid(node.querySelector('.gb-bingo-card'));
+fitCardWords(node.querySelector('.gb-bingo-card'));
 await waitForNextFrame();
 
 const canvas = await html2canvas(node, {

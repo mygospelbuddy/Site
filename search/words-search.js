@@ -1,6 +1,64 @@
 (function(window, document) {
   'use strict';
 
+(function setupMobileDebug() {
+  function ensureBox() {
+    var box = document.getElementById('mobileDebugBox');
+    if (!box) {
+      box = document.createElement('div');
+      box.id = 'mobileDebugBox';
+      box.style.position = 'fixed';
+      box.style.left = '8px';
+      box.style.right = '8px';
+      box.style.bottom = '8px';
+      box.style.maxHeight = '40vh';
+      box.style.overflow = 'auto';
+      box.style.background = '#111';
+      box.style.color = '#0f0';
+      box.style.font = '12px/1.4 monospace';
+      box.style.padding = '10px';
+      box.style.zIndex = '999999';
+      box.style.border = '2px solid #0f0';
+      box.style.whiteSpace = 'pre-wrap';
+      box.style.display = 'none';
+      document.addEventListener('DOMContentLoaded', function() {
+        if (!document.body.contains(box)) {
+          document.body.appendChild(box);
+        }
+      });
+    }
+    return box;
+  }
+
+  function logToBox(message) {
+    try {
+      var box = ensureBox();
+      box.style.display = 'block';
+      box.textContent += '\n' + String(message);
+    } catch (error) {}
+  }
+
+  window.__mobileDebugLog = logToBox;
+
+  window.addEventListener('error', function(event) {
+    logToBox('[error] ' + (event.message || 'Unknown error') +
+      '\nfile: ' + (event.filename || '') +
+      '\nline: ' + (event.lineno || '') + ':' + (event.colno || '') +
+      '\nstack: ' + ((event.error && event.error.stack) || ''));
+  });
+
+  window.addEventListener('unhandledrejection', function(event) {
+    var reason = event.reason;
+    logToBox('[promise] ' + (
+      reason && reason.stack ? reason.stack :
+      reason && reason.message ? reason.message :
+      String(reason)
+    ));
+  });
+
+  logToBox('[debug] script loaded');
+})();
+
   const TALKS_URL = 'https://kameronyork.com/datasets/general-conference-talks.json';
   const DEFAULTS = {
     query: '',
@@ -33,10 +91,15 @@
   document.addEventListener('DOMContentLoaded', initialize);
 
   function initialize() {
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('initialize start'); }
     cacheDom();
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('cacheDom done'); }
     bindEvents();
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('bindEvents done'); }
     applyDefaults();
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('applyDefaults done'); }
     loadFromUrl();
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('loadFromUrl done'); }
     if (window.GBCommon && typeof window.GBCommon.initTooltips === 'function') {
       window.GBCommon.initTooltips();
     }
@@ -180,7 +243,7 @@
     refs.tableMode.checked = params.tableMode === '1';
     refs.metricPer1000.checked = (params.metric || DEFAULTS.metricMode) !== 'perTalk';
     refs.metricPerTalk.checked = (params.metric || DEFAULTS.metricMode) === 'perTalk';
-    refs.chartType.value = ['scatter', 'line', 'bar'].includes(params.chartType) ? params.chartType : DEFAULTS.chartType;
+    refs.chartType.value = (params.chartType === 'scatter' || params.chartType === 'line' || params.chartType === 'bar') ? params.chartType : DEFAULTS.chartType;
     refs.caseSensitive.checked = params.caseSensitive === '1';
     refs.yearFrom.value = params.yearFrom || '';
     refs.yearTo.value = params.yearTo || '';
@@ -208,6 +271,7 @@
   }
 
   async function fetchTalks(showLoading, loadingMessage) {
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('fetchTalks start'); }
     if (state.talksData) {
       return state.talksData;
     }
@@ -241,6 +305,7 @@
   }
 
   async function runSearch() {
+    if (window.__mobileDebugLog) { window.__mobileDebugLog('runSearch start: ' + String(refs.input && refs.input.value || '')); }
     const query = refs.input.value.trim();
     if (!query) {
       refs.status.show('Enter a word or phrase before clicking Search.', 'error', false);
@@ -741,7 +806,7 @@
     html += '</tbody></table></div>';
     refs.aggregateTable.innerHTML = html;
 
-    refs.aggregateTable.querySelectorAll('td.is-clickable').forEach(function(cell) {
+    Array.prototype.forEach.call(refs.aggregateTable.querySelectorAll('td.is-clickable'), function(cell) {
       cell.addEventListener('click', function() {
         const bucketKey = cell.getAttribute('data-bucket');
         const groupIndex = Number(cell.getAttribute('data-group'));
