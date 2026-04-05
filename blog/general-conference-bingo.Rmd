@@ -18,16 +18,28 @@ border: 1px solid rgba(148, 163, 184, 0.28);
 border-radius: 22px;
 padding: 20px;
 box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+width: fit-content;
+min-width: fit-content;
+margin: 0 auto;
+flex: 0 0 auto;
 }
 
 .gb-bingo-preview-wrap {
-display: flex;
-justify-content: center;
+display: block;
+overflow-x: auto;
+overflow-y: hidden;
+-webkit-overflow-scrolling: touch;
+padding: 0 6px 8px;
+}
+
+.gb-bingo-preview-wrap > * {
+margin-left: auto;
+margin-right: auto;
 }
 
 .gb-bingo-card {
-width: min(820px, 100%);
-aspect-ratio: 8.5 / 11;
+width: 820px;
+height: 1061px;
 background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
 border: 2px solid #0f172a;
 padding: 24px 24px 18px;
@@ -90,11 +102,8 @@ overflow: hidden;
 }
 
 .gb-bingo-grid-frame {
-width: var(--grid-size, 100%);
-height: var(--grid-size, auto);
-max-width: 100%;
-max-height: 100%;
-aspect-ratio: 1 / 1;
+width: 640px;
+height: 640px;
 display: flex;
 align-items: stretch;
 justify-content: stretch;
@@ -113,7 +122,7 @@ background: #ffffff;
 .gb-bingo-cell {
 border-right: 1.5px solid #0f172a;
 border-bottom: 1.5px solid #0f172a;
-padding: clamp(10px, 1.25vw, 14px);
+padding: 12px;
 display: flex;
 align-items: center;
 justify-content: center;
@@ -138,24 +147,34 @@ border-bottom: none;
 background: #eff6ff;
 }
 
+.gb-bingo-cell__fitbox {
+width: 100%;
+height: 100%;
+display: flex;
+align-items: center;
+justify-content: center;
+overflow: hidden;
+min-width: 0;
+min-height: 0;
+}
+
 .gb-bingo-cell__word {
 display: inline-block;
-max-width: 100%;
-margin: 0 auto;
+margin: 0;
 padding: 0;
-font-family: inherit;
 font-weight: 800;
-font-size: var(--cell-font-size, 16px);
-line-height: 1.08;
-letter-spacing: -0.015em;
+font-size: 31px;
+line-height: 1.04;
+letter-spacing: -0.02em;
 text-align: center;
 white-space: nowrap;
-word-break: normal;
+word-break: keep-all;
 overflow-wrap: normal;
 hyphens: none;
-text-transform: none;
-vertical-align: middle;
-min-width: 0;
+transform-origin: center center;
+transform: scale(var(--fit-scale, 1));
+max-width: none;
+text-rendering: geometricPrecision;
 }
 
 .gb-bingo-cell__word--phrase {
@@ -164,7 +183,7 @@ width: 100%;
 white-space: normal;
 overflow-wrap: break-word;
 word-break: normal;
-line-height: 1.04;
+line-height: 1.02;
 }
 
 .gb-bingo-card__footer-brand {
@@ -206,7 +225,7 @@ line-height: 1.5;
 position: fixed;
 left: -99999px;
 top: 0;
-width: 816px;
+width: 860px;
 pointer-events: none;
 opacity: 0;
 contain: layout style paint;
@@ -238,28 +257,17 @@ grid-template-columns: 1fr;
 min-width: 0;
 }
 
-.gb-bingo-card {
-padding: 18px 18px 14px;
-gap: 10px;
+.gb-bingo-preview-wrap {
+padding-bottom: 12px;
 }
 
-.gb-bingo-card__logo {
-width: 56px;
-height: 56px;
-}
+.gb-bingo-preview-wrap::-webkit-scrollbar {
+height: 10px;
 }
 
-@media (max-width: 680px) {
-.gb-bingo-card {
-padding: 14px 14px 12px;
-}
-
-.gb-bingo-card__title {
-font-size: 1.1rem;
-}
-
-.gb-bingo-card__eyebrow {
-font-size: 0.68rem;
+.gb-bingo-preview-wrap::-webkit-scrollbar-thumb {
+background: rgba(100, 116, 139, 0.35);
+border-radius: 999px;
 }
 }
 
@@ -358,7 +366,7 @@ background: rgba(255, 191, 0, 0.6);
 </div>
 
 <div id="bingoStatus" class="gb-status" aria-live="polite"></div>
-<div class="gb-config-note">Preview shows one possible card from the current settings. Printed sheets are generated fresh each time from the same difficulty and year range.</div>
+<div class="gb-config-note">Preview stays at full print size so the text remains accurate. On smaller screens, scroll sideways to view the full card.</div>
 </section>
 
 <section class="gb-search-card">
@@ -407,7 +415,6 @@ normalizationMap: {}
 };
 
 const elements = {};
-let cardResizeObserver = null;
 let fitRaf = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -438,13 +445,6 @@ function bindEvents() {
 elements.generate.addEventListener('click', () => generateAndRenderCard(true));
 elements.printSheets.addEventListener('click', exportPdfBatch);
 elements.reset.addEventListener('click', resetSettings);
-
-window.addEventListener('resize', () => {
-const liveCard = elements.printArea.querySelector('.gb-bingo-card');
-if (liveCard) {
-scheduleCardFit(liveCard);
-}
-});
 }
 
 async function prepareConferenceData() {
@@ -898,12 +898,16 @@ cellElement.addEventListener('click', () => {
 cellElement.classList.toggle('gb-bingo-cell--selected');
 });
 
+const fitBox = document.createElement('div');
+fitBox.className = 'gb-bingo-cell__fitbox';
+
 const word = document.createElement('div');
 word.className = 'gb-bingo-cell__word';
 word.setAttribute('lang', 'en');
 word.textContent = cell.word;
 
-cellElement.append(word);
+fitBox.appendChild(word);
+cellElement.appendChild(fitBox);
 grid.appendChild(cellElement);
 }
 
@@ -940,29 +944,6 @@ scheduleCardFit(cardElement);
 return shell;
 }
 
-function sizeCardGrid(cardElement) {
-const main = cardElement.querySelector('.gb-bingo-card__main');
-const frame = cardElement.querySelector('.gb-bingo-grid-frame');
-
-if (!main || !frame) {
-return;
-}
-
-const mainRect = main.getBoundingClientRect();
-const gridSize = Math.floor(Math.min(mainRect.width, mainRect.height) * 0.9);
-
-if (gridSize <= 0) {
-return;
-}
-
-frame.style.setProperty('--grid-size', `${gridSize}px`);
-
-const cellSize = gridSize / 5;
-const baseFontSize = Math.max(9, Math.min(24, cellSize * 0.19));
-cardElement.style.setProperty('--cell-font-size', `${baseFontSize}px`);
-cardElement.style.setProperty('--cell-size', `${cellSize}px`);
-}
-
 function fitCardWords(cardElement) {
 const words = Array.from(cardElement.querySelectorAll('.gb-bingo-cell__word'));
 for (const word of words) {
@@ -971,8 +952,10 @@ fitWordToCell(word);
 }
 
 function fitWordToCell(wordElement) {
-const cell = wordElement.parentElement;
-if (!cell) {
+const fitBox = wordElement.parentElement;
+const cell = fitBox ? fitBox.parentElement : null;
+
+if (!fitBox || !cell) {
 return;
 }
 
@@ -980,56 +963,29 @@ const text = (wordElement.textContent || '').trim();
 const isPhrase = /\s/.test(text);
 
 wordElement.classList.toggle('gb-bingo-cell__word--phrase', isPhrase);
-
-const card = wordElement.closest('.gb-bingo-card');
-const cellSize = parseFloat(getComputedStyle(card).getPropertyValue('--cell-size')) || Math.min(cell.clientWidth, cell.clientHeight);
-
-const style = window.getComputedStyle(cell);
-const padX = parseFloat(style.paddingLeft || 0) + parseFloat(style.paddingRight || 0);
-const padY = parseFloat(style.paddingTop || 0) + parseFloat(style.paddingBottom || 0);
-
-const maxWidth = Math.max(12, cell.clientWidth - padX - 10);
-const maxHeight = Math.max(12, cell.clientHeight - padY - 10);
-
-const characterCount = text.replace(/\s+/g, '').length;
-const startRatio = isPhrase ? 0.18 : 0.205;
-const lengthPenalty = isPhrase ? Math.max(0, characterCount - 10) * 0.003 : Math.max(0, characterCount - 8) * 0.0045;
-const startSize = Math.max(8, Math.min(24, cellSize * Math.max(0.12, startRatio - lengthPenalty)));
-const minSize = Math.max(7, cellSize * 0.09);
-
-wordElement.style.fontSize = `${startSize}px`;
-wordElement.style.whiteSpace = isPhrase ? 'normal' : 'nowrap';
+wordElement.style.setProperty('--fit-scale', '1');
 wordElement.style.width = isPhrase ? '100%' : 'auto';
-wordElement.style.lineHeight = isPhrase ? '1.04' : '1.08';
+wordElement.style.whiteSpace = isPhrase ? 'normal' : 'nowrap';
 
-let low = minSize;
-let high = startSize;
-let best = minSize;
+const boxWidth = fitBox.clientWidth;
+const boxHeight = fitBox.clientHeight;
 
-for (let i = 0; i < 16; i += 1) {
-const mid = (low + high) / 2;
-wordElement.style.fontSize = `${mid}px`;
-
-const fitsWidth = wordElement.scrollWidth <= maxWidth + 0.5;
-const fitsHeight = wordElement.scrollHeight <= maxHeight + 0.5;
-
-if (fitsWidth && fitsHeight) {
-best = mid;
-low = mid;
-} else {
-high = mid;
-}
+if (!boxWidth || !boxHeight) {
+return;
 }
 
-wordElement.style.fontSize = `${best}px`;
+const naturalWidth = wordElement.scrollWidth;
+const naturalHeight = wordElement.scrollHeight;
 
-for (let guard = 0; guard < 8; guard += 1) {
-if (wordElement.scrollWidth <= maxWidth + 0.5 && wordElement.scrollHeight <= maxHeight + 0.5) {
-break;
+if (!naturalWidth || !naturalHeight) {
+return;
 }
-best = Math.max(minSize, best - 0.35);
-wordElement.style.fontSize = `${best}px`;
-}
+
+const widthRatio = boxWidth / naturalWidth;
+const heightRatio = boxHeight / naturalHeight;
+const scale = Math.min(1, widthRatio, heightRatio) * 0.94;
+
+wordElement.style.setProperty('--fit-scale', String(Math.max(0.5, scale)));
 }
 
 function scheduleCardFit(cardElement) {
@@ -1042,31 +998,8 @@ cancelAnimationFrame(fitRaf);
 }
 
 fitRaf = requestAnimationFrame(() => {
-sizeCardGrid(cardElement);
 fitCardWords(cardElement);
 });
-}
-
-function observeCardResizing(cardElement) {
-if (cardResizeObserver) {
-cardResizeObserver.disconnect();
-cardResizeObserver = null;
-}
-
-if (!window.ResizeObserver || !cardElement) {
-return;
-}
-
-cardResizeObserver = new ResizeObserver(() => {
-scheduleCardFit(cardElement);
-});
-
-cardResizeObserver.observe(cardElement);
-
-const main = cardElement.querySelector('.gb-bingo-card__main');
-if (main) {
-cardResizeObserver.observe(main);
-}
 }
 
 function waitForImageLoad(node) {
@@ -1094,8 +1027,6 @@ elements.summary.textContent = `Preview example • ${card.difficulty} difficult
 state.currentCard = { card, settings };
 
 const liveCard = shell.querySelector('.gb-bingo-card');
-observeCardResizing(liveCard);
-
 requestAnimationFrame(() => {
 scheduleCardFit(liveCard);
 });
@@ -1163,11 +1094,7 @@ elements.pdfStage.appendChild(node);
 
 await waitForNextFrame();
 await waitForImageLoad(node);
-
-const pdfCard = node.querySelector('.gb-bingo-card');
-sizeCardGrid(pdfCard);
-fitCardWords(pdfCard);
-
+fitCardWords(node.querySelector('.gb-bingo-card'));
 await waitForNextFrame();
 
 const canvas = await html2canvas(node, {
