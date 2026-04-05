@@ -140,7 +140,7 @@ background: #eff6ff;
 .gb-bingo-cell__word {
 display: block;
 max-width: 100%;
-font-size: 16px;
+font-size: clamp(0.5rem, 2.2vw, 1.2rem);
 line-height: 1.06;
 font-weight: 800;
 letter-spacing: 0.01em;
@@ -148,9 +148,6 @@ text-transform: uppercase;
 text-align: center;
 overflow: hidden;
 white-space: nowrap;
-word-break: normal;
-overflow-wrap: normal;
-hyphens: none;
 }
 
 .gb-bingo-card__footer-brand {
