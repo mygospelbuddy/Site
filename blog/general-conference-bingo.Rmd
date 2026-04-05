@@ -3,8 +3,8 @@ title: "General Conference Bingo"
 output:
   html_document:
     includes:
-      in_header: "../docs/header.html"
-      after_body: "../docs/footer.html"
+      in_header: "https://www.mygospelbuddy.com/docs/header2.html"
+      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
 ---
 
 <style>

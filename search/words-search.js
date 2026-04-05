@@ -1,4 +1,3 @@
-
 (function(window, document) {
   'use strict';
 
@@ -20,7 +19,7 @@
 
   const state = {
     chart: null,
-    preparedTalks: null,
+    rawTalks: null,
     currentGroups: [],
     currentAggregation: null,
     currentTalkRows: [],
@@ -31,13 +30,14 @@
 
   document.addEventListener('DOMContentLoaded', initialize);
 
-  async function initialize() {
+  function initialize() {
     cacheDom();
     bindEvents();
     applyDefaults();
     loadFromUrl();
-    window.GBCommon.initTooltips();
-    await ensureTalksLoaded(false);
+    if (window.GBCommon && typeof window.GBCommon.initTooltips === 'function') {
+      window.GBCommon.initTooltips();
+    }
   }
 
   function cacheDom() {
@@ -65,30 +65,63 @@
   }
 
   function bindEvents() {
-    refs.searchButton.addEventListener('click', runSearch);
-    refs.clearButton.addEventListener('click', clearQuery);
-    refs.resetButton.addEventListener('click', resetDefaults);
-    refs.exportAggregate.addEventListener('click', exportAggregateData);
-    refs.exportTalks.addEventListener('click', exportTalkRows);
-
-    refs.input.addEventListener('keydown', function(event) {
-      if (event.key === 'Enter') {
+    if (refs.searchButton) {
+      refs.searchButton.addEventListener('click', function(event) {
         event.preventDefault();
         runSearch();
-      }
-    });
+      });
+    }
 
-    refs.metricPer1000.addEventListener('change', function() {
-      if (refs.metricPer1000.checked) {
-        refs.metricPerTalk.checked = false;
-      }
-    });
+    if (refs.clearButton) {
+      refs.clearButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        clearQuery();
+      });
+    }
 
-    refs.metricPerTalk.addEventListener('change', function() {
-      if (refs.metricPerTalk.checked) {
-        refs.metricPer1000.checked = false;
-      }
-    });
+    if (refs.resetButton) {
+      refs.resetButton.addEventListener('click', function(event) {
+        event.preventDefault();
+        resetDefaults();
+      });
+    }
+
+    if (refs.exportAggregate) {
+      refs.exportAggregate.addEventListener('click', function(event) {
+        event.preventDefault();
+        exportAggregateData();
+      });
+    }
+
+    if (refs.exportTalks) {
+      refs.exportTalks.addEventListener('click', function(event) {
+        event.preventDefault();
+        exportTalkRows();
+      });
+    }
+
+    if (refs.input) {
+      refs.input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          runSearch();
+        }
+      });
+    }
+
+    if (refs.metricPer1000 && refs.metricPerTalk) {
+      refs.metricPer1000.addEventListener('change', function() {
+        if (refs.metricPer1000.checked) {
+          refs.metricPerTalk.checked = false;
+        }
+      });
+
+      refs.metricPerTalk.addEventListener('change', function() {
+        if (refs.metricPerTalk.checked) {
+          refs.metricPer1000.checked = false;
+        }
+      });
+    }
   }
 
   function applyDefaults() {
@@ -147,7 +180,9 @@
     refs.speaker.value = params.speaker || '';
 
     if (refs.input.value) {
-      runSearch();
+      window.setTimeout(function() {
+        runSearch();
+      }, 0);
     }
   }
 
@@ -171,8 +206,8 @@
   }
 
   async function ensureTalksLoaded(showLoading) {
-    if (state.preparedTalks) {
-      return state.preparedTalks;
+    if (state.rawTalks) {
+      return state.rawTalks;
     }
 
     if (showLoading) {
@@ -180,43 +215,26 @@
     }
 
     const rawTalks = await window.GBCommon.fetchJsonCached(TALKS_URL, { cacheKey: 'general-conference-talks' });
-    state.preparedTalks = prepareTalks(Array.isArray(rawTalks) ? rawTalks : []);
-    return state.preparedTalks;
+    state.rawTalks = Array.isArray(rawTalks) ? rawTalks.map(prepareTalkRecord) : [];
+    return state.rawTalks;
   }
 
-  function prepareTalks(rawTalks) {
-    return rawTalks.map(function(talk) {
-      const normalizedLower = normalizeTalkText(talk.text, false);
-      const normalizedCase = normalizeTalkText(talk.text, true);
-      const lowerWords = normalizedLower ? normalizedLower.split(' ') : [];
-      const caseWords = normalizedCase ? normalizedCase.split(' ') : [];
-
-      return {
-        raw: talk,
-        title: String(talk.title || 'Untitled talk'),
-        speaker: String(talk.speaker || 'Unknown speaker'),
-        year: Number(talk.year || 0),
-        month: String(talk.month || ''),
-        conferenceLabel: String(talk.month || '') + ' ' + String(talk.year || ''),
-        hyperlink: String(talk.hyperlink || ''),
-        talkId: Number(talk['talk-id'] || talk.talk_id || 0),
-        textLower: normalizedLower,
-        textCase: normalizedCase,
-        wordsLower: lowerWords,
-        wordsCase: caseWords,
-        wordFreqLower: buildWordFrequency(lowerWords),
-        wordFreqCase: buildWordFrequency(caseWords),
-        wordCount: lowerWords.length || 1
-      };
-    });
-  }
-
-  function buildWordFrequency(words) {
-    const frequency = new Map();
-    words.forEach(function(word) {
-      frequency.set(word, (frequency.get(word) || 0) + 1);
-    });
-    return frequency;
+  function prepareTalkRecord(talk) {
+    return {
+      title: String(talk.title || 'Untitled talk'),
+      speaker: String(talk.speaker || 'Unknown speaker'),
+      year: Number(talk.year || 0),
+      month: String(talk.month || ''),
+      conferenceLabel: String(talk.month || '') + ' ' + String(talk.year || ''),
+      hyperlink: String(talk.hyperlink || ''),
+      talkId: Number(talk['talk-id'] || talk.talk_id || 0),
+      text: String(talk.text || ''),
+      _normalizedLower: null,
+      _normalizedCase: null,
+      _wordFreqLower: null,
+      _wordFreqCase: null,
+      _wordCount: null
+    };
   }
 
   function normalizeTalkText(value, preserveCase) {
@@ -224,11 +242,60 @@
       .replace(/[“”]/g, '"')
       .replace(/[‘’]/g, "'")
       .replace(/[—–-]/g, ' ')
-      .replace(/[^A-Za-z0-9'" ]+/g, ' ')
+      .replace(/[^A-Za-z0-9*'" ]+/g, ' ')
       .replace(/\s+/g, ' ')
       .trim();
 
     return preserveCase ? normalized : normalized.toLowerCase();
+  }
+
+  function getTalkText(talk, caseSensitive) {
+    if (caseSensitive) {
+      if (talk._normalizedCase == null) {
+        talk._normalizedCase = normalizeTalkText(talk.text, true);
+      }
+      return talk._normalizedCase;
+    }
+
+    if (talk._normalizedLower == null) {
+      talk._normalizedLower = normalizeTalkText(talk.text, false);
+    }
+    return talk._normalizedLower;
+  }
+
+  function getTalkWordFrequency(talk, caseSensitive) {
+    if (caseSensitive) {
+      if (!talk._wordFreqCase) {
+        talk._wordFreqCase = buildWordFrequency(getTalkText(talk, true));
+      }
+      return talk._wordFreqCase;
+    }
+
+    if (!talk._wordFreqLower) {
+      talk._wordFreqLower = buildWordFrequency(getTalkText(talk, false));
+    }
+    return talk._wordFreqLower;
+  }
+
+  function getTalkWordCount(talk) {
+    if (talk._wordCount == null) {
+      const normalizedLower = getTalkText(talk, false);
+      talk._wordCount = normalizedLower ? normalizedLower.split(' ').length : 1;
+    }
+    return talk._wordCount;
+  }
+
+  function buildWordFrequency(normalizedText) {
+    const frequency = new Map();
+    if (!normalizedText) {
+      return frequency;
+    }
+
+    normalizedText.split(' ').forEach(function(word) {
+      frequency.set(word, (frequency.get(word) || 0) + 1);
+    });
+
+    return frequency;
   }
 
   async function runSearch() {
@@ -248,7 +315,7 @@
     refs.status.show('Searching conference text...', 'info', true);
 
     try {
-      const talks = await ensureTalksLoaded(false);
+      const talks = await ensureTalksLoaded(true);
       const groups = parseComparisonGroups(query);
       const settings = getSettings();
       const filteredTalks = applyTalkFilters(talks, settings);
@@ -326,11 +393,7 @@
       const char = normalized[index];
       if (char === '"' && normalized[index - 1] !== '\\') {
         inQuote = !inQuote;
-        if (depth > 0) {
-          buffer += char;
-        } else {
-          buffer += char;
-        }
+        buffer += char;
         continue;
       }
 
@@ -562,11 +625,11 @@
 
     talks.forEach(function(talk) {
       const bucketKey = settings.byConference ? talk.conferenceLabel : String(talk.year);
-      const bucketLabel = bucketKey;
       const orderValue = settings.byConference ? (talk.year * 10 + conferenceMonthOrder(talk.month)) : talk.year;
+
       if (!bucketOrder.has(bucketKey)) {
         bucketOrder.set(bucketKey, orderValue);
-        bucketMap.set(bucketKey, bucketLabel);
+        bucketMap.set(bucketKey, bucketKey);
       }
 
       groups.forEach(function(group, groupIndex) {
@@ -576,7 +639,7 @@
         }
 
         const adjustedCount = settings.metricMode === 'per1000'
-          ? Math.round((evaluation.count / Math.max(1, talk.wordCount)) * 1000 * 10) / 10
+          ? Math.round((evaluation.count / Math.max(1, getTalkWordCount(talk))) * 1000 * 10) / 10
           : evaluation.count;
 
         series[groupIndex].counts[bucketKey] = (series[groupIndex].counts[bucketKey] || 0) + adjustedCount;
@@ -585,6 +648,7 @@
         if (!talkMatches.has(talkKey)) {
           talkMatches.set(talkKey, []);
         }
+
         talkMatches.get(talkKey).push({
           title: talk.title,
           href: talk.hyperlink,
@@ -677,9 +741,9 @@
       return countFuzzyMatches(talk, pattern, caseSensitive);
     }
 
-    const sourceText = caseSensitive ? talk.textCase : talk.textLower;
+    const sourceText = getTalkText(talk, caseSensitive);
     const query = caseSensitive ? pattern.normalizedCase : pattern.normalized;
-    if (!query) {
+    if (!query || !sourceText) {
       return 0;
     }
 
@@ -699,8 +763,9 @@
 
   function countFuzzyMatches(talk, pattern, caseSensitive) {
     const query = caseSensitive ? pattern.normalizedCase : pattern.normalized;
-    const frequency = caseSensitive ? talk.wordFreqCase : talk.wordFreqLower;
+    const frequency = getTalkWordFrequency(talk, caseSensitive);
     let total = 0;
+
     frequency.forEach(function(count, word) {
       if (Math.abs(word.length - query.length) > 1) {
         return;
@@ -709,6 +774,7 @@
         total += count;
       }
     });
+
     return total;
   }
 
@@ -720,15 +786,15 @@
     for (let j = 0; j <= left.length; j += 1) {
       matrix[0][j] = j;
     }
-    for (let i = 1; i <= right.length; i += 1) {
-      for (let j = 1; j <= left.length; j += 1) {
-        if (right.charAt(i - 1) === left.charAt(j - 1)) {
-          matrix[i][j] = matrix[i - 1][j - 1];
+    for (let row = 1; row <= right.length; row += 1) {
+      for (let col = 1; col <= left.length; col += 1) {
+        if (right.charAt(row - 1) === left.charAt(col - 1)) {
+          matrix[row][col] = matrix[row - 1][col - 1];
         } else {
-          matrix[i][j] = Math.min(
-            matrix[i - 1][j - 1] + 1,
-            matrix[i][j - 1] + 1,
-            matrix[i - 1][j] + 1
+          matrix[row][col] = Math.min(
+            matrix[row - 1][col - 1] + 1,
+            matrix[row][col - 1] + 1,
+            matrix[row - 1][col] + 1
           );
         }
       }
@@ -751,11 +817,19 @@
   }
 
   function renderChart(aggregation, groups, settings) {
+    if (!refs.plotCanvas) {
+      return;
+    }
+
     refs.plotCanvas.style.display = 'block';
     clearAggregateTable();
     destroyChart();
 
     const ctx = refs.plotCanvas.getContext('2d');
+    if (!ctx || !window.Chart) {
+      return;
+    }
+
     const datasets = aggregation.series.map(function(seriesItem) {
       const points = aggregation.bucketKeys.map(function(key) {
         return {
@@ -787,14 +861,14 @@
         maintainAspectRatio: true,
         responsive: true,
         animation: false,
-        parsing: chartType === 'bar' ? false : true,
+        parsing: chartType !== 'bar',
         plugins: {
           legend: { display: false },
           tooltip: { enabled: false }
         },
         scales: {
           x: {
-            type: chartType === 'bar' ? 'category' : 'category',
+            type: 'category',
             ticks: {
               maxRotation: 45,
               minRotation: 0,
@@ -871,7 +945,9 @@
 
   function clearAggregateTable() {
     refs.aggregateTable.innerHTML = '';
-    refs.plotCanvas.style.display = 'block';
+    if (refs.plotCanvas) {
+      refs.plotCanvas.style.display = 'block';
+    }
   }
 
   function displayTalkMatches(bucketKey, group, settings) {
