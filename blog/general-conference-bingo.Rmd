@@ -113,7 +113,7 @@ background: #ffffff;
 .gb-bingo-cell {
 border-right: 1.5px solid #0f172a;
 border-bottom: 1.5px solid #0f172a;
-padding: clamp(8px, 1.1vw, 12px);
+padding: clamp(10px, 1.25vw, 14px);
 display: flex;
 align-items: center;
 justify-content: center;
@@ -139,32 +139,32 @@ background: #eff6ff;
 }
 
 .gb-bingo-cell__word {
-display: flex;
-align-items: center;
-justify-content: center;
-width: 100%;
+display: inline-block;
 max-width: 100%;
-max-height: 100%;
-margin: 0;
+margin: 0 auto;
 padding: 0;
+font-family: inherit;
 font-weight: 800;
 font-size: var(--cell-font-size, 16px);
 line-height: 1.08;
-letter-spacing: -0.01em;
+letter-spacing: -0.015em;
 text-align: center;
+white-space: nowrap;
 word-break: normal;
 overflow-wrap: normal;
 hyphens: none;
-white-space: nowrap;
+text-transform: none;
+vertical-align: middle;
 min-width: 0;
-text-transform: capitalize;
 }
 
 .gb-bingo-cell__word--phrase {
+display: block;
+width: 100%;
 white-space: normal;
 overflow-wrap: break-word;
 word-break: normal;
-line-height: 1.05;
+line-height: 1.04;
 }
 
 .gb-bingo-card__footer-brand {
@@ -958,7 +958,7 @@ return;
 frame.style.setProperty('--grid-size', `${gridSize}px`);
 
 const cellSize = gridSize / 5;
-const baseFontSize = Math.max(10, Math.min(26, cellSize * 0.22));
+const baseFontSize = Math.max(9, Math.min(24, cellSize * 0.19));
 cardElement.style.setProperty('--cell-font-size', `${baseFontSize}px`);
 cardElement.style.setProperty('--cell-size', `${cellSize}px`);
 }
@@ -981,36 +981,32 @@ const isPhrase = /\s/.test(text);
 
 wordElement.classList.toggle('gb-bingo-cell__word--phrase', isPhrase);
 
-const cellRect = cell.getBoundingClientRect();
-const cellWidth = Math.max(0, cellRect.width);
-const cellHeight = Math.max(0, cellRect.height);
-
-if (!cellWidth || !cellHeight) {
-return;
-}
+const card = wordElement.closest('.gb-bingo-card');
+const cellSize = parseFloat(getComputedStyle(card).getPropertyValue('--cell-size')) || Math.min(cell.clientWidth, cell.clientHeight);
 
 const style = window.getComputedStyle(cell);
 const padX = parseFloat(style.paddingLeft || 0) + parseFloat(style.paddingRight || 0);
 const padY = parseFloat(style.paddingTop || 0) + parseFloat(style.paddingBottom || 0);
 
-const maxWidth = Math.max(8, cellWidth - padX - 8);
-const maxHeight = Math.max(8, cellHeight - padY - 8);
+const maxWidth = Math.max(12, cell.clientWidth - padX - 10);
+const maxHeight = Math.max(12, cell.clientHeight - padY - 10);
 
-const card = wordElement.closest('.gb-bingo-card');
-const cellSizeVar = parseFloat(getComputedStyle(card).getPropertyValue('--cell-size')) || Math.min(cellWidth, cellHeight);
-const startSize = Math.max(10, Math.min(26, cellSizeVar * (isPhrase ? 0.185 : 0.215)));
-const minSize = Math.max(8, cellSizeVar * 0.105);
+const characterCount = text.replace(/\s+/g, '').length;
+const startRatio = isPhrase ? 0.18 : 0.205;
+const lengthPenalty = isPhrase ? Math.max(0, characterCount - 10) * 0.003 : Math.max(0, characterCount - 8) * 0.0045;
+const startSize = Math.max(8, Math.min(24, cellSize * Math.max(0.12, startRatio - lengthPenalty)));
+const minSize = Math.max(7, cellSize * 0.09);
 
 wordElement.style.fontSize = `${startSize}px`;
-wordElement.style.lineHeight = isPhrase ? '1.05' : '1.08';
 wordElement.style.whiteSpace = isPhrase ? 'normal' : 'nowrap';
-wordElement.style.width = '100%';
+wordElement.style.width = isPhrase ? '100%' : 'auto';
+wordElement.style.lineHeight = isPhrase ? '1.04' : '1.08';
 
 let low = minSize;
 let high = startSize;
 let best = minSize;
 
-for (let i = 0; i < 14; i += 1) {
+for (let i = 0; i < 16; i += 1) {
 const mid = (low + high) / 2;
 wordElement.style.fontSize = `${mid}px`;
 
@@ -1027,15 +1023,12 @@ high = mid;
 
 wordElement.style.fontSize = `${best}px`;
 
-let guard = 0;
-while (
-guard < 8 &&
-(wordElement.scrollWidth > maxWidth + 0.5 || wordElement.scrollHeight > maxHeight + 0.5) &&
-best > minSize
-) {
-best = Math.max(minSize, best - 0.4);
+for (let guard = 0; guard < 8; guard += 1) {
+if (wordElement.scrollWidth <= maxWidth + 0.5 && wordElement.scrollHeight <= maxHeight + 0.5) {
+break;
+}
+best = Math.max(minSize, best - 0.35);
 wordElement.style.fontSize = `${best}px`;
-guard += 1;
 }
 }
 
@@ -1069,9 +1062,10 @@ scheduleCardFit(cardElement);
 });
 
 cardResizeObserver.observe(cardElement);
-const gridFrame = cardElement.querySelector('.gb-bingo-grid-frame');
-if (gridFrame) {
-cardResizeObserver.observe(gridFrame);
+
+const main = cardElement.querySelector('.gb-bingo-card__main');
+if (main) {
+cardResizeObserver.observe(main);
 }
 }
 
