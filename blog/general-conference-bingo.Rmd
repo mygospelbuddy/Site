@@ -138,16 +138,7 @@ background: #eff6ff;
 }
 
 .gb-bingo-cell__word {
-display: block;
-max-width: 100%;
-font-size: clamp(0.5rem, 2.2vw, 1.2rem);
-line-height: 1.06;
-font-weight: 800;
-letter-spacing: 0.01em;
-text-transform: uppercase;
-text-align: center;
-overflow: hidden;
-white-space: nowrap;
+font-size: var(--cell-font-size, 14px);
 }
 
 .gb-bingo-card__footer-brand {
@@ -920,8 +911,18 @@ return shell;
 function sizeCardGrid(cardElement) {
 const main = cardElement.querySelector('.gb-bingo-card__main');
 const frame = cardElement.querySelector('.gb-bingo-grid-frame');
-if (!main || !frame) {
-return;
+if (!main || !frame) return;
+
+const mainRect = main.getBoundingClientRect();
+const gridSize = Math.floor(Math.min(mainRect.width, mainRect.height) * 0.9);
+
+if (gridSize > 0) {
+frame.style.setProperty('--grid-size', `${gridSize}px`);
+
+// 👇 NEW: set cell-based font size
+const cellSize = gridSize / 5;
+cardElement.style.setProperty('--cell-font-size', `${cellSize * 0.32}px`);
+}
 }
 
 const mainRect = main.getBoundingClientRect();
