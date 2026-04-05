@@ -113,7 +113,7 @@ background: #ffffff;
 .gb-bingo-cell {
 border-right: 1.5px solid #0f172a;
 border-bottom: 1.5px solid #0f172a;
-padding: 8px;
+padding: clamp(5px, 0.8vw, 8px);
 display: flex;
 align-items: center;
 justify-content: center;
@@ -123,6 +123,7 @@ overflow: hidden;
 box-sizing: border-box;
 min-width: 0;
 min-height: 0;
+position: relative;
 }
 
 .gb-bingo-cell:nth-child(5n) {
@@ -138,7 +139,34 @@ background: #eff6ff;
 }
 
 .gb-bingo-cell__word {
-font-size: var(--cell-font-size, 14px);
+display: -webkit-box;
+display: flex;
+align-items: center;
+justify-content: center;
+width: 100%;
+max-width: 100%;
+max-height: 100%;
+margin: 0;
+padding: 0;
+font-weight: 800;
+font-size: var(--cell-font-size, 16px);
+line-height: 1.06;
+letter-spacing: -0.01em;
+text-align: center;
+word-break: normal;
+overflow-wrap: normal;
+hyphens: none;
+white-space: nowrap;
+text-wrap: balance;
+min-width: 0;
+transform-origin: center center;
+}
+
+.gb-bingo-cell__word--phrase {
+white-space: normal;
+overflow-wrap: break-word;
+word-break: normal;
+line-height: 1.05;
 }
 
 .gb-bingo-card__footer-brand {
@@ -226,10 +254,6 @@ height: 56px;
 @media (max-width: 680px) {
 .gb-bingo-card {
 padding: 14px 14px 12px;
-}
-
-.gb-bingo-cell {
-padding: 6px;
 }
 
 .gb-bingo-card__title {
@@ -385,6 +409,8 @@ normalizationMap: {}
 };
 
 const elements = {};
+let cardResizeObserver = null;
+let fitRaf = null;
 
 document.addEventListener('DOMContentLoaded', () => {
 cacheElements();
@@ -414,6 +440,13 @@ function bindEvents() {
 elements.generate.addEventListener('click', () => generateAndRenderCard(true));
 elements.printSheets.addEventListener('click', exportPdfBatch);
 elements.reset.addEventListener('click', resetSettings);
+
+window.addEventListener('resize', () => {
+const liveCard = elements.printArea.querySelector('.gb-bingo-card');
+if (liveCard) {
+scheduleCardFit(liveCard);
+}
+});
 }
 
 async function prepareConferenceData() {
@@ -898,12 +931,7 @@ footer.append(spacer, footerBrand);
 cardElement.append(header, main, footer);
 shell.appendChild(cardElement);
 
-sizeCardGrid(cardElement);
-
-requestAnimationFrame(() => {
-sizeCardGrid(cardElement);
-fitCardWords(cardElement);
-});
+scheduleCardFit(cardElement);
 
 return shell;
 }
@@ -911,25 +939,24 @@ return shell;
 function sizeCardGrid(cardElement) {
 const main = cardElement.querySelector('.gb-bingo-card__main');
 const frame = cardElement.querySelector('.gb-bingo-grid-frame');
-if (!main || !frame) return;
+
+if (!main || !frame) {
+return;
+}
 
 const mainRect = main.getBoundingClientRect();
 const gridSize = Math.floor(Math.min(mainRect.width, mainRect.height) * 0.9);
 
-if (gridSize > 0) {
+if (gridSize <= 0) {
+return;
+}
+
 frame.style.setProperty('--grid-size', `${gridSize}px`);
 
-// 👇 NEW: set cell-based font size
 const cellSize = gridSize / 5;
-cardElement.style.setProperty('--cell-font-size', `${cellSize * 0.32}px`);
-}
-}
-
-const mainRect = main.getBoundingClientRect();
-const gridSize = Math.floor(Math.min(mainRect.width, mainRect.height) * 0.9);
-if (gridSize > 0) {
-frame.style.setProperty('--grid-size', `${gridSize}px`);
-}
+const baseFontSize = Math.max(10, Math.min(28, cellSize * 0.24));
+cardElement.style.setProperty('--cell-font-size', `${baseFontSize}px`);
+cardElement.style.setProperty('--cell-size', `${cellSize}px`);
 }
 
 function fitCardWords(cardElement) {
@@ -941,29 +968,112 @@ fitWordToCell(word);
 
 function fitWordToCell(wordElement) {
 const cell = wordElement.parentElement;
-if (!cell) return;
+if (!cell) {
+return;
+}
 
-const baseFontSize = 14;
-const minFontSize = 3;
-const step = 0.25;
-const horizontalPaddingAllowance = 16;
-const verticalPaddingAllowance = 16;
+const text = (wordElement.textContent || '').trim();
+const isPhrase = /\s/.test(text);
 
-wordElement.style.fontSize = `${baseFontSize}px`;
-wordElement.style.whiteSpace = 'nowrap';
-wordElement.style.lineHeight = '1.06';
+wordElement.classList.toggle('gb-bingo-cell__word--phrase', isPhrase);
 
-const maxWidth = cell.clientWidth - horizontalPaddingAllowance;
-const maxHeight = cell.clientHeight - verticalPaddingAllowance;
+const cellRect = cell.getBoundingClientRect();
+const cellWidth = Math.max(0, cellRect.width);
+const cellHeight = Math.max(0, cellRect.height);
 
-let fontSize = baseFontSize;
+if (!cellWidth || !cellHeight) {
+return;
+}
 
+const style = window.getComputedStyle(cell);
+const padX = parseFloat(style.paddingLeft || 0) + parseFloat(style.paddingRight || 0);
+const padY = parseFloat(style.paddingTop || 0) + parseFloat(style.paddingBottom || 0);
+
+const maxWidth = Math.max(8, cellWidth - padX - 4);
+const maxHeight = Math.max(8, cellHeight - padY - 4);
+
+const cellSizeVar = parseFloat(getComputedStyle(wordElement.closest('.gb-bingo-card')).getPropertyValue('--cell-size')) || Math.min(cellWidth, cellHeight);
+const startSize = Math.max(10, Math.min(28, cellSizeVar * (isPhrase ? 0.205 : 0.245)));
+const minSize = Math.max(8, cellSizeVar * 0.105);
+
+wordElement.style.fontSize = `${startSize}px`;
+wordElement.style.lineHeight = isPhrase ? '1.05' : '1.06';
+wordElement.style.whiteSpace = isPhrase ? 'normal' : 'nowrap';
+
+if (isPhrase) {
+wordElement.style.width = '100%';
+} else {
+wordElement.style.width = 'auto';
+}
+
+let low = minSize;
+let high = startSize;
+let best = minSize;
+
+for (let i = 0; i < 14; i += 1) {
+const mid = (low + high) / 2;
+wordElement.style.fontSize = `${mid}px`;
+
+const fitsWidth = wordElement.scrollWidth <= maxWidth + 0.5;
+const fitsHeight = wordElement.scrollHeight <= maxHeight + 0.5;
+
+if (fitsWidth && fitsHeight) {
+best = mid;
+low = mid;
+} else {
+high = mid;
+}
+}
+
+wordElement.style.fontSize = `${best}px`;
+
+if (isPhrase) {
+let guard = 0;
 while (
-fontSize > minFontSize &&
-(wordElement.scrollWidth > maxWidth || wordElement.scrollHeight > maxHeight)
+guard < 8 &&
+(wordElement.scrollWidth > maxWidth + 0.5 || wordElement.scrollHeight > maxHeight + 0.5) &&
+best > minSize
 ) {
-fontSize -= step;
-wordElement.style.fontSize = `${fontSize}px`;
+best = Math.max(minSize, best - 0.4);
+wordElement.style.fontSize = `${best}px`;
+guard += 1;
+}
+}
+}
+
+function scheduleCardFit(cardElement) {
+if (!cardElement) {
+return;
+}
+
+if (fitRaf) {
+cancelAnimationFrame(fitRaf);
+}
+
+fitRaf = requestAnimationFrame(() => {
+sizeCardGrid(cardElement);
+fitCardWords(cardElement);
+});
+}
+
+function observeCardResizing(cardElement) {
+if (cardResizeObserver) {
+cardResizeObserver.disconnect();
+cardResizeObserver = null;
+}
+
+if (!window.ResizeObserver || !cardElement) {
+return;
+}
+
+cardResizeObserver = new ResizeObserver(() => {
+scheduleCardFit(cardElement);
+});
+
+cardResizeObserver.observe(cardElement);
+const gridFrame = cardElement.querySelector('.gb-bingo-grid-frame');
+if (gridFrame) {
+cardResizeObserver.observe(gridFrame);
 }
 }
 
@@ -986,9 +1096,17 @@ img.addEventListener('error', resolve, { once: true });
 
 function renderCurrentCard(card, settings) {
 elements.printArea.innerHTML = '';
-elements.printArea.appendChild(createCardElement(card));
+const shell = createCardElement(card);
+elements.printArea.appendChild(shell);
 elements.summary.textContent = `Preview example • ${card.difficulty} difficulty • ${card.conferenceCount} conference(s) analyzed • ${card.talkCount} talk(s) in range • ${settings.yearFrom}–${settings.yearTo}`;
 state.currentCard = { card, settings };
+
+const liveCard = shell.querySelector('.gb-bingo-card');
+observeCardResizing(liveCard);
+
+requestAnimationFrame(() => {
+scheduleCardFit(liveCard);
+});
 }
 
 function setStatus(type, message, showSpinner = false) {
@@ -1013,14 +1131,6 @@ try {
 setStatus('info', 'Building your bingo card…', true);
 const card = createCardData(settings);
 renderCurrentCard(card, settings);
-
-requestAnimationFrame(() => {
-const liveCard = elements.printArea.querySelector('.gb-bingo-card');
-if (liveCard) {
-sizeCardGrid(liveCard);
-fitCardWords(liveCard);
-}
-});
 
 if (showReadyMessage) {
 setStatus('success', 'New bingo card preview ready.');
@@ -1061,8 +1171,11 @@ elements.pdfStage.appendChild(node);
 
 await waitForNextFrame();
 await waitForImageLoad(node);
-sizeCardGrid(node.querySelector('.gb-bingo-card'));
-fitCardWords(node.querySelector('.gb-bingo-card'));
+
+const pdfCard = node.querySelector('.gb-bingo-card');
+sizeCardGrid(pdfCard);
+fitCardWords(pdfCard);
+
 await waitForNextFrame();
 
 const canvas = await html2canvas(node, {
