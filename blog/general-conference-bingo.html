@@ -18096,7 +18096,7 @@ font-size: 0.68rem;
 }
 }
 .gb-bingo-cell--selected {
-background: rgba(255, 191, 0, 0.6)
+background: rgba(255, 191, 0, 0.6);
 }
 </style>
 <style type="text/css">
@@ -20002,10 +20002,9 @@ for (const cell of card.cells) {
 const cellElement = document.createElement('div');
 cellElement.className = `gb-bingo-cell${cell.isFree ? ' gb-bingo-cell--free' : ''}`;
 
-cellElement.addEventListener('click' () => {
+cellElement.addEventListener('click', () => {
 cellElement.classList.toggle('gb-bingo-cell--selected');
-)
-}
+});
 
 const word = document.createElement('div');
 word.className = 'gb-bingo-cell__word';
