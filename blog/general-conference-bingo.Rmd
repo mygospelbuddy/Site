@@ -227,10 +227,14 @@ line-height: 1.5;
 position: fixed;
 left: -99999px;
 top: 0;
-width: 900px;
+width: 100%;
+max-width: 862px;
+padding: 0;
+margin: 0;
 pointer-events: none;
 opacity: 0;
 contain: layout style paint;
+box-sizing: border-box;
 }
 
 .gb-bingo-empty {
@@ -355,7 +359,7 @@ background: rgba(255, 191, 0, 0.6);
 </div>
 
 <div id="bingoStatus" class="gb-status" aria-live="polite"></div>
-<div class="gb-config-note">Preview automatically scales to fit the screen while keeping the word sizing tied to the actual square size.</div>
+<div class="gb-config-note">Preview automatically scales to fit the screen, and PDF export now captures that same fitted text sizing model.</div>
 </section>
 
 <section class="gb-search-card">
@@ -1105,6 +1109,48 @@ setStatus('error', error.message || 'Gospel Buddy could not generate a bingo car
 }
 }
 
+function createPdfCardFromLivePreview(card) {
+const liveShell = elements.printArea.querySelector('.gb-bingo-card-shell');
+
+if (!liveShell) {
+throw new Error('No live bingo card is available to print.');
+}
+
+const clone = liveShell.cloneNode(true);
+
+clone.querySelectorAll('.gb-bingo-cell--selected').forEach((node) => {
+node.classList.remove('gb-bingo-cell--selected');
+});
+
+const logoImages = Array.from(clone.querySelectorAll('img'));
+for (const img of logoImages) {
+img.crossOrigin = 'anonymous';
+img.decoding = 'async';
+}
+
+const clonedCard = clone.querySelector('.gb-bingo-card');
+if (!clonedCard) {
+throw new Error('The printable bingo card could not be prepared.');
+}
+
+const liveCard = liveShell.querySelector('.gb-bingo-card');
+const liveWidth = liveCard ? liveCard.getBoundingClientRect().width : 0;
+
+elements.pdfStage.innerHTML = '';
+elements.pdfStage.style.width = `${Math.ceil(Math.max(1, liveShell.getBoundingClientRect().width))}px`;
+elements.pdfStage.appendChild(clone);
+
+if (liveWidth > 0) {
+clonedCard.style.width = `${liveWidth}px`;
+clonedCard.style.maxWidth = `${liveWidth}px`;
+}
+
+sizeCardLayout(clonedCard);
+fitCardWords(clonedCard);
+
+return clone;
+}
+
 async function exportPdfBatch() {
 if (!state.ready) {
 return;
@@ -1125,16 +1171,20 @@ format: 'letter'
 });
 
 for (let index = 0; index < totalCards; index += 1) {
+let node;
+
+if (index === 0 && state.currentCard && state.currentCard.card) {
+node = createPdfCardFromLivePreview(state.currentCard.card);
+} else {
 const card = createCardData(settings);
-const node = createCardElement(card);
-elements.pdfStage.appendChild(node);
+renderCurrentCard(card, settings);
+await waitForNextFrame();
+await waitForNextFrame();
+node = createPdfCardFromLivePreview(card);
+}
 
 await waitForNextFrame();
 await waitForImageLoad(node);
-
-const pdfCard = node.querySelector('.gb-bingo-card');
-sizeCardLayout(pdfCard);
-fitCardWords(pdfCard);
 await waitForNextFrame();
 
 const canvas = await html2canvas(node, {
@@ -1163,7 +1213,7 @@ pdf.addPage();
 }
 
 pdf.addImage(imgData, 'PNG', offsetX, offsetY, renderWidth, renderHeight, undefined, 'FAST');
-node.remove();
+elements.pdfStage.innerHTML = '';
 }
 
 const safeDifficulty = prettyDifficulty(settings.difficulty).toLowerCase().replace(/\s+/g, '-');
