@@ -3,8 +3,8 @@ title: "Gospel Buddy Privacy Policy"  # Sets the Title.
 output:
   html_document:
     includes:
-      in_header: "https://mygospelbuddy.com/docs/header.html"
-      after_body: "https://mygospelbuddy.com/docs/footer.html"
+      in_header: "https://raw.githubusercontent.com/kameronyork/kameronyork.github.io/main/projects/conference/headers/inspire-change-header.html"
+      after_body: "https://raw.githubusercontent.com/kameronyork/kameronyork.github.io/main/parables/footer.html"
 ---
 <br>
 <br>
