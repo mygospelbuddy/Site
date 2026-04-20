@@ -1,10 +1,10 @@
 ---
-title: "Gospel Buddy Privacy Policy"  # Sets the Title.
+title: "My Gospel Buddy Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "https://raw.githubusercontent.com/kameronyork/kameronyork.github.io/main/projects/conference/headers/inspire-change-header.html"
-      after_body: "https://raw.githubusercontent.com/kameronyork/kameronyork.github.io/main/parables/footer.html"
+      in_header: "./header.html"
+      after_body: "./footer.html"
 ---
 <br>
 <br>
