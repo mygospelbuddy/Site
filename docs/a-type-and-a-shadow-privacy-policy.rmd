@@ -1,0 +1,89 @@
+---
+title: "A Type and a Shadow Privacy Policy"
+output:
+  html_document:
+    includes:
+      in_header: "./header.html"
+      after_body: "./footer.html"
+---
+
+<br>
+<br>
+
+## Privacy Policy
+
+A Type and a Shadow is designed to help users practice typing on scripture chapters and general conference talks on ChurchofJesusChrist.org. This privacy policy explains what data the extension processes, how that data is used, and what permissions the extension requires.
+
+## Data Collection and Use
+
+A Type and a Shadow does **not** collect personally identifiable information such as name, email address, phone number, mailing address, or payment information.
+
+The extension does process limited data that is necessary for its typing features to work properly. This includes:
+
+- **Website content on supported pages**: the extension reads visible text on supported scripture chapters and general conference talks so it can create the typing interface.
+- **User activity within the typing experience**: the extension processes keystrokes, typing progress, mistakes, correct characters, and session metrics in order to provide typing mode, progress tracking, and performance statistics.
+- **User settings and progress data**: the extension stores settings, page progress, chapter completion data, recent chapters, and current-session metrics using browser extension storage.
+
+This data is used only to provide the extension’s core functionality. It is **not sold**, **not used for advertising**, and **not shared with third parties for unrelated purposes**. :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5}
+
+## Permissions
+
+The extension requests the following permissions:
+
+1. **Storage**  
+   Used to save user settings, page progress, chapter completion records, recent chapters, and session metrics.
+
+2. **Tabs**  
+   Used so the popup can identify and interact with the active tab, determine whether the page is supported, and keep typing mode specific to the tab where the user enabled it. :contentReference[oaicite:6]{index=6} :contentReference[oaicite:7]{index=7}
+
+## Host Permissions
+
+The extension requests host access only for:
+
+- `https://www.churchofjesuschrist.org/*`
+
+This access is required so the extension can function on supported scripture chapters and general conference talks on that site. The extension does not request host access for unrelated websites. :contentReference[oaicite:8]{index=8}
+
+## Remote Code
+
+A Type and a Shadow does **not** use remote code.
+
+All executable code used by the extension is packaged with the extension itself. The extension does not load remote JavaScript files, remote modules, or remote WebAssembly for execution. :contentReference[oaicite:9]{index=9}
+
+## Remote Data
+
+The extension may request non-executable remote data used to support its features, such as scripture metadata. This data is used only to support extension functionality and is not treated as executable code. The extension does not use remote data to identify users. :contentReference[oaicite:10]{index=10}
+
+## Data Storage
+
+A Type and a Shadow stores its settings and progress information using the browser’s extension storage system.
+
+Depending on the feature, stored data may include:
+
+- saved settings
+- scripture and page progress
+- recent chapters
+- tab-specific typing mode state
+- current-session typing metrics
+
+This information is stored to support the user experience and is not stored for advertising or profiling purposes. :contentReference[oaicite:11]{index=11} :contentReference[oaicite:12]{index=12}
+
+## Data Sharing
+
+A Type and a Shadow does **not** sell user data.
+
+A Type and a Shadow does **not** transfer user data to third parties except where strictly necessary to retrieve supporting non-executable data required by the extension’s functionality.
+
+A Type and a Shadow does **not** use or transfer user data for creditworthiness, lending decisions, advertising, or unrelated analytics.
+
+## Children’s Privacy
+
+A Type and a Shadow is not designed to knowingly collect personal information from children.
+
+## Changes to This Policy
+
+This privacy policy may be updated from time to time to reflect changes to the extension’s functionality or Chrome Web Store requirements. If material changes are made, the updated policy will be published with a revised effective date.
+
+---
+
+**Last updated:** April 23, 2026
