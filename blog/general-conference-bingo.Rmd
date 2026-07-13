@@ -6,7 +6,6 @@ output:
       in_header: "../docs/header-bingo.html"
       after_body: "../docs/footer.html"
 ---
-
 <style>
 h1.title {
 display: none;
@@ -270,6 +269,133 @@ background: rgba(255, 191, 0, 0.6);
 </style>
 
 <link rel="stylesheet" href="../search/search-common.css">
+
+<style>
+/* Settings pane layout override.
+   This block intentionally comes AFTER search-common.css so the shared two-column
+   form rules cannot override the settings panel. */
+#conferenceBingoApp .gb-settings-dropdown__body {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: 18px !important;
+  align-items: start !important;
+  padding: 20px 22px 22px !important;
+  box-sizing: border-box !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-settings-grid,
+#conferenceBingoApp .gb-settings-dropdown__body .gb-form-grid,
+#conferenceBingoApp .gb-settings-dropdown__body .gb-form-grid--aligned {
+  display: grid !important;
+  grid-template-columns: minmax(0, 645px) !important;
+  gap: 18px !important;
+  align-items: start !important;
+  justify-items: stretch !important;
+  width: 100% !important;
+  max-width: 535px !important;
+  margin: 0 !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-field {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: 100% !important;
+  max-width: 535px !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-label-with-tip {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: auto !important;
+  margin: 0 !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-field__label {
+  display: block !important;
+  margin: 0 !important;
+  line-height: 1.2 !important;
+  text-align: left !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-select {
+  display: block !important;
+  width: 100% !important;
+  max-width: 535px !important;
+  margin: 0 !important;
+}
+
+#conferenceBingoApp .gb-difficulty-note {
+  max-width: 535px !important;
+  margin: 0 !important;
+  color: #64748b !important;
+  font-size: 0.84rem !important;
+  line-height: 1.5 !important;
+}
+
+#conferenceBingoApp .gb-difficulty-note strong {
+  color: #334155 !important;
+  font-weight: 700 !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-checkbox {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 8px !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  align-self: flex-start !important;
+  white-space: nowrap !important;
+}
+
+#conferenceBingoApp .gb-settings-dropdown__body .gb-checkbox input {
+  flex: 0 0 auto !important;
+  margin: 0 !important;
+}
+
+#conferenceBingoApp .gb-btn-row--settings {
+  display: flex !important;
+  justify-content: flex-start !important;
+  align-items: center !important;
+  width: 100% !important;
+  max-width: 535px !important;
+  margin: 2px 0 0 !important;
+}
+
+#conferenceBingoApp .gb-btn-row--settings .gb-btn {
+  margin: 0 !important;
+}
+
+@media (max-width: 560px) {
+  #conferenceBingoApp .gb-settings-dropdown__body {
+    padding: 16px !important;
+  }
+
+  #conferenceBingoApp .gb-settings-dropdown__body .gb-settings-grid,
+  #conferenceBingoApp .gb-settings-dropdown__body .gb-form-grid,
+  #conferenceBingoApp .gb-settings-dropdown__body .gb-form-grid--aligned,
+  #conferenceBingoApp .gb-settings-dropdown__body .gb-field,
+  #conferenceBingoApp .gb-settings-dropdown__body .gb-select,
+  #conferenceBingoApp .gb-btn-row--settings {
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  #conferenceBingoApp .gb-settings-dropdown__body .gb-checkbox {
+    white-space: normal !important;
+  }
+}
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
@@ -284,23 +410,11 @@ background: rgba(255, 191, 0, 0.6);
 
 <div class="gb-settings-dropdown__body">
 
-<div class="gb-form-grid gb-form-grid--2 gb-form-grid--aligned">
-<div class="gb-field">
-<label class="gb-field__label" for="bingoYearFrom">Year from</label>
-<input id="bingoYearFrom" class="gb-input" type="number" inputmode="numeric" placeholder="2000">
-</div>
-
-<div class="gb-field">
-<label class="gb-field__label" for="bingoYearTo">Year to</label>
-<input id="bingoYearTo" class="gb-input" type="number" inputmode="numeric" placeholder="2025">
-</div>
-</div>
-
-<div class="gb-form-grid gb-form-grid--2 gb-form-grid--aligned">
+<div class="gb-form-grid gb-form-grid--aligned gb-settings-grid">
 <div class="gb-field">
 <div class="gb-label-with-tip">
 <label class="gb-field__label" for="bingoDifficulty">Difficulty</label>
-<button type="button" class="gb-info-chip" aria-label="Difficulty help" title="Easy uses the most common Gospel-focused conference words. Medium uses moderately common words. Hard uses less common but still recognizable conference words. Random mixes all three pools.">ⓘ</button>
+<button type="button" class="gb-info-chip" aria-label="Difficulty help" title="Difficulty is precomputed from session appearance rates: Easy is 97%+, Medium is 65% to under 97%, Hard is under 65%. Random uses every allowed word with no filtering.">ⓘ</button>
 </div>
 <select id="bingoDifficulty" class="gb-select">
 <option value="easy">Easy</option>
@@ -308,6 +422,7 @@ background: rgba(255, 191, 0, 0.6);
 <option value="hard">Hard</option>
 <option value="random">Random</option>
 </select>
+<p class="gb-difficulty-note" id="bingoDifficultyNote">Easy words have a 97% or higher likelihood of appearing in any talk in a given session.</p>
 </div>
 
 <div class="gb-field">
@@ -359,19 +474,19 @@ background: rgba(255, 191, 0, 0.6);
 </div>
 
 <div id="bingoStatus" class="gb-status" aria-live="polite"></div>
-<div class="gb-config-note">Preview automatically scales to fit the screen, and PDF export now captures that same fitted text sizing model.</div>
+<div class="gb-config-note">Preview automatically scales to fit the screen. Difficulty filtering uses the precomputed allowed-word JSON: Easy 97%+, Medium 65% to under 97%, Hard under 65%, and Random uses every allowed word.</div>
 </section>
 
 <section class="gb-search-card">
 <div class="gb-search-card__heading gb-search-card__heading--compact">
 <div>
 <h2 class="gb-search-card__title">Current bingo card preview</h2>
-<p class="gb-search-card__subtitle" id="bingoSummary">Loading conference words…</p>
+<p class="gb-search-card__subtitle" id="bingoSummary">Loading precomputed conference bingo words…</p>
 </div>
 </div>
 
 <div id="bingoPrintArea" class="gb-bingo-preview-wrap">
-<div class="gb-bingo-empty">Preparing conference word pools…</div>
+<div class="gb-bingo-empty">Loading precomputed bingo word pools…</div>
 </div>
 </section>
 
@@ -381,30 +496,25 @@ background: rgba(255, 191, 0, 0.6);
 
 <script>
 const BINGO_CONFIG = {
-datasetUrl: 'https://kameronyork.com/datasets/general-conference-talks.json',
-allowedWordsUrl: 'https://kameronyork.com/datasets/conference-bingo-allowed-words.json',
+allowedWordsWithDifficultyUrl: 'https://kameronyork.com/datasets/conference-bingo-allowed-words-with-difficulty.json',
 logoUrl: 'https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png',
-defaultYearFrom: 2000,
 defaultDifficulty: 'easy',
 defaultUseFreeSpace: true,
 maxPdfCards: 10,
-minAverageMentionsPerConference: 1.25,
-easyMinAveragePerConference: 5.5,
-mediumMinAveragePerConference: 3,
-mediumMaxAveragePerConference: 5.5,
-hardMinAveragePerConference: 1.75,
-hardMaxAveragePerConference: 3.25
+difficultyLabels: new Set(['easy', 'medium', 'hard'])
 };
 
 const state = {
-rawTalks: [],
-processedTalks: [],
-yearRange: { min: null, max: null },
-cache: new Map(),
+wordEntries: [],
+wordPools: {
+easy: [],
+medium: [],
+hard: [],
+random: []
+},
+metadata: {},
 currentCard: null,
-ready: false,
-allowedWords: new Set(),
-normalizationMap: {}
+ready: false
 };
 
 const elements = {};
@@ -414,15 +524,13 @@ let cardResizeObserver = null;
 document.addEventListener('DOMContentLoaded', () => {
 cacheElements();
 bindEvents();
-prepareConferenceData().catch((error) => {
+prepareWordData().catch((error) => {
 console.error(error);
-setStatus('error', 'Gospel Buddy could not prepare the conference word pools. Please try refreshing the page.');
+setStatus('error', 'Gospel Buddy could not load the precomputed bingo word list. Please try refreshing the page.');
 });
 });
 
 function cacheElements() {
-elements.yearFrom = document.getElementById('bingoYearFrom');
-elements.yearTo = document.getElementById('bingoYearTo');
 elements.difficulty = document.getElementById('bingoDifficulty');
 elements.useFreeSpace = document.getElementById('bingoUseFreeSpace');
 elements.pdfCount = document.getElementById('bingoPdfCount');
@@ -431,218 +539,115 @@ elements.printSheets = document.getElementById('bingoPrintSheetsButton');
 elements.reset = document.getElementById('bingoResetButton');
 elements.status = document.getElementById('bingoStatus');
 elements.summary = document.getElementById('bingoSummary');
+elements.difficultyNote = document.getElementById('bingoDifficultyNote');
 elements.printArea = document.getElementById('bingoPrintArea');
 elements.pdfStage = document.getElementById('pdfRenderStage');
 }
 
 function bindEvents() {
 elements.generate.addEventListener('click', () => generateAndRenderCard(true));
+elements.difficulty.addEventListener('change', updateDifficultyNote);
 elements.printSheets.addEventListener('click', exportPdfBatch);
 elements.reset.addEventListener('click', resetSettings);
 window.addEventListener('resize', scheduleLiveCardLayout);
 }
 
-async function prepareConferenceData() {
-setStatus('info', 'Preparing conference word pools…', true);
+async function prepareWordData() {
+setStatus('info', 'Loading precomputed bingo word pools…', true);
 
-const [datasetResponse, allowedResponse] = await Promise.all([
-fetch(BINGO_CONFIG.datasetUrl, {
-cache: 'force-cache',
+const response = await fetch(BINGO_CONFIG.allowedWordsWithDifficultyUrl, {
+cache: 'no-cache',
 credentials: 'omit'
-}),
-fetch(BINGO_CONFIG.allowedWordsUrl, {
-cache: 'force-cache',
-credentials: 'omit'
-})
-]);
-
-if (!datasetResponse.ok) {
-throw new Error(`Dataset request failed with status ${datasetResponse.status}`);
-}
-
-if (!allowedResponse.ok) {
-throw new Error(`Allowed word list request failed with status ${allowedResponse.status}`);
-}
-
-const data = await datasetResponse.json();
-const allowedConfig = await allowedResponse.json();
-
-if (!Array.isArray(data) || data.length === 0) {
-throw new Error('The conference talks dataset did not return any talks.');
-}
-
-initializeAllowedWords(allowedConfig);
-
-state.rawTalks = data;
-state.processedTalks = data
-.filter((row) => row && typeof row.text === 'string' && Number.isFinite(Number(row.year)))
-.map((row) => {
-const year = Number(row.year);
-const month = String(row.month || '').trim() || 'Unknown';
-const conferenceKey = `${year}-${month}`;
-return {
-year,
-month,
-conferenceKey,
-wordCounts: buildWordCounts(row.text)
-};
 });
 
-const years = state.processedTalks.map((talk) => talk.year).filter((year) => Number.isFinite(year));
-state.yearRange.min = Math.min(...years);
-state.yearRange.max = Math.max(...years);
+if (!response.ok) {
+throw new Error(`Allowed word list request failed with status ${response.status}`);
+}
 
-const defaultFrom = Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min);
-elements.yearFrom.value = String(defaultFrom);
-elements.yearTo.value = String(state.yearRange.max);
-elements.yearFrom.min = String(state.yearRange.min);
-elements.yearFrom.max = String(state.yearRange.max);
-elements.yearTo.min = String(state.yearRange.min);
-elements.yearTo.max = String(state.yearRange.max);
+const config = await response.json();
+initializeWordPools(config);
+
 elements.difficulty.value = BINGO_CONFIG.defaultDifficulty;
 elements.useFreeSpace.checked = BINGO_CONFIG.defaultUseFreeSpace;
 elements.pdfCount.value = '1';
+updateDifficultyNote();
 
 state.ready = true;
 elements.printSheets.disabled = false;
 
-setStatus('success', 'Conference word pools are ready.');
+setStatus('success', 'Precomputed bingo word pools are ready.');
 generateAndRenderCard(false);
 }
 
-function initializeAllowedWords(config) {
+function initializeWordPools(config) {
 const allowedWords = Array.isArray(config && config.allowedWords) ? config.allowedWords : [];
-const normalizationMap = (config && typeof config.normalizationMap === 'object' && config.normalizationMap) ? config.normalizationMap : {};
+state.metadata = (config && typeof config.metadata === 'object' && config.metadata) ? config.metadata : {};
 
-state.allowedWords = new Set(
-allowedWords
-.map((word) => String(word || '').trim().toLowerCase())
-.filter(Boolean)
-);
+const seen = new Set();
+const entries = [];
 
-state.normalizationMap = {};
-Object.keys(normalizationMap).forEach((key) => {
-const normalizedKey = String(key || '').trim().toLowerCase();
-const normalizedValue = String(normalizationMap[key] || '').trim().toLowerCase();
-if (normalizedKey && normalizedValue) {
-state.normalizationMap[normalizedKey] = normalizedValue;
+for (const item of allowedWords) {
+let word = '';
+let difficulty = 'random';
+let stats = {};
+
+if (typeof item === 'string') {
+word = item;
+} else if (item && typeof item === 'object') {
+word = item.word;
+difficulty = item.difficulty || 'random';
+stats = item;
 }
+
+word = String(word || '').trim().toLowerCase();
+difficulty = String(difficulty || '').trim().toLowerCase();
+
+if (!word || seen.has(word)) {
+continue;
+}
+
+if (!BINGO_CONFIG.difficultyLabels.has(difficulty)) {
+difficulty = 'hard';
+}
+
+seen.add(word);
+entries.push({
+word,
+difficulty,
+stats
 });
-
-if (state.allowedWords.size === 0) {
-throw new Error('The allowed Gospel word list is empty.');
-}
 }
 
-function buildWordCounts(text) {
-const counts = new Map();
-const tokens = tokenizeText(text);
-
-for (const token of tokens) {
-counts.set(token, (counts.get(token) || 0) + 1);
+if (entries.length === 0) {
+throw new Error('The precomputed allowed word list is empty.');
 }
 
-return counts;
+state.wordEntries = entries;
+state.wordPools = {
+easy: entries.filter((entry) => entry.difficulty === 'easy'),
+medium: entries.filter((entry) => entry.difficulty === 'medium'),
+hard: entries.filter((entry) => entry.difficulty === 'hard'),
+random: entries.slice()
+};
 }
 
-function tokenizeText(text) {
-const cleaned = String(text || '')
-.toLowerCase()
-.replace(/[\u2018\u2019]/g, "'")
-.replace(/[^a-z'\s-]/g, ' ')
-.replace(/-/g, ' ');
 
-const rawTokens = cleaned.split(/\s+/).filter(Boolean);
-const acceptedTokens = [];
+function updateDifficultyNote() {
+const selectedDifficulty = elements.difficulty ? elements.difficulty.value : BINGO_CONFIG.defaultDifficulty;
+const explanations = {
+easy: 'Easy words have a 97% or higher likelihood of appearing in any talk in a given session.',
+medium: 'Medium words have a 65% to under 97% likelihood of appearing in any talk in a given session.',
+hard: 'Hard words have a 0% to under 65% likelihood of appearing in any talk in a given session.',
+random: 'Random uses every allowed word, regardless of how likely it is to appear in any talk in a given session.'
+};
 
-for (let token of rawTokens) {
-token = token.replace(/^'+|'+$/g, '').replace(/^-+|-+$/g, '');
-if (!token) {
-continue;
+if (elements.difficultyNote) {
+elements.difficultyNote.textContent = explanations[selectedDifficulty] || explanations.easy;
 }
-
-const normalized = normalizeWord(token);
-if (!normalized) {
-continue;
-}
-
-acceptedTokens.push(normalized);
-}
-
-return acceptedTokens;
-}
-
-function normalizeWord(word) {
-let normalized = String(word || '').toLowerCase().trim();
-
-if (!normalized) {
-return '';
-}
-
-normalized = normalized.replace(/^'+|'+$/g, '');
-normalized = normalized.replace(/^[^a-z]+|[^a-z]+$/g, '');
-
-if (!normalized) {
-return '';
-}
-
-if (normalized.endsWith("'s")) {
-normalized = normalized.slice(0, -2);
-}
-
-if (state.normalizationMap[normalized]) {
-const mapped = state.normalizationMap[normalized];
-return state.allowedWords.has(mapped) ? mapped : '';
-}
-
-if (state.allowedWords.has(normalized)) {
-return normalized;
-}
-
-const singular = singularizeWord(normalized);
-if (!singular) {
-return '';
-}
-
-if (state.normalizationMap[singular]) {
-const mapped = state.normalizationMap[singular];
-return state.allowedWords.has(mapped) ? mapped : '';
-}
-
-if (state.allowedWords.has(singular)) {
-return singular;
-}
-
-return '';
-}
-
-function singularizeWord(word) {
-if (!word) {
-return '';
-}
-
-if (word.endsWith('ies') && word.length > 4) {
-return word.slice(0, -3) + 'y';
-}
-
-if (/(ches|shes|sses|xes|zes)$/.test(word) && word.length > 4) {
-return word.slice(0, -2);
-}
-
-if (word.endsWith('s') && word.length > 4 && !word.endsWith('ss') && !word.endsWith('us')) {
-return word.slice(0, -1);
-}
-
-return word;
 }
 
 function getSettings() {
-const yearFrom = clampNumber(elements.yearFrom.value, state.yearRange.min, state.yearRange.max, Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min));
-const yearTo = clampNumber(elements.yearTo.value, state.yearRange.min, state.yearRange.max, state.yearRange.max);
-
 return {
-yearFrom: Math.min(yearFrom, yearTo),
-yearTo: Math.max(yearFrom, yearTo),
 difficulty: elements.difficulty.value || BINGO_CONFIG.defaultDifficulty,
 useFreeSpace: elements.useFreeSpace.checked,
 pdfCount: clampNumber(elements.pdfCount.value, 1, BINGO_CONFIG.maxPdfCards, 1)
@@ -650,15 +655,10 @@ pdfCount: clampNumber(elements.pdfCount.value, 1, BINGO_CONFIG.maxPdfCards, 1)
 }
 
 function resetSettings() {
-if (state.yearRange.min === null || state.yearRange.max === null) {
-return;
-}
-
-elements.yearFrom.value = String(Math.max(BINGO_CONFIG.defaultYearFrom, state.yearRange.min));
-elements.yearTo.value = String(state.yearRange.max);
 elements.difficulty.value = BINGO_CONFIG.defaultDifficulty;
 elements.useFreeSpace.checked = BINGO_CONFIG.defaultUseFreeSpace;
 elements.pdfCount.value = '1';
+updateDifficultyNote();
 generateAndRenderCard(false);
 }
 
@@ -670,111 +670,12 @@ return fallback;
 return Math.min(Math.max(Math.round(numeric), min), max);
 }
 
-function getWordStatsForRange(yearFrom, yearTo) {
-const cacheKey = `${yearFrom}-${yearTo}`;
-if (state.cache.has(cacheKey)) {
-return state.cache.get(cacheKey);
+function getDifficultyPool(difficulty) {
+if (difficulty === 'random') {
+return state.wordPools.random || [];
 }
 
-const talks = state.processedTalks.filter((talk) => talk.year >= yearFrom && talk.year <= yearTo);
-const conferenceKeys = Array.from(new Set(talks.map((talk) => talk.conferenceKey)));
-const conferenceCount = conferenceKeys.length;
-
-if (conferenceCount === 0) {
-const emptyResult = { stats: [], conferenceCount: 0, talkCount: 0 };
-state.cache.set(cacheKey, emptyResult);
-return emptyResult;
-}
-
-const statMap = new Map();
-
-for (const talk of talks) {
-for (const [word, count] of talk.wordCounts.entries()) {
-if (!statMap.has(word)) {
-statMap.set(word, {
-word,
-totalCount: 0,
-talkCount: 0,
-conferenceCounts: new Map()
-});
-}
-
-const entry = statMap.get(word);
-entry.totalCount += count;
-entry.talkCount += 1;
-entry.conferenceCounts.set(talk.conferenceKey, (entry.conferenceCounts.get(talk.conferenceKey) || 0) + count);
-}
-}
-
-const stats = Array.from(statMap.values())
-.map((entry) => {
-const conferenceMentionCount = entry.conferenceCounts.size;
-const avgPerConference = entry.totalCount / conferenceCount;
-return {
-word: entry.word,
-totalCount: entry.totalCount,
-talkCount: entry.talkCount,
-conferenceMentionCount,
-avgPerConference
-};
-})
-.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.minAverageMentionsPerConference)
-.sort((left, right) => {
-if (right.avgPerConference !== left.avgPerConference) {
-return right.avgPerConference - left.avgPerConference;
-}
-if (right.totalCount !== left.totalCount) {
-return right.totalCount - left.totalCount;
-}
-return left.word.localeCompare(right.word);
-});
-
-const result = {
-stats,
-conferenceCount,
-talkCount: talks.length
-};
-
-state.cache.set(cacheKey, result);
-return result;
-}
-
-function getDifficultyPool(stats, difficulty) {
-const ranked = stats.slice();
-
-const easyBase = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.easyMinAveragePerConference);
-const mediumBase = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.mediumMinAveragePerConference && entry.avgPerConference < BINGO_CONFIG.mediumMaxAveragePerConference);
-const hardBase = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.hardMinAveragePerConference && entry.avgPerConference < BINGO_CONFIG.hardMaxAveragePerConference);
-
-const easy = uniqueByWord(easyBase.length >= 35 ? easyBase : ranked.slice(0, Math.min(100, ranked.length)));
-const medium = uniqueByWord(mediumBase.length >= 35 ? mediumBase : ranked.slice(Math.min(20, ranked.length), Math.min(140, ranked.length)));
-const hardFallback = ranked.filter((entry) => entry.avgPerConference >= BINGO_CONFIG.hardMinAveragePerConference).slice(Math.min(45, ranked.length), Math.min(180, ranked.length));
-const hard = uniqueByWord(hardBase.length >= 35 ? hardBase : hardFallback);
-const random = uniqueByWord([...easy, ...medium, ...hard]);
-
-const pools = {
-easy,
-medium,
-hard,
-random
-};
-
-return pools[difficulty] || pools.easy;
-}
-
-function uniqueByWord(entries) {
-const seen = new Set();
-const unique = [];
-
-for (const entry of entries) {
-if (!entry || !entry.word || seen.has(entry.word)) {
-continue;
-}
-seen.add(entry.word);
-unique.push(entry);
-}
-
-return unique;
+return state.wordPools[difficulty] || state.wordPools.easy || [];
 }
 
 function shuffle(items) {
@@ -808,17 +709,11 @@ return String(text || '')
 }
 
 function createCardData(settings) {
-const { stats, conferenceCount, talkCount } = getWordStatsForRange(settings.yearFrom, settings.yearTo);
-
-if (conferenceCount === 0 || talkCount === 0) {
-throw new Error('No conference talks were found in that year range.');
-}
-
-const pool = getDifficultyPool(stats, settings.difficulty);
+const pool = getDifficultyPool(settings.difficulty);
 const requiredWords = settings.useFreeSpace ? 24 : 25;
 
 if (pool.length < requiredWords) {
-throw new Error('There are not enough eligible Gospel-focused conference words in that year range. Try widening the year range or choosing an easier difficulty.');
+throw new Error(`There are not enough ${prettyDifficulty(settings.difficulty).toLowerCase()} bingo words to build a card. Add more words to that difficulty in the precomputed JSON or choose random mode.`);
 }
 
 const picked = shuffle(pool).slice(0, requiredWords);
@@ -837,10 +732,9 @@ isFree: true
 return {
 title: `${prettyDifficulty(settings.difficulty)} Conference Bingo`,
 difficulty: prettyDifficulty(settings.difficulty),
-yearFrom: settings.yearFrom,
-yearTo: settings.yearTo,
-conferenceCount,
-talkCount,
+eligibleWordCount: pool.length,
+totalWordCount: state.wordPools.random.length,
+metadata: state.metadata,
 cells
 };
 }
@@ -1062,7 +956,14 @@ function renderCurrentCard(card, settings) {
 elements.printArea.innerHTML = '';
 const shell = createCardElement(card);
 elements.printArea.appendChild(shell);
-elements.summary.textContent = `Preview example • ${card.difficulty} difficulty • ${card.conferenceCount} conference(s) analyzed • ${card.talkCount} talk(s) in range • ${settings.yearFrom}–${settings.yearTo}`;
+
+const sessionCount = Number(card.metadata && card.metadata.totalSessions) || 0;
+const sessionText = sessionCount ? ` • ${sessionCount} session(s) analyzed in preprocessing` : '';
+const thresholds = card.metadata && card.metadata.thresholds ? card.metadata.thresholds : {};
+const thresholdText = Number.isFinite(Number(thresholds.easySessionPercent)) && Number.isFinite(Number(thresholds.mediumSessionPercent))
+? ` • Easy ${thresholds.easySessionPercent}%+ / Medium ${thresholds.mediumSessionPercent}%+`
+: '';
+elements.summary.textContent = `Preview example • ${card.difficulty} difficulty • ${card.eligibleWordCount} eligible word(s) • ${card.totalWordCount} total allowed word(s)${sessionText}${thresholdText}`;
 state.currentCard = { card, settings };
 
 const liveCard = shell.querySelector('.gb-bingo-card');
@@ -1085,7 +986,7 @@ elements.status.innerHTML = '';
 
 function generateAndRenderCard(showReadyMessage) {
 if (!state.ready) {
-setStatus('info', 'Conference word pools are still loading…', true);
+setStatus('info', 'Precomputed bingo word pools are still loading…', true);
 return;
 }
 
