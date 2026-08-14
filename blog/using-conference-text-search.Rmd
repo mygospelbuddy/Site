@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-badge.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">'
@@ -21,16 +23,10 @@ header-includes:
 ---
 
 <!--
-  This page previously used docs/header2.html, the "badge" style instead of
-  the big circular banner. That's reproduced directly below now instead of
-  living in its own duplicated header file — see /assets/css/site.css for
-  the .gb-badge-wrap / .gb-badge styles.
+  This page uses the compact "badge" banner instead of the big circular one
+  (it previously used docs/header2.html for this). That now comes from
+  _includes/banner-badge.html via before_body above.
 -->
-<div class="gb-badge-wrap">
-  <div class="gb-badge">
-    <a href="https://www.mygospelbuddy.com/"><img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="Logo"></a>
-  </div>
-</div>
 
 <style>
 h1.title {

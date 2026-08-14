@@ -91,27 +91,44 @@ without affecting the look of any other page.
 
 ## The page banner (the icon under the nav bar)
 
-The big circular icon (or the small badge, on the couple of pages that use
-that instead) is no longer baked into a hidden header file — it's plain HTML
-at the top of each page's own body, right after the YAML:
+The banner lives in `_includes/` and is pulled in through `before_body:`
+alongside the nav, so it renders **above** the page title — matching the
+original site layout:
 
-```html
-<div class="gb-page-banner">
-  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="Logo">
-</div>
+```yaml
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
 ```
 
-or, for the compact badge style used by `blog/using-conference-text-search.Rmd`:
+Three variants exist — swap the second line to change a page's banner:
 
-```html
-<div class="gb-badge-wrap">
-  <div class="gb-badge">
-    <a href="https://www.mygospelbuddy.com/"><img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="Logo"></a>
-  </div>
-</div>
-```
+| File | Look |
+|---|---|
+| `banner-gospel-buddy.html` | Red band + circular Gospel Buddy icon (most pages) |
+| `banner-a-type-and-a-shadow.html` | Same band, A Type and a Shadow icon |
+| `banner-badge.html` | Compact logo tile (search guide page) |
 
-Swap the image, or delete the block entirely, on a page-by-page basis.
+### Why the nav and banner use `.gb-fullbleed`
+
+rmarkdown puts `before_body` content *inside* its
+`<div class="container-fluid main-container">`, which has a max-width. Left
+alone, the nav bar and banner stop short of the window edges.
+
+The old site got full-width by accident: `header.html` was a complete
+`<!DOCTYPE><html><head>…<body>` document injected into `<head>`, so the
+browser abandoned `<head>`, opened `<body>` early, and dropped the nav and
+banner *outside* `main-container`. Right look, invalid markup.
+
+`.gb-fullbleed` (in `assets/css/site.css`) reproduces that width from valid
+markup by stretching the element to `100vw` and pulling it back out of its
+max-width parent with negative margins. **Keep this class on the `<header>`
+in `nav.html` and on the banner divs** — removing it re-breaks the layout.
+
+Related: `.gb-page-banner img` sets its size with `!important` on purpose.
+`.content img { height: auto }` in `articles.style.min.css` was overriding
+the old percentage height, letting the icon render at full natural size and
+get cropped by the banner's `overflow: hidden`.
 
 ## Re-knitting everything
 

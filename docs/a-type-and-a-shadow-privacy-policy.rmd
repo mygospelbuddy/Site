@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-a-type-and-a-shadow.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/docs/a-type-and-a-shadow-privacy-policy.html">'
@@ -20,10 +22,6 @@ header-includes:
   NOTE: kept at /docs/ for the same reason as gospel-buddy-privacy-policy.Rmd
   — likely registered as this extension's store privacy-policy link.
 -->
-
-<div class="gb-page-banner">
-  <img src="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
-</div>
 
 <br>
 <br>

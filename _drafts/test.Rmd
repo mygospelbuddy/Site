@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 ---
 

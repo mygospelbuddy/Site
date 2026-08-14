@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/search/">'
@@ -19,10 +21,6 @@ header-includes:
   - '<meta name="twitter:description" content="Search for a scripture reference and see how often it has been quoted in General Conference talks.">'
   - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png">'
 ---
-
-<div class="gb-page-banner">
-  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
-</div>
 
 <style>
 h1.title {

@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html">'
@@ -27,10 +29,6 @@ header-includes:
   console.log debug statements throughout the script below); add it to
   blog/index.Rmd whenever it's ready to publish.
 -->
-
-<div class="gb-page-banner">
-  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
-</div>
 
 #### The Role of a Prophet
 

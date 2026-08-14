@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<meta name="description" content="Generate bingo sheets to follow along with General Conference. Select your difficulty level and print a PDF with up to ten pages at a time.">'
@@ -29,10 +31,6 @@ header-includes:
   stub was left at the old blog/general-conference-bingo.html URL so old
   links/bookmarks/shares still land on this page.
 -->
-
-<div class="gb-page-banner">
-  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
-</div>
 
 <style>
 h1.title {

@@ -20,6 +20,10 @@
 body {
   margin: 0;
   padding: 0;
+  /* 100vw includes the vertical scrollbar's width, so the full-bleed nav and
+     banner overhang by a few px and would otherwise add a horizontal
+     scrollbar. */
+  overflow-x: hidden;
 }
 
 /* Remove the extra margin Bootstrap normally adds under the top nav bar */
@@ -29,12 +33,34 @@ body {
   margin-bottom: 0;
 }
 
+/* -------------------------------------------------------------------------
+   FULL-BLEED UTILITY  — important, read before editing
+
+   rmarkdown places `before_body` content *inside* its
+   `<div class="container-fluid main-container">`, which has a max-width and
+   side padding. That's why the nav bar and banner stopped spanning the full
+   window after the reorg.
+
+   The old site got full-width by accident: the old header.html was a whole
+   `<!DOCTYPE><html><head>...<body>` document injected into <head>, so the
+   browser bailed out of <head>, started <body> early, and dropped the nav +
+   banner at the top of the document OUTSIDE main-container. That produced
+   the right *look* from invalid markup.
+
+   This class gets the same full-width result from valid markup: it breaks
+   an element out of its max-width parent and stretches it to the viewport.
+   Uses margin (not position/transform) so it doesn't interfere with
+   Bootstrap's .sticky-top on the nav.
+   ------------------------------------------------------------------------- */
+.gb-fullbleed {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
 /* ---- Page banner (the big circular icon under the nav bar) ------------ */
-/* Used by most pages. Add this markup at the top of a page's own .Rmd:
-     <div class="gb-page-banner">
-       <img src="/assets/img/gospel-buddy-icon.png" alt="Logo">
-     </div>
-*/
+/* Lives in _includes/banner-*.html and is pulled in via each page's
+   `before_body:` so it renders ABOVE the page title, like the old site. */
 .gb-page-banner {
   background: linear-gradient(to bottom, #E74C3C 50%, transparent 50%);
   max-height: 200px;
@@ -46,13 +72,20 @@ body {
   align-items: center;
 }
 
+/* Explicit px height + !important on purpose: the previous `height: 75%`
+   was being lost to `.content img { height: auto }` in
+   articles.style.min.css, which let the icon render at its natural size and
+   get cropped by the overflow:hidden above. 150px == the old 75% of 200px. */
 .gb-page-banner img {
   border-radius: 50%;
   border: 5px solid #0d0f38;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  height: 75%;
-  width: auto;
-  max-width: 100%;
+  height: 150px !important;
+  width: 150px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  display: block !important;
+  object-fit: cover;
 }
 
 .gb-page-banner + div {
@@ -89,9 +122,11 @@ body {
 }
 
 .gb-badge img {
-  height: 60px;
-  width: 60px;
-  margin-right: 10px;
+  height: 60px !important;
+  width: 60px !important;
+  max-width: none !important;
+  margin: 0 !important;
+  display: block !important;
   border-radius: 4px;
 }
 

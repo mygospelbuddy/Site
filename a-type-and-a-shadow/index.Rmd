@@ -4,7 +4,9 @@ output:
   html_document:
     includes:
       in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
-      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-a-type-and-a-shadow.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/a-type-and-a-shadow/">'
@@ -19,10 +21,6 @@ header-includes:
   - '<meta name="twitter:description" content="A Google Chrome extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
   - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
 ---
-
-<div class="gb-page-banner">
-  <img src="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
-</div>
 
 <style>
   /* Center alignment for the title, text under the title, and buttons */
