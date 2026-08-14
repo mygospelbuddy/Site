@@ -4,9 +4,9 @@ author: "My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/quote-collecting.html">'
   - '<meta property="og:title" content="Collecting General Conference Data">'
@@ -22,7 +22,7 @@ header-includes:
 ---
 
 <div class="gb-page-banner">
-  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
 </div>
 
 <small>Last Updated:  12/6/2023</small>

@@ -3,9 +3,9 @@ title: "My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "_includes/head-shared.html"
-      before_body: "_includes/nav.html"
-      after_body: "_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/">'
   - '<meta property="og:title" content="My Gospel Buddy">'
@@ -34,7 +34,7 @@ h1.title {
 </style>
 
 <div class="gb-page-banner">
-  <img src="/assets/img/gospel-buddy-icon.png" alt="Logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="Logo">
 </div>
 <br>
 
@@ -59,16 +59,16 @@ h1.title {
 </div>
 
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
-<a href="/info/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
-<img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<a href="https://www.mygospelbuddy.com/info/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
 <h3 class="mb-3 mt-0">My Gospel Buddy</h3>
 <p class="mb-0">An extension that creates links between the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.</p>
 </a>
 </div>
 
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
-<a href="/a-type-and-a-shadow/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
-<img src="/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<a href="https://www.mygospelbuddy.com/a-type-and-a-shadow/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
 <h3 class="mb-3 mt-0">A Type and a Shadow</h3>
 <p class="mb-0">An extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.</p>
 </a>
@@ -81,24 +81,24 @@ h1.title {
 </div>
 
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
-<a href="/search/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
-<img src="/assets/img/search-gospel-buddy.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<a href="https://www.mygospelbuddy.com/search/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
 <h3 class="mb-3 mt-0">Reference Search</h3>
 <p class="mb-0">Find when a scripture's been referenced</p>
 </a>
 </div>
 
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
-<a href="/search/words" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
-<img src="/assets/img/text-search.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<a href="https://www.mygospelbuddy.com/search/words" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="https://www.mygospelbuddy.com/assets/img/text-search.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
 <h3 class="mb-3 mt-0">Text Search</h3>
 <p class="mb-0">Words in Conference Talks over time.</p>
 </a>
 </div>
 
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
-<a href="/bingo/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
-<img src="/assets/img/bingo-sheet.png" alt="general conference bingo sheet easy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<a href="https://www.mygospelbuddy.com/bingo/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="https://www.mygospelbuddy.com/assets/img/bingo-sheet.png" alt="general conference bingo sheet easy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
 <h3 class="mb-3 mt-0">General Conference Bingo</h3>
 <p class="mb-0">Generate bingo sheets with gospel related words.</p>
 </a>

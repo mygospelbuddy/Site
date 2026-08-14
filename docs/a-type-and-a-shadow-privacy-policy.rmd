@@ -3,9 +3,9 @@ title: "A Type and a Shadow Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/docs/a-type-and-a-shadow-privacy-policy.html">'
   - '<meta property="og:title" content="A Type and a Shadow Privacy Policy">'
@@ -22,7 +22,7 @@ header-includes:
 -->
 
 <div class="gb-page-banner">
-  <img src="/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
 </div>
 
 <br>

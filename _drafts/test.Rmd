@@ -3,9 +3,9 @@ title: "Draft / Scratch Page (not published)"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 ---
 
 <!--

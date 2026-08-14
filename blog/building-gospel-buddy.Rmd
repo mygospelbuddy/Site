@@ -3,9 +3,9 @@ title: "Building My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/building-gospel-buddy.html">'
   - '<meta property="og:title" content="Building the Gospel Buddy Extension">'
@@ -21,7 +21,7 @@ header-includes:
 ---
 
 <div class="gb-page-banner">
-  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
 </div>
 
 <style>
@@ -69,11 +69,11 @@ This process can identify verse numbers and replace them with Verse Buttons in t
 <br>
 <div class="subtitle-text">
   <a href="https://chromewebstore.google.com/detail/gospel-buddy/mlimohmgngjmnpllmnbjgkggclnmcdbn?hl=en" class="download-button">
-    <img src="/assets/img/chrome-logo.png" alt="Google Chrome Logo">
+    <img src="https://www.mygospelbuddy.com/assets/img/chrome-logo.png" alt="Google Chrome Logo">
     Add to Chrome
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/gospel-buddy/mjpbfipgpeclaihceppjnkgeibgjdoig" class="download-button">
-    <img src="/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
+    <img src="https://www.mygospelbuddy.com/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
     Add to Edge
   </a>
 </div>

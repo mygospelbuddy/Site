@@ -30,30 +30,48 @@ sitemap.xml, robots.txt, CNAME, .nojekyll   Root-level site config
 
 ## How pages are put together
 
-Every page's YAML front matter includes three shared partials from `_includes/`:
+Every page's YAML front matter includes the same three shared partials, referenced
+by their **live URL** on mygospelbuddy.com:
 
 ```yaml
 output:
   html_document:
     includes:
-      in_header:   "../_includes/head-shared.html"   # <head>: css/js/fonts, no title/OG
-      before_body: "../_includes/nav.html"            # the top nav bar
-      after_body:  "../_includes/footer.html"          # the footer
+      in_header:   "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body:  "https://www.mygospelbuddy.com/_includes/footer.html"
 ```
 
-(Adjust the `../` depth to match how many folders deep the page is — root-level
-`index.Rmd` uses `_includes/...` with no `../`.)
+Because these are absolute URLs, they resolve identically no matter how many
+folders deep a page lives — no `../` counting, and no "file not found" errors
+when knitting. All asset references (images, css, js) and internal links
+throughout the site use full `https://www.mygospelbuddy.com/...` URLs for the
+same reason.
 
 **Edit the nav, fonts, css/js links, or footer in exactly one of those three
 files and every page picks it up.** This replaces the old setup where the
 same ~100-line header was copy-pasted into 4 separate files
 (`header.html`, `header2.html`, `header-type-and-shadow.html`,
-`header-bingo.html`) that had started to drift out of sync with each other —
-which was the most likely cause of the top bar looking different from page
-to page. Those files also used to be included by a **live URL**
-(`https://www.mygospelbuddy.com/docs/header.html`) instead of a local file,
-which meant knitting a page would pull in whatever was *currently deployed*
-rather than your local edits. Everything now uses local relative paths.
+`header-bingo.html`) that had drifted out of sync with each other — the most
+likely cause of the top bar looking different from page to page.
+
+### ⚠️ Important: push before you knit
+
+Since the includes are fetched over the network at knit time, **knitting pulls
+whatever version of `_includes/` is currently live on the site — not your local
+copy.** That means:
+
+1. Edit `_includes/*.html` (or any asset) locally.
+2. **Commit and push first.** Wait for GitHub Pages to finish deploying.
+3. *Then* knit. Now the knit picks up your new header/nav/footer.
+
+If you knit before pushing, your pages will silently be built against the *old*
+deployed partials and your changes won't appear. If you ever see stale-looking
+output, that's almost always the cause — push, wait, re-knit.
+
+The `.nojekyll` file at the repo root is what allows GitHub Pages to serve the
+underscore-prefixed `_includes/` folder at all. **Do not delete it** — without
+it, Jekyll strips `_`-prefixed directories and every include URL will 404.
 
 ## Editing Open Graph / Twitter tags per page
 
@@ -79,7 +97,7 @@ at the top of each page's own body, right after the YAML:
 
 ```html
 <div class="gb-page-banner">
-  <img src="/assets/img/gospel-buddy-icon.png" alt="Logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="Logo">
 </div>
 ```
 
@@ -88,7 +106,7 @@ or, for the compact badge style used by `blog/using-conference-text-search.Rmd`:
 ```html
 <div class="gb-badge-wrap">
   <div class="gb-badge">
-    <a href="/"><img src="/assets/img/gospel-buddy-icon.png" alt="Logo"></a>
+    <a href="https://www.mygospelbuddy.com/"><img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="Logo"></a>
   </div>
 </div>
 ```

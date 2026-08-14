@@ -3,9 +3,9 @@ title: "About A Type and a Shadow"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/a-type-and-a-shadow/">'
   - '<meta property="og:title" content="A Type and a Shadow Extension">'
@@ -21,7 +21,7 @@ header-includes:
 ---
 
 <div class="gb-page-banner">
-  <img src="/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
 </div>
 
 <style>
@@ -45,11 +45,11 @@ header-includes:
 
 <div class="subtitle-text">
   <a href="https://chromewebstore.google.com/detail/gospel-buddy/mlimohmgngjmnpllmnbjgkggclnmcdbn?hl=en" class="download-button">
-    <img src="/assets/img/chrome-logo.png" alt="Google Chrome Logo">
+    <img src="https://www.mygospelbuddy.com/assets/img/chrome-logo.png" alt="Google Chrome Logo">
     Add to Chrome
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/gospel-buddy/mjpbfipgpeclaihceppjnkgeibgjdoig" class="download-button">
-    <img src="/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
+    <img src="https://www.mygospelbuddy.com/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
     Add to Edge
   </a>
 </div>
@@ -80,11 +80,11 @@ The A Type and a Shadow Extension is available through the Chrome and Edge Exten
 <br>
 <div class="subtitle-text">
   <a href="https://chromewebstore.google.com/detail/a-type-and-a-shadow/pafknbdojpebalifeoikgbgcnnlgpakk?pli=1" class="download-button">
-    <img src="/assets/img/chrome-logo.png" alt="Google Chrome Logo">
+    <img src="https://www.mygospelbuddy.com/assets/img/chrome-logo.png" alt="Google Chrome Logo">
     Add to Chrome
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/a-type-and-a-shadow/bokdfkhncpebbfoidkocajdpgodmdikk" class="download-button">
-    <img src="/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
+    <img src="https://www.mygospelbuddy.com/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
     Add to Edge
   </a>
 </div>

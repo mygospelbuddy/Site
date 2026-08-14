@@ -4,9 +4,9 @@ author: "My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/quotes.html">'
   - '<meta property="og:title" content="What is the Most Quoted Scripture in General Conference?">'
@@ -24,7 +24,7 @@ header-includes:
 <!-- NOTE: not currently linked from blog/index.Rmd (was already commented out there before this reorg). -->
 
 <div class="gb-page-banner">
-  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
 </div>
 
 <small>Last Updated:  12/6/2023</small>

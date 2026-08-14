@@ -3,9 +3,9 @@ title: "Blog"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/">'
   - '<meta property="og:title" content="Blog - My Gospel Buddy">'
@@ -45,13 +45,13 @@ h1.title {
 <div class="row">
 <div class="col-md-2">
 <div class="image-container">
-<a href="/blog/building-gospel-buddy.html">
-<img src="/assets/img/gb-article-icon-large.png" alt="general conference center" class="img-fluid">
+<a href="https://www.mygospelbuddy.com/blog/building-gospel-buddy.html">
+<img src="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png" alt="general conference center" class="img-fluid">
 </a>
 </div>
 </div>
 <div class="col-md-10">
-<a href="/blog/building-gospel-buddy.html" class="post-link">
+<a href="https://www.mygospelbuddy.com/blog/building-gospel-buddy.html" class="post-link">
 <div class="post-content">
 <h4>Building the Gospel Buddy Extension</h4>
 <p>What inspired the Gospel Buddy Chrome extension? How does the Gospel Buddy gather the footnote data from General Conference talks? Learn more</p>
@@ -63,13 +63,13 @@ h1.title {
 <div class="row">
 <div class="col-md-2">
 <div class="image-container">
-<a href="/blog/using-conference-text-search.html">
-<img src="/assets/img/combined-search.png" alt="a search in the conference text search" class="img-fluid">
+<a href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">
+<img src="https://www.mygospelbuddy.com/assets/img/combined-search.png" alt="a search in the conference text search" class="img-fluid">
 </a>
 </div>
 </div>
 <div class="col-md-10">
-<a href="/blog/using-conference-text-search.html" class="post-link">
+<a href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html" class="post-link">
 <div class="post-content">
 <h4>Using the Conference Text Search</h4>
 <p>Search frequency of words and phrases in General Conference talks! Use tables and visuals to find specific talks.</p>
@@ -81,13 +81,13 @@ h1.title {
 <!-- <div class="row">
     <div class="col-md-2">
         <div class="image-container">
-            <a href="/blog/quotes.html">
-                <img src="/assets/img/conference-center.png" alt="general conference center" class="img-fluid">
+            <a href="https://www.mygospelbuddy.com/blog/quotes.html">
+                <img src="https://www.mygospelbuddy.com/assets/img/conference-center.png" alt="general conference center" class="img-fluid">
             </a>
         </div>
     </div>
     <div class="col-md-10">
-        <a href="/blog/quotes.html" class="post-link">
+        <a href="https://www.mygospelbuddy.com/blog/quotes.html" class="post-link">
             <div class="post-content">
                 <h4>What is the Most Quoted Scripture in General Conference?</h4>
                 <p>Is there a definitive most referenced scripture in the Church of Jesus Christ of Latter-Day Saints? What is the most quoted scripture in the 2000s, 2010s, and the 2020s?</p>
@@ -99,7 +99,7 @@ h1.title {
 </div>
 
 <nav class="pagination mt-3">
-<a class="nav nav-prev" href="/"><i class="ti-arrow-left mr-2"></i><span class="d-none d-md-block">Home</span></a>
+<a class="nav nav-prev" href="https://www.mygospelbuddy.com/"><i class="ti-arrow-left mr-2"></i><span class="d-none d-md-block">Home</span></a>
 </nav>
 </div>
 </div>

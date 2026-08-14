@@ -3,9 +3,9 @@ title: "General Conference Bingo"
 output:
   html_document:
     includes:
-      in_header: "../_includes/head-shared.html"
-      before_body: "../_includes/nav.html"
-      after_body: "../_includes/footer.html"
+      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      before_body: "https://www.mygospelbuddy.com/_includes/nav.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
 header-includes:
   - '<meta name="description" content="Generate bingo sheets to follow along with General Conference. Select your difficulty level and print a PDF with up to ten pages at a time.">'
   - '<link rel="canonical" href="https://www.mygospelbuddy.com/bingo/">'
@@ -31,7 +31,7 @@ header-includes:
 -->
 
 <div class="gb-page-banner">
-  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
 </div>
 
 <style>
@@ -296,7 +296,7 @@ background: rgba(255, 191, 0, 0.6);
 }
 </style>
 
-<link rel="stylesheet" href="/search/search-common.css">
+<link rel="stylesheet" href="https://www.mygospelbuddy.com/search/search-common.css">
 
 <style>
 /* Settings pane layout override.
