@@ -3,23 +3,13 @@ title: "About My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/info.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/info/">'
-  - '<meta property="og:title" content="About My Gospel Buddy Extension">'
-  - '<meta property="og:description" content="A browser extension built for better General Conference references between the scriptures and general conference talks.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/info/">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="About My Gospel Buddy Extension">'
-  - '<meta name="twitter:description" content="A browser extension built for better General Conference references between the scriptures and general conference talks.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
 ---
 
 <style>

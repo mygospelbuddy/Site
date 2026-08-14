@@ -3,23 +3,13 @@ title: "Using Gospel Buddy Search"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/blog-using-conference-text-search.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-badge.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">'
-  - '<meta property="og:title" content="Using the Conference Text Search">'
-  - '<meta property="og:description" content="Search frequency of words and phrases in General Conference talks, and use tables and visuals to find specific talks.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/combined-search.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">'
-  - '<meta property="og:type" content="article">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="Using the Conference Text Search">'
-  - '<meta name="twitter:description" content="Search frequency of words and phrases in General Conference talks, and use tables and visuals to find specific talks.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/combined-search.png">'
 ---
 
 <!--

@@ -4,23 +4,13 @@ author: "My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/draft-quote-collecting.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/quote-collecting.html">'
-  - '<meta property="og:title" content="Collecting General Conference Data">'
-  - '<meta property="og:description" content="How the General Conference footnote and quote data behind My Gospel Buddy was collected and cleaned.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/quote-collecting.html">'
-  - '<meta property="og:type" content="article">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="Collecting General Conference Data">'
-  - '<meta name="twitter:description" content="How the General Conference footnote and quote data behind My Gospel Buddy was collected and cleaned.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
 ---
 
 <small>Last Updated:  12/6/2023</small>

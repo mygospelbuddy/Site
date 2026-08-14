@@ -3,23 +3,13 @@ title: "Reference Search"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/search.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/search/">'
-  - '<meta property="og:title" content="Reference Search - My Gospel Buddy">'
-  - '<meta property="og:description" content="Search for a scripture reference and see how often it has been quoted in General Conference talks.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/search/">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="Reference Search - My Gospel Buddy">'
-  - '<meta name="twitter:description" content="Search for a scripture reference and see how often it has been quoted in General Conference talks.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png">'
 ---
 
 <style>

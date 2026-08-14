@@ -3,19 +3,13 @@ title: "A Type and a Shadow Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/docs-a-type-and-a-shadow-privacy-policy.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-a-type-and-a-shadow.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/docs/a-type-and-a-shadow-privacy-policy.html">'
-  - '<meta property="og:title" content="A Type and a Shadow Privacy Policy">'
-  - '<meta property="og:description" content="Privacy policy for the A Type and a Shadow Chrome and Edge extension.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/docs/a-type-and-a-shadow-privacy-policy.html">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
 ---
 
 <!--

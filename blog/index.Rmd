@@ -3,19 +3,13 @@ title: "Blog"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/blog.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/">'
-  - '<meta property="og:title" content="Blog - My Gospel Buddy">'
-  - '<meta property="og:description" content="Articles about building and using the My Gospel Buddy tools.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-header.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
 ---
 
 <!--

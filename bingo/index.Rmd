@@ -3,26 +3,13 @@ title: "General Conference Bingo"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/bingo.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<meta name="description" content="Generate bingo sheets to follow along with General Conference. Select your difficulty level and print a PDF with up to ten pages at a time.">'
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/bingo/">'
-  - '<meta property="og:title" content="General Conference Bingo - My Gospel Buddy">'
-  - '<meta property="og:description" content="Generate bingo sheets to follow along with General Conference. Select your difficulty level and print a PDF with up to ten pages at a time.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/bingo-sheet.png">'
-  - '<meta property="og:image:secure_url" content="https://www.mygospelbuddy.com/assets/img/bingo-sheet.png">'
-  - '<meta property="og:image:alt" content="General Conference Bingo sheet">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/bingo/">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="General Conference Bingo - My Gospel Buddy">'
-  - '<meta name="twitter:description" content="Generate bingo sheets to follow along with General Conference. Select your difficulty level and print a PDF with up to ten pages at a time.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/bingo-sheet.png">'
 ---
 
 <!--

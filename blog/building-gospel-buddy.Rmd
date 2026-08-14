@@ -3,23 +3,13 @@ title: "Building My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/blog-building-gospel-buddy.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/building-gospel-buddy.html">'
-  - '<meta property="og:title" content="Building the Gospel Buddy Extension">'
-  - '<meta property="og:description" content="What inspired the Gospel Buddy Chrome extension, and how it gathers footnote data from General Conference talks.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/building-gospel-buddy.html">'
-  - '<meta property="og:type" content="article">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="Building the Gospel Buddy Extension">'
-  - '<meta name="twitter:description" content="What inspired the Gospel Buddy Chrome extension, and how it gathers footnote data from General Conference talks.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
 ---
 
 <style>

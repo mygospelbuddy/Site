@@ -3,23 +3,13 @@ title: "Prophet Mentions in General Conference Over Time"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/draft-prophet-names-over-time.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html">'
-  - '<meta property="og:title" content="Prophet Mentions in General Conference Over Time">'
-  - '<meta property="og:description" content="How often is each prophet mentioned in General Conference talks over time, and how that changes once a new prophet is called?">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html">'
-  - '<meta property="og:type" content="article">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="Prophet Mentions in General Conference Over Time">'
-  - '<meta name="twitter:description" content="How often is each prophet mentioned in General Conference talks over time, and how that changes once a new prophet is called?">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
 ---
 
 <!--

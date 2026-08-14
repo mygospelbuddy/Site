@@ -3,23 +3,13 @@ title: "About A Type and a Shadow"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/a-type-and-a-shadow.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-a-type-and-a-shadow.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/a-type-and-a-shadow/">'
-  - '<meta property="og:title" content="A Type and a Shadow Extension">'
-  - '<meta property="og:description" content="A Google Chrome extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/a-type-and-a-shadow/">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
-  - '<meta name="twitter:card" content="summary_large_image">'
-  - '<meta name="twitter:title" content="A Type and a Shadow Extension">'
-  - '<meta name="twitter:description" content="A Google Chrome extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
-  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
 ---
 
 <style>

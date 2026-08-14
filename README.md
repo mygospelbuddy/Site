@@ -75,19 +75,34 @@ it, Jekyll strips `_`-prefixed directories and every include URL will 404.
 
 ## Editing Open Graph / Twitter tags per page
 
-Each page's own `header-includes:` block in its YAML front matter holds its
-unique link-preview tags, right in the same file you already edit:
+Each page has its own metadata file in `_includes/meta/`, loaded through the
+`in_header:` list in that page's YAML:
 
 ```yaml
-header-includes:
-  - '<meta property="og:title" content="Your Page Title">'
-  - '<meta property="og:description" content="One sentence about this page.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/some-image.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/path/">'
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/bingo.html"
 ```
 
-Change these on any page without touching the shared header files, and
-without affecting the look of any other page.
+The first file is the shared head (fonts, css, js) used by every page. The
+second holds only this page's title, description, Open Graph, and Twitter
+card tags. To change how a page looks when shared in iMessage, Twitter/X,
+Facebook, Slack, or Discord, edit its file in `_includes/meta/` -- nothing
+else needs to change, and no other page is affected.
+
+### Why these are separate files and not YAML
+
+An earlier version of this setup put the tags in a `header-includes:` block
+inside each `.Rmd`, which would have been tidier. **That does not work in
+this project's rmarkdown/pandoc version** -- the block rendered as nothing
+at all, and every page's link previews came out blank (verified with
+opengraph.xyz: og:image, og:description, twitter:card and the meta
+description were all missing). Passing the tags as an include file is the
+mechanism that has always worked on this site, so that is what is used.
+
+Loading them via `metathis` in an R chunk was also tried and does not work
+here either -- with `include=FALSE` the tags never render, and without it the
+raw HTML gets dumped into the page body instead of the `<head>`.
 
 ## The page banner (the icon under the nav bar)
 

@@ -3,19 +3,13 @@ title: "My Gospel Buddy Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/_includes/head-shared.html"
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/docs-gospel-buddy-privacy-policy.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
       after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
-header-includes:
-  - '<link rel="canonical" href="https://www.mygospelbuddy.com/docs/gospel-buddy-privacy-policy.html">'
-  - '<meta property="og:title" content="My Gospel Buddy Privacy Policy">'
-  - '<meta property="og:description" content="Privacy policy for the My Gospel Buddy Chrome and Edge extension.">'
-  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png">'
-  - '<meta property="og:url" content="https://www.mygospelbuddy.com/docs/gospel-buddy-privacy-policy.html">'
-  - '<meta property="og:type" content="website">'
-  - '<meta property="og:site_name" content="My Gospel Buddy">'
 ---
 
 <!--
