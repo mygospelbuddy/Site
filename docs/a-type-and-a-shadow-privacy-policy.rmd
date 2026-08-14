@@ -3,7 +3,7 @@ title: "A Type and a Shadow Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "./header.html"
+      in_header: "./header-type-and-shadow.html"
       after_body: "./footer.html"
 ---
 
