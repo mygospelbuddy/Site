@@ -1,0 +1,108 @@
+---
+title: "My Gospel Buddy"
+output:
+  html_document:
+    includes:
+      in_header: "_includes/head-shared.html"
+      before_body: "_includes/nav.html"
+      after_body: "_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/">'
+  - '<meta property="og:title" content="My Gospel Buddy">'
+  - '<meta property="og:description" content="Search the Scriptures and connect with General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-header.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/">'
+  - '<meta property="og:type" content="website">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
+  - '<meta name="twitter:card" content="summary_large_image">'
+  - '<meta name="twitter:title" content="My Gospel Buddy">'
+  - '<meta name="twitter:description" content="Search the Scriptures and connect with General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
+  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-header.png">'
+---
+
+<!--
+  Previously this page was a hand-written static index.html with no .Rmd
+  source at all — every other page on the site was managed as a knitted
+  .Rmd. This file brings the homepage in line with that so the whole site
+  can be edited/knitted the same way.
+-->
+
+<style>
+h1.title {
+  display: none;
+}
+</style>
+
+<div class="gb-page-banner">
+  <img src="/assets/img/gospel-buddy-icon.png" alt="Logo">
+</div>
+<br>
+
+<section class="section">
+<div style="text-align: center; margin-top: -40px;">
+## My Gospel Buddy
+<p style="color: grey">Search the Scriptures - Connect with Conference</p>
+</div>
+
+<div class="container section" style="margin-top: 40px;">
+<div class="row">
+<div class="col-lg-8 text-center mx-auto">
+<p style="color: black">We build Chrome Extensions to make studying the scriptures engaging. Our Extensions are available on both the Chrome and Edge webstores. Use the links below to learn more about our Extensions.</p>
+</div>
+</div>
+</div>
+
+<div class="container" style="margin-top: 60px;">
+<div class="row justify-content-center">
+<div class="col-12 text-center">
+<h2 class="section-title"></h2>
+</div>
+
+<div class="col-lg-4 col-sm-6 mb-4 d-flex">
+<a href="/info/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<h3 class="mb-3 mt-0">My Gospel Buddy</h3>
+<p class="mb-0">An extension that creates links between the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.</p>
+</a>
+</div>
+
+<div class="col-lg-4 col-sm-6 mb-4 d-flex">
+<a href="/a-type-and-a-shadow/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<h3 class="mb-3 mt-0">A Type and a Shadow</h3>
+<p class="mb-0">An extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.</p>
+</a>
+</div>
+</div>
+
+<div class="row justify-content-center">
+<div class="col-12 text-center">
+<h2 class="section-title"><br><br>Tools Available on this Website:<br><br></h2>
+</div>
+
+<div class="col-lg-4 col-sm-6 mb-4 d-flex">
+<a href="/search/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="/assets/img/search-gospel-buddy.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<h3 class="mb-3 mt-0">Reference Search</h3>
+<p class="mb-0">Find when a scripture's been referenced</p>
+</a>
+</div>
+
+<div class="col-lg-4 col-sm-6 mb-4 d-flex">
+<a href="/search/words" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="/assets/img/text-search.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<h3 class="mb-3 mt-0">Text Search</h3>
+<p class="mb-0">Words in Conference Talks over time.</p>
+</a>
+</div>
+
+<div class="col-lg-4 col-sm-6 mb-4 d-flex">
+<a href="/bingo/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="/assets/img/bingo-sheet.png" alt="general conference bingo sheet easy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<h3 class="mb-3 mt-0">General Conference Bingo</h3>
+<p class="mb-0">Generate bingo sheets with gospel related words.</p>
+</a>
+</div>
+</div>
+</div>
+</section>

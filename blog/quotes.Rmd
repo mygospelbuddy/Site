@@ -4,13 +4,34 @@ author: "My Gospel Buddy"
 output:
   html_document:
     includes:
-      in_header: "https://mygospelbuddy.com/docs/header.html"
-      after_body: "https://mygospelbuddy.com/docs/footer.html"
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/quotes.html">'
+  - '<meta property="og:title" content="What is the Most Quoted Scripture in General Conference?">'
+  - '<meta property="og:description" content="Is there a definitive most-referenced scripture in the Church of Jesus Christ of Latter-day Saints general conference?">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/quotes.html">'
+  - '<meta property="og:type" content="article">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
+  - '<meta name="twitter:card" content="summary_large_image">'
+  - '<meta name="twitter:title" content="What is the Most Quoted Scripture in General Conference?">'
+  - '<meta name="twitter:description" content="Is there a definitive most-referenced scripture in the Church of Jesus Christ of Latter-day Saints general conference?">'
+  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
 ---
+
+<!-- NOTE: not currently linked from blog/index.Rmd (was already commented out there before this reorg). -->
+
+<div class="gb-page-banner">
+  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+</div>
+
 <small>Last Updated:  12/6/2023</small>
 ```{r setup, include=FALSE}
 library(tidyverse)
 
+# Data sources below are intentionally left as-is (kameronyork.com).
 verses <- read.csv("https://kameronyork.com/datasets/scripture-verses.csv", encoding = "UTF-8")
 quotes <- read.csv("https://kameronyork.com/datasets/conference-quotes.csv", encoding = "UTF-8") %>% 
   mutate(decade = (talk_year %/% 10) * 10) %>% 

@@ -3,9 +3,26 @@ title: "Reference Search"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/docs/header.html"
-      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/search/">'
+  - '<meta property="og:title" content="Reference Search - My Gospel Buddy">'
+  - '<meta property="og:description" content="Search for a scripture reference and see how often it has been quoted in General Conference talks.">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/search/">'
+  - '<meta property="og:type" content="website">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
+  - '<meta name="twitter:card" content="summary_large_image">'
+  - '<meta name="twitter:title" content="Reference Search - My Gospel Buddy">'
+  - '<meta name="twitter:description" content="Search for a scripture reference and see how often it has been quoted in General Conference talks.">'
+  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png">'
 ---
+
+<div class="gb-page-banner">
+  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+</div>
 
 <style>
 h1.title {
@@ -18,9 +35,9 @@ h1.title {
 <div class="gb-search-shell" id="referenceSearchApp">
 
 <nav class="gb-search-nav" aria-label="Search tools">
-<a class="gb-search-nav__link gb-search-nav__link--active" href="https://www.mygospelbuddy.com/search/">Reference Search</a>
-<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
-<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">Search Guide</a>
+<a class="gb-search-nav__link gb-search-nav__link--active" href="/search/">Reference Search</a>
+<a class="gb-search-nav__link" href="/search/words">Conference Text Search</a>
+<a class="gb-search-nav__link" href="/blog/using-conference-text-search.html">Search Guide</a>
 </nav>
 
 <section class="gb-search-card gb-search-card--settings-top">

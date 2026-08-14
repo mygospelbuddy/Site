@@ -1,11 +1,36 @@
 ---
-title: "Building the Gospel Buddy"
+title: "Prophet Mentions in General Conference Over Time"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/docs/header.html"
-      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html">'
+  - '<meta property="og:title" content="Prophet Mentions in General Conference Over Time">'
+  - '<meta property="og:description" content="How often is each prophet mentioned in General Conference talks over time, and how that changes once a new prophet is called?">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html">'
+  - '<meta property="og:type" content="article">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
+  - '<meta name="twitter:card" content="summary_large_image">'
+  - '<meta name="twitter:title" content="Prophet Mentions in General Conference Over Time">'
+  - '<meta name="twitter:description" content="How often is each prophet mentioned in General Conference talks over time, and how that changes once a new prophet is called?">'
+  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-icon-large.png">'
 ---
+
+<!--
+  NOTE: this post was found not linked from blog/index.Rmd before this reorg
+  (title was also wrongly copy-pasted as "Building the Gospel Buddy" — fixed
+  above). Left unlisted since it looked like a work-in-progress (still has
+  console.log debug statements throughout the script below); add it to
+  blog/index.Rmd whenever it's ready to publish.
+-->
+
+<div class="gb-page-banner">
+  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+</div>
 
 #### The Role of a Prophet
 

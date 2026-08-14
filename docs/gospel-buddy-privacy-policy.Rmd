@@ -3,9 +3,30 @@ title: "My Gospel Buddy Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "./header.html"
-      after_body: "./footer.html"
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/docs/gospel-buddy-privacy-policy.html">'
+  - '<meta property="og:title" content="My Gospel Buddy Privacy Policy">'
+  - '<meta property="og:description" content="Privacy policy for the My Gospel Buddy Chrome and Edge extension.">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/docs/gospel-buddy-privacy-policy.html">'
+  - '<meta property="og:type" content="website">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
 ---
+
+<!--
+  NOTE: this page is intentionally kept at /docs/ (not moved to a cleaner
+  location) because this exact URL is very likely registered as the
+  extension's Privacy Policy link in the Chrome Web Store / Edge Add-ons
+  listings. Moving it would 404 that listing until manually updated there.
+-->
+
+<div class="gb-page-banner">
+  <img src="/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+</div>
+
 <br>
 <br>
 

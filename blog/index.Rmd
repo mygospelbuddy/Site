@@ -1,0 +1,108 @@
+---
+title: "Blog"
+output:
+  html_document:
+    includes:
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/blog/">'
+  - '<meta property="og:title" content="Blog - My Gospel Buddy">'
+  - '<meta property="og:description" content="Articles about building and using the My Gospel Buddy tools.">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/gb-article-header.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/blog/">'
+  - '<meta property="og:type" content="website">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
+---
+
+<!--
+  Previously this page was a hand-written static blog/index.html with no
+  .Rmd source, and it also had its own one-off footer (crediting Kameron
+  York individually, with GitHub/LinkedIn icons) instead of the shared
+  site footer used everywhere else. That's been unified below to the
+  shared footer for consistency — restore the old one here if that
+  personal credit was intentional rather than drift.
+
+  The "General Conference Bingo" entry that used to be the first post
+  here has been removed — that page is now a main site feature at /bingo/
+  instead of a blog post (see the Tools menu).
+-->
+
+<style>
+h1.title {
+  display: none;
+}
+</style>
+
+<section class="single section-sm pb-0">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-10 offset-lg-1" style="margin-top: 40px; margin-bottom:40px;">
+<div class="p-lg-5 p-4 bg-white">
+<div class="content">
+
+<div class="row">
+<div class="col-md-2">
+<div class="image-container">
+<a href="/blog/building-gospel-buddy.html">
+<img src="/assets/img/gb-article-icon-large.png" alt="general conference center" class="img-fluid">
+</a>
+</div>
+</div>
+<div class="col-md-10">
+<a href="/blog/building-gospel-buddy.html" class="post-link">
+<div class="post-content">
+<h4>Building the Gospel Buddy Extension</h4>
+<p>What inspired the Gospel Buddy Chrome extension? How does the Gospel Buddy gather the footnote data from General Conference talks? Learn more</p>
+</div>
+</a>
+</div>
+</div>
+
+<div class="row">
+<div class="col-md-2">
+<div class="image-container">
+<a href="/blog/using-conference-text-search.html">
+<img src="/assets/img/combined-search.png" alt="a search in the conference text search" class="img-fluid">
+</a>
+</div>
+</div>
+<div class="col-md-10">
+<a href="/blog/using-conference-text-search.html" class="post-link">
+<div class="post-content">
+<h4>Using the Conference Text Search</h4>
+<p>Search frequency of words and phrases in General Conference talks! Use tables and visuals to find specific talks.</p>
+</div>
+</a>
+</div>
+</div>
+
+<!-- <div class="row">
+    <div class="col-md-2">
+        <div class="image-container">
+            <a href="/blog/quotes.html">
+                <img src="/assets/img/conference-center.png" alt="general conference center" class="img-fluid">
+            </a>
+        </div>
+    </div>
+    <div class="col-md-10">
+        <a href="/blog/quotes.html" class="post-link">
+            <div class="post-content">
+                <h4>What is the Most Quoted Scripture in General Conference?</h4>
+                <p>Is there a definitive most referenced scripture in the Church of Jesus Christ of Latter-Day Saints? What is the most quoted scripture in the 2000s, 2010s, and the 2020s?</p>
+            </div>
+        </a>
+    </div>
+</div> -->
+
+</div>
+
+<nav class="pagination mt-3">
+<a class="nav nav-prev" href="/"><i class="ti-arrow-left mr-2"></i><span class="d-none d-md-block">Home</span></a>
+</nav>
+</div>
+</div>
+</div>
+</div>
+</section>

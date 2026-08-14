@@ -3,9 +3,27 @@ title: "A Type and a Shadow Privacy Policy"
 output:
   html_document:
     includes:
-      in_header: "./header-type-and-shadow.html"
-      after_body: "./footer.html"
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/docs/a-type-and-a-shadow-privacy-policy.html">'
+  - '<meta property="og:title" content="A Type and a Shadow Privacy Policy">'
+  - '<meta property="og:description" content="Privacy policy for the A Type and a Shadow Chrome and Edge extension.">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/docs/a-type-and-a-shadow-privacy-policy.html">'
+  - '<meta property="og:type" content="website">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
 ---
+
+<!--
+  NOTE: kept at /docs/ for the same reason as gospel-buddy-privacy-policy.Rmd
+  — likely registered as this extension's store privacy-policy link.
+-->
+
+<div class="gb-page-banner">
+  <img src="/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
+</div>
 
 <br>
 <br>
@@ -24,7 +42,7 @@ The extension does process limited data that is necessary for its typing feature
 - **User activity within the typing experience**: the extension processes keystrokes, typing progress, mistakes, correct characters, and session metrics in order to provide typing mode, progress tracking, and performance statistics.
 - **User settings and progress data**: the extension stores settings, page progress, chapter completion data, recent chapters, and current-session metrics using browser extension storage.
 
-This data is used only to provide the extension’s core functionality. It is **not sold**, **not used for advertising**, and **not shared with third parties for unrelated purposes**. :contentReference[oaicite:3]{index=3} :contentReference[oaicite:4]{index=4} :contentReference[oaicite:5]{index=5}
+This data is used only to provide the extension’s core functionality. It is **not sold**, **not used for advertising**, and **not shared with third parties for unrelated purposes**.
 
 ## Permissions
 
@@ -34,7 +52,7 @@ The extension requests the following permissions:
    Used to save user settings, page progress, chapter completion records, recent chapters, and session metrics.
 
 2. **Tabs**  
-   Used so the popup can identify and interact with the active tab, determine whether the page is supported, and keep typing mode specific to the tab where the user enabled it. :contentReference[oaicite:6]{index=6} :contentReference[oaicite:7]{index=7}
+   Used so the popup can identify and interact with the active tab, determine whether the page is supported, and keep typing mode specific to the tab where the user enabled it.
 
 ## Host Permissions
 
@@ -42,17 +60,17 @@ The extension requests host access only for:
 
 - `https://www.churchofjesuschrist.org/*`
 
-This access is required so the extension can function on supported scripture chapters and general conference talks on that site. The extension does not request host access for unrelated websites. :contentReference[oaicite:8]{index=8}
+This access is required so the extension can function on supported scripture chapters and general conference talks on that site. The extension does not request host access for unrelated websites.
 
 ## Remote Code
 
 A Type and a Shadow does **not** use remote code.
 
-All executable code used by the extension is packaged with the extension itself. The extension does not load remote JavaScript files, remote modules, or remote WebAssembly for execution. :contentReference[oaicite:9]{index=9}
+All executable code used by the extension is packaged with the extension itself. The extension does not load remote JavaScript files, remote modules, or remote WebAssembly for execution.
 
 ## Remote Data
 
-The extension may request non-executable remote data used to support its features, such as scripture metadata. This data is used only to support extension functionality and is not treated as executable code. The extension does not use remote data to identify users. :contentReference[oaicite:10]{index=10}
+The extension may request non-executable remote data used to support its features, such as scripture metadata. This data is used only to support extension functionality and is not treated as executable code. The extension does not use remote data to identify users.
 
 ## Data Storage
 
@@ -66,7 +84,7 @@ Depending on the feature, stored data may include:
 - tab-specific typing mode state
 - current-session typing metrics
 
-This information is stored to support the user experience and is not stored for advertising or profiling purposes. :contentReference[oaicite:11]{index=11} :contentReference[oaicite:12]{index=12}
+This information is stored to support the user experience and is not stored for advertising or profiling purposes.
 
 ## Data Sharing
 

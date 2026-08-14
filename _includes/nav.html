@@ -1,0 +1,42 @@
+<!--
+  _includes/nav.html
+
+  The single, canonical top nav bar for the whole site. Included on every
+  page via `includes: before_body:` in each page's YAML.
+
+  Previously this markup was copy-pasted into 4 separate files
+  (header.html, header2.html, header-type-and-shadow.html,
+  header-bingo.html) and had started to drift out of sync — which is the
+  most likely reason the top bar looked inconsistent from page to page.
+  Now there is exactly one copy. Edit this file and every page updates.
+-->
+<header class="shadow-bottom sticky-top bg-white">
+  <nav class="navbar navbar-expand-md navbar-light">
+    <div class="container">
+      <button class="navbar-toggler border-0 mx-auto" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse text-center" id="navigation">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link text-dark dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tools</a>
+            <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+              <a class="dropdown-item" href="/search/">Reference Search</a>
+              <a class="dropdown-item" href="/search/words">Conference Text Search</a>
+              <a class="dropdown-item" href="/bingo/">General Conference Bingo</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/blog/">Blog</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="/help/">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>

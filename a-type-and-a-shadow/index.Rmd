@@ -3,9 +3,27 @@ title: "About A Type and a Shadow"
 output:
   html_document:
     includes:
-      in_header: "https://www.mygospelbuddy.com/docs/header-type-and-shadow.html"
-      after_body: "https://www.mygospelbuddy.com/docs/footer.html"
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+header-includes:
+  - '<link rel="canonical" href="https://www.mygospelbuddy.com/a-type-and-a-shadow/">'
+  - '<meta property="og:title" content="A Type and a Shadow Extension">'
+  - '<meta property="og:description" content="A Google Chrome extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
+  - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
+  - '<meta property="og:url" content="https://www.mygospelbuddy.com/a-type-and-a-shadow/">'
+  - '<meta property="og:type" content="website">'
+  - '<meta property="og:site_name" content="My Gospel Buddy">'
+  - '<meta name="twitter:card" content="summary_large_image">'
+  - '<meta name="twitter:title" content="A Type and a Shadow Extension">'
+  - '<meta name="twitter:description" content="A Google Chrome extension that lets you type along with the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.">'
+  - '<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/a-type-and-a-shadow-icon.png">'
 ---
+
+<div class="gb-page-banner">
+  <img src="/assets/img/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Logo">
+</div>
+
 <style>
   /* Center alignment for the title, text under the title, and buttons */
   h1, .subtitle-text, .download-button {
@@ -23,67 +41,15 @@ output:
 </div>
 <br>
 
-<style>
-  .download-button {
-    display: inline-block; /* Use inline-block to allow setting width */
-    width: 180px; /* Set fixed width */
-    height: 50px;
-    margin-right: 10px;
-    background-color: #0073e6; /* Blue color */
-    color: #ffffff; /* White text color */
-    padding: 10px 10px; /* Adjust padding as needed */
-    border-radius: 5px; /* Rounded corners */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold;
-    text-align: center; /* Center text horizontally */
-    line-height: 30px; /* Center text vertically */
-  }
-
-  .download-button img {
-    width: 20px; /* Adjust image size as needed */
-    margin-right: 10px; /* Add space between image and text */
-  }
-  
-  /* Apply styling to larger images */
-  .large-image {
-    width: 75%; /* Set the width of the images to 75% of their current size */
-    display: block; /* Center the images */
-    margin: 0 auto; /* Center the images */
-    border: 2px solid #f0f0f0;
-  }
-
-  /* Apply styling to Chrome and Edge icons */
-  .download-button img {
-    width: 20px; /* Adjust image size as needed */
-    margin-right: 10px; /* Add space between image and text */
-  }
-
-  @media (max-width: 600px) {
-  .download-button {
-    display: block; /* Change to block-level element */
-    margin: 0 auto; /* Center the buttons horizontally */
-    width: 180px; /* Set fixed width */
-    height: 50px;
-    margin-bottom: 10px; /* Add spacing between buttons */
-    background-color: #0073e6; /* Blue color */
-    color: #ffffff; /* White text color */
-    padding: 10px 10px; /* Adjust padding as needed */
-    border-radius: 5px; /* Rounded corners */
-    text-decoration: none; /* Remove underline */
-    font-weight: bold;
-    text-align: center; /* Center text horizontally */
-    line-height: 30px; /* Center text vertically */
-  }
-}
-</style>
+<!-- .download-button / .large-image styling now lives once in /assets/css/site.css -->
 
 <div class="subtitle-text">
   <a href="https://chromewebstore.google.com/detail/gospel-buddy/mlimohmgngjmnpllmnbjgkggclnmcdbn?hl=en" class="download-button">
-    <img src="https://www.mygospelbuddy.com/docs/assets/chrome-logo.png" alt="Google Chrome Logo">
+    <img src="/assets/img/chrome-logo.png" alt="Google Chrome Logo">
     Add to Chrome
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/gospel-buddy/mjpbfipgpeclaihceppjnkgeibgjdoig" class="download-button">
-    <img src="https://www.mygospelbuddy.com/docs/assets/edge-logo.png" alt="Microsoft Edge Logo">
+    <img src="/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
     Add to Edge
   </a>
 </div>
@@ -92,15 +58,15 @@ output:
 
 #### What is the A Type and a Shadow Extension?
 
-Have you ever wanted to type along with the Scriptures or General Conference talks? The A Type and a Shadow Extension has been built to make the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints typable on <a href="www.churchofjesuschrist.org">churchofjesuschrist.org</a>.
+Have you ever wanted to type along with the Scriptures or General Conference talks? The A Type and a Shadow Extension has been built to make the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints typable on <a href="https://www.churchofjesuschrist.org" target="_blank" rel="noopener">churchofjesuschrist.org</a>.
 
-The A Type and a Shadow Extension works entirely within www.churchofjesuchrist.org webpages. Open the Extension's setting pane by clicking on the icon within your web browser's extensions pane. Click the "Enter Typing Mode" button while a scripture chapter or General Conference talk webpage is open to make the webpage text typable. Other webpages can be typed by highlighting any text on <a href="www.churchofjesuschrist.org">churchofjesuschrist.org</a> and clicking "Make Highlighted Text" button. Typing speed metrics start being calculated once typing mode is toggled on and are deleted once typing mode is toggled off.
+The A Type and a Shadow Extension works entirely within www.churchofjesuschrist.org webpages. Open the Extension's setting pane by clicking on the icon within your web browser's extensions pane. Click the "Enter Typing Mode" button while a scripture chapter or General Conference talk webpage is open to make the webpage text typable. Other webpages can be typed by highlighting any text on <a href="https://www.churchofjesuschrist.org" target="_blank" rel="noopener">churchofjesuschrist.org</a> and clicking "Make Highlighted Text" button. Typing speed metrics start being calculated once typing mode is toggled on and are deleted once typing mode is toggled off.
 
 Scripture typing progress is saved to the user's Chrome profile. A scripture chapter completion map can be found within the A Type and a Shadow's Extension settings pane. Click on a chapter within the chapter completion map to navigate directly to that chapter. Can you make it to 100% of chapters typed?
 
 #### How Does the A Type and a Shadow Extension Make Webpages Typable?
 
-The A Type and a Shadow Extension manipulates the opacity levels of webpage text as you type along. Un-typed characters are made slightly transparent. Character transparency is reset to normal levels when typed correctly. Entering typing mode has been made easy on scripture chapters and general conference talks. You can also type any other text on <a href="www.churchofjesuschrist.org">churchofjesuschrist.org</a> by highlighting text and clicking "Make Highlighted Text Typable". Characters use the same transparency manipulation when using this typing mode.
+The A Type and a Shadow Extension manipulates the opacity levels of webpage text as you type along. Un-typed characters are made slightly transparent. Character transparency is reset to normal levels when typed correctly. Entering typing mode has been made easy on scripture chapters and general conference talks. You can also type any other text on <a href="https://www.churchofjesuschrist.org" target="_blank" rel="noopener">churchofjesuschrist.org</a> by highlighting text and clicking "Make Highlighted Text Typable". Characters use the same transparency manipulation when using this typing mode.
 
 #### What should I do if a Character is Un-Typable?
 
@@ -114,11 +80,11 @@ The A Type and a Shadow Extension is available through the Chrome and Edge Exten
 <br>
 <div class="subtitle-text">
   <a href="https://chromewebstore.google.com/detail/a-type-and-a-shadow/pafknbdojpebalifeoikgbgcnnlgpakk?pli=1" class="download-button">
-    <img src="https://www.mygospelbuddy.com/docs/assets/chrome-logo.png" alt="Google Chrome Logo">
+    <img src="/assets/img/chrome-logo.png" alt="Google Chrome Logo">
     Add to Chrome
   </a>
   <a href="https://microsoftedge.microsoft.com/addons/detail/a-type-and-a-shadow/bokdfkhncpebbfoidkocajdpgodmdikk" class="download-button">
-    <img src="https://www.mygospelbuddy.com/docs/assets/edge-logo.png" alt="Microsoft Edge Logo">
+    <img src="/assets/img/edge-logo.png" alt="Microsoft Edge Logo">
     Add to Edge
   </a>
 </div>

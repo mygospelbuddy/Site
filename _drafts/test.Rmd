@@ -1,0 +1,29 @@
+---
+title: "Draft / Scratch Page (not published)"
+output:
+  html_document:
+    includes:
+      in_header: "../_includes/head-shared.html"
+      before_body: "../_includes/nav.html"
+      after_body: "../_includes/footer.html"
+---
+
+<!--
+  Moved here from blog/test.Rmd during the site reorg — this looked like a
+  scratch/test file (title was literally "Building the Gospel Buddy" with
+  placeholder "Testing" headers) rather than real content, so it's kept
+  here in _drafts/ instead of being deleted or left live in /blog/.
+  Delete this file, or move it back into a real section, whenever you're
+  done with it.
+-->
+
+## Testing
+
+this is some regular text 
+
+
+### Testing
+
+[Can a Prophet Inspire Change?](https://kameronyork.com/projects/conference/inspire-change.html)
+
+#### Testing
