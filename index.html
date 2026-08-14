@@ -1,155 +1,197 @@
 <!DOCTYPE html>
 <html lang="en-us">
+
 <head>
-  <meta charset="utf-8">
-  <title>Gospel Buddy</title>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
-  <link rel="stylesheet" href="https://www.mygospelbuddy.com/scripting/bootstrap/bootstrap.min.css">
-  <link rel="stylesheet" href="https://www.mygospelbuddy.com/scripting/themify-icons/themify-icons.css">
-  <link rel="stylesheet" href="https://www.mygospelbuddy.com/scripting/highlight/hybrid.css">
-  <link rel="icon" href="https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" type="image/x-icon">
-  <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+    <meta charset="utf-8">
+    <title>My Gospel Buddy</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    <link rel="stylesheet" href="https://www.mygospelbuddy.com/scripting/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="https://www.mygospelbuddy.com/scripting/themify-icons/themify-icons.css">
+    <link rel="stylesheet" href="https://www.mygospelbuddy.com/scripting/highlight/hybrid.css">
+    <link rel="icon" href="https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
 
-  <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="The Gospel Buddy">
-  <meta property="og:description" content="A google chrome extension to add better references from the scriptures to the general conference talks of the Church of Jesus Christ of Latter-Day Saints">
-  <meta property="og:image" content="https://www.mygospelbuddy.com/docs/assets/gb-article-header.png"> <!-- Replace with the URL of your image -->
-  <meta property="og:url" content="https://www.mygospelbuddy.com/"> <!-- Replace with your URL -->
-  <meta property="og:type" content="website">
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="My Gospel Buddy">
+    <meta property="og:description" content="A google chrome extension to add better references from the scriptures to the general conference talks of the Church of Jesus Christ of Latter-Day Saints">
+    <meta property="og:image" content="https://www.mygospelbuddy.com/docs/assets/gb-article-header.png"> <!-- Replace with the URL of your image -->
+    <meta property="og:url" content="https://www.mygospelbuddy.com/"> <!-- Replace with your URL -->
+    <meta property="og:type" content="website">
 
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-    }
-    .shadow-bottom {
-      margin-bottom: 0; /* Remove margin spacing at the bottom of the header */
-    }
-    .navbar {
-      margin-bottom: 0; /* Remove margin spacing at the bottom of the header */
-    }
-    .container {
-      margin-bottom: 0; /* Remove margin spacing at the bottom of the header */
-    }
-    .header {
-      background: linear-gradient(to bottom, #E74C3C 50%, transparent 50%);
-      max-height: 200px;
-      overflow: hidden;
-      position: relative;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 200px; /* Set explicit height for the header */
-    }
-    .header img {
-      border-radius: 50%;
-      border: 5px solid #0d0f38;
-      box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-      height: 75%; /* Image height is 75% of the header height */
-      width: auto; /* Maintain aspect ratio */
-      max-width: 100%; /* Ensure the image doesn't exceed the header's width */
-    }
-    :root {
-      --primary-color: #02007e;
-      --body-color: #f9f9f9;
-      --text-color: #636363;
-      --text-color-dark: #242738;
-      --white-color: #ffffff;
-      --light-color: #f8f9fa;
-      --font-family: Roboto
-    }
-    .header + div {
-      margin-top: -1px; /* Move the div up by 20 pixels */
-    }
-  </style>
-  <link href="https://www.mygospelbuddy.com/scripting/css/articles.style.min.css" rel="stylesheet" media="screen">
-  <script src="https://www.mygospelbuddy.com/scripting/jquery/projects.jquery-1.12.4.js"></script>
-  <script src="https://www.mygospelbuddy.com/scripting/jquery/projects.jquery-ui.js"></script>
-  <script src="https://www.mygospelbuddy.com/scripting/bootstrap/bootstrap.bundle.min.js"></script>
-  <script src="https://www.mygospelbuddy.com/scripting/match-height/jquery.matchHeight.js"></script>
-  <script src="https://www.mygospelbuddy.com/scripting/highlight/highlight.pack.js"></script>
-  <script>
-    hljs.initHighlightingOnLoad();
-  </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        .shadow-bottom {
+            margin-bottom: 0;
+            /* Remove margin spacing at the bottom of the header */
+        }
+
+        .navbar {
+            margin-bottom: 0;
+            /* Remove margin spacing at the bottom of the header */
+        }
+
+        .container {
+            margin-bottom: 0;
+            /* Remove margin spacing at the bottom of the header */
+        }
+
+        .header {
+            background: linear-gradient(to bottom, #E74C3C 50%, transparent 50%);
+            max-height: 200px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+            /* Set explicit height for the header */
+        }
+
+        .header img {
+            border-radius: 50%;
+            border: 5px solid #0d0f38;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+            height: 75%;
+            /* Image height is 75% of the header height */
+            width: auto;
+            /* Maintain aspect ratio */
+            max-width: 100%;
+            /* Ensure the image doesn't exceed the header's width */
+        }
+
+        :root {
+            --primary-color: #02007e;
+            --body-color: #f9f9f9;
+            --text-color: #636363;
+            --text-color-dark: #242738;
+            --white-color: #ffffff;
+            --light-color: #f8f9fa;
+            --font-family: Roboto
+        }
+
+        .header+div {
+            margin-top: -1px;
+            /* Move the div up by 20 pixels */
+        }
+    </style>
+    <link href="https://www.mygospelbuddy.com/scripting/css/articles.style.min.css" rel="stylesheet" media="screen">
+    <script src="https://www.mygospelbuddy.com/scripting/jquery/projects.jquery-1.12.4.js"></script>
+    <script src="https://www.mygospelbuddy.com/scripting/jquery/projects.jquery-ui.js"></script>
+    <script src="https://www.mygospelbuddy.com/scripting/bootstrap/bootstrap.bundle.min.js"></script>
+    <script src="https://www.mygospelbuddy.com/scripting/match-height/jquery.matchHeight.js"></script>
+    <script src="https://www.mygospelbuddy.com/scripting/highlight/highlight.pack.js"></script>
+    <script>
+        hljs.initHighlightingOnLoad();
+    </script>
 </head>
+
 <body>
-  <header class="shadow-bottom sticky-top bg-white">
-      <nav class="navbar navbar-expand-md navbar-light">
-          <div class="container">
-              <button class="navbar-toggler border-0 mx-auto" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
-                  <span class="navbar-toggler-icon"></span>
-              </button>
-              <div class="collapse navbar-collapse text-center" id="navigation">
-                  <ul class="navbar-nav ml-auto">
-                      <li class="nav-item">
-                          <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/">Home</a>
-                      </li>
-                      <li class="nav-item dropdown">
-                        <a class="nav-link text-dark dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
-                        <div class="dropdown-menu" aria-labelledby="searchDropdown">
-                          <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/">Footnote Search</a>
-                          <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/words">Conference Text</a>
-                        </div>
-                      </li>
-                      <li class="nav-item">
-                          <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/blog/">Blog</a>
-                      </li>
-                      <!-- <li class="nav-item">
+    <header class="shadow-bottom sticky-top bg-white">
+        <nav class="navbar navbar-expand-md navbar-light">
+            <div class="container">
+                <button class="navbar-toggler border-0 mx-auto" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse text-center" id="navigation">
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/">Home</a>
+                        </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" id="searchDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Search</a>
+                            <div class="dropdown-menu" aria-labelledby="searchDropdown">
+                                <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/">Footnote Search</a>
+                                <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/words">Conference Text</a>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/blog/">Blog</a>
+                        </li>
+                        <!-- <li class="nav-item">
                           <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/docs/contact/">Contact</a>
                       </li> -->
-                  </ul>
-              </div>
-          </div>
-      </nav>
-  </header>
-  <div class="header">
-    <img src="https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" alt="Logo">
-  </div>
-  <br>
-  <section class =section>
-    <div style="text-align: center; margin-top: -40px;">
-      <h2>Gospel Buddy</h2>
-      <p style = "color: grey">Search the Scriptures - Connect with Conference</p>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="header">
+        <img src="https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" alt="Logo">
     </div>
-  
-    <div class="container section" style="margin-top: 40px;">
-      <div class=row>
-          
-        <div class="col-lg-8 text-center mx-auto">
-          <p style = "color: black">A Google Chrome Extension to easily create links between the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.  An Instagram account to create links between your daily life and the words of modern prophets!</p>
-        </div>
-      </div>
-    <div class=container style="margin-top: 60px;">
-      <div class="row justify-content-center">
-        <div class="col-12 text-center">
-          <h2 class=section-title></h2>
-        </div>
-        <div class="col-lg-4 col-sm-6 mb-4">
-          <a href= "https://www.mygospelbuddy.com/info/" class="px-4 py-5 bg-white shadow text-center d-block match-height">
-            <img src="https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" alt="Gospel Buddy Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
-            <h3 class="mb-3 mt-0">About Gospel Buddy</h3>
-            <p class=mb-0>Learn about the Chrome Extension</p>
-          </a>
-        </div>
-        <div class="col-lg-4 col-sm-6 mb-4">
-          <a href= "https://www.mygospelbuddy.com/search/" class="px-4 py-5 bg-white shadow text-center d-block match-height">
-            <img src="https://www.mygospelbuddy.com/docs/assets/search-gospel-buddy.png" alt="Search the Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
-            <h3 class="mb-3 mt-0">Reference Search</h3>
-            <p class=mb-0>Find when a scripture's been referenced</p>
-          </a>
-        </div>
-        <div class="col-lg-4 col-sm-6 mb-4">
-          <a href= "https://www.mygospelbuddy.com/search/words" class="px-4 py-5 bg-white shadow text-center d-block match-height">
-            <img src="https://www.mygospelbuddy.com/docs/assets/text-search.png" alt="Search the Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
-            <h3 class="mb-3 mt-0">Text Search</h3>
-            <p class=mb-0>Words in Conference Talks over time.</p>
-          </a>
+    <br>
+    <section class=section>
+        <div style="text-align: center; margin-top: -40px;">
+            <h2>My Gospel Buddy</h2>
+            <p style="color: grey">Search the Scriptures - Connect with Conference</p>
         </div>
 
+        <div class="container section" style="margin-top: 40px;">
+            <div class=row>
 
-      </div>
-    </div>
-  </section>
+                <div class="col-lg-8 text-center mx-auto">
+                    <p style="color: black">We build Chrome Extensions to make studying the scriptures engaging. Our Extensions are available on both the Chrome and Edge webstores. Use the links below to learn more about our Extensions.</p>
+                </div>
+            </div>
+        </div>
+        <div class="container" style="margin-top: 60px;">
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    <h2 class="section-title"></h2>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4 d-flex">
+                    <a href="https://www.mygospelbuddy.com/info/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+                        <img src="https://www.mygospelbuddy.com/docs/assets/gospel-buddy-icon.png" alt="My Gospel Buddy Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+                        <h3 class="mb-3 mt-0">My Gospel Buddy</h3>
+                        <p class="mb-0">An extension that create links between the Scriptures and General Conference talks of the Church of Jesus Christ of Latter-Day Saints.</p>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4 d-flex">
+                    <a href="https://www.mygospelbuddy.com/a-type-and-a-shadow/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+                        <img src="https://www.mygospelbuddy.com/docs/assets/a-type-and-a-shadow-icon.png" alt="A Type and a Shadow Chrome Extension Icon" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+                        <h3 class="mb-3 mt-0">A Type and a Shadow</h3>
+                        <p class="mb-0">An extension that lets you type along with the Scriptures and General Conference talks of the the Church of Jesus Christ of Latter-Day Saints.</p>
+                    </a>
+                </div>
+            </div>
+
+
+            <div class="row justify-content-center">
+                <div class="col-12 text-center">
+                    <h2 class="section-title"><br><br>Tools Available on this Website:<br><br></h2>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4 d-flex">
+                    <a href="https://www.mygospelbuddy.com/search/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+                        <img src="https://www.mygospelbuddy.com/docs/assets/search-gospel-buddy.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+                        <h3 class="mb-3 mt-0">Reference Search</h3>
+                        <p class="mb-0">Find when a scripture's been referenced</p>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4 d-flex">
+                    <a href="https://www.mygospelbuddy.com/search/words" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+                        <img src="https://www.mygospelbuddy.com/docs/assets/text-search.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+                        <h3 class="mb-3 mt-0">Text Search</h3>
+                        <p class="mb-0">Words in Conference Talks over time.</p>
+                    </a>
+                </div>
+
+                <div class="col-lg-4 col-sm-6 mb-4 d-flex">
+                    <a href="https://www.mygospelbuddy.com/blog/general-conference-bingo.html" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+                        <img src="https://www.mygospelbuddy.com/docs/assets/bingo-sheet.png" alt="general conference bingo sheet easy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+                        <h3 class="mb-3 mt-0">General Conference Bingo</h3>
+                        <p class="mb-0">Generate bingo sheets with gospel related words.</p>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
     <footer class="section pb-4">
         <div class="container">
             <div class="row align-items-center">
@@ -158,11 +200,13 @@
                 </div>
                 <div class="col-md-4 text-md-right text-center">
                     <ul class="list-inline">
-                    <li class="list-inline-item"><a class="text-color d-inline-block p-2" href="https://www.instagram.com/mygospelbuddy"><i class="ti-instagram"></i></a></li>                    </ul>
+                        <li class="list-inline-item"><a class="text-color d-inline-block p-2" href="https://www.instagram.com/mygospelbuddy"><i class="ti-instagram"></i></a></li>
+                    </ul>
                 </div>
             </div>
         </div>
     </footer>
     <script src="https://www.mygospelbuddy.com/scripting/js/script.min.js"></script>
 </body>
+
 </html>
