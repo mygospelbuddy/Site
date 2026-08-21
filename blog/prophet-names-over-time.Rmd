@@ -547,7 +547,12 @@ document.addEventListener("DOMContentLoaded", async function() {
 <br>
 <br>
 
-#### How Often Is the Current LDS Prophet Mentioned Compared With Jesus and Other Church Leaders?
+
+#### Why Are Prophets Mentioned More During Their Presidency?
+I believe this illustrates an important practice among members of The Church of Jesus Christ of Latter-Day Saints. Members of the church always seek to honor, sustain, and follow the Prophet God has chosen regardless of who it is. The current Prophet will always be mentioned far more than any other Apostle because they have been selected by God, through revelation, to lead His Church in this time. Members of the church talk about the Prophet frequently. While members definitely honor previous Prophets, they believe that the most important Prophet the Church has ever had is the one the Church has today!
+<br>
+
+#### How Often Is the Current Prophet Mentioned Compared With Jesus and Other Church Leaders?
 In the graph below I am showing a single line for mentions of the current prophet. Here we will compare total mentions of the current prophet in each conference to a few figures important to members of the Church of Jesus Christ of Latter-Day Saints.
 
 <br>
@@ -841,7 +846,3 @@ document.addEventListener("DOMContentLoaded", function() {
 <br>
 <br>
 Compare mentions of the current prophet to mentions of Jesus. Members of the church speak frequently about the current prophet, yet that pales in comparison to how frequently they talk about Jesus Christ. The high spikes seen in the previous chart are nothing compared to the consistently high mentions of our Savior within General Conference talks. In fact, the numbers show that prophets are mentioned 5-8x less frequently than Jesus. Members of the church honor and sustain the current church President, but they love and worship Jesus Christ.
-
-
-#### Why Are Prophets Mentioned More During Their Presidency?
-I believe this illustrates an important practice among members of The Church of Jesus Christ of Latter-Day Saints. Members of the church always seek to honor, sustain, and follow the Prophet God has chosen regardless of who it is. The current Prophet will always be mentioned far more than any other Apostle because they have been selected by God, through revelation, to lead His Church in this time. Members of the church talk about the Prophet frequently. While members definitely honor previous Prophets, they believe that the most important Prophet the Church has ever had is the one the Church has today!
