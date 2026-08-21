@@ -5,7 +5,7 @@ output:
     includes:
       in_header:
         - "https://www.mygospelbuddy.com/_includes/head-shared.html"
-        - "https://www.mygospelbuddy.com/_includes/meta/draft-prophet-names-over-time.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/prophet-names-over-time.html"
       before_body:
         - "https://www.mygospelbuddy.com/_includes/nav.html"
         - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
