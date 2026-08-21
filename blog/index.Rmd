@@ -38,6 +38,26 @@ h1.title {
 <div class="p-lg-5 p-4 bg-white">
 <div class="content">
 
+
+<div class="row">
+<div class="col-md-2">
+<div class="image-container">
+<a href="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html">
+<img src="https://www.mygospelbuddy.com/assets/img/prophet-mentions-pull-graph.png" alt="graph of lds prophet mentions in general conference over time" class="img-fluid">
+</a>
+</div>
+</div>
+<div class="col-md-10">
+<a href="https://www.mygospelbuddy.com/blog/prophet-names-over-time.html" class="post-link">
+<div class="post-content">
+<h4>Prophet Mentions in General Conference Over Time</h4>
+<p>How often is each prophet mentioned in General Conference talks over time, and how does that change once a new prophet is called?</p>
+</div>
+</a>
+</div>
+</div>
+
+
 <div class="row">
 <div class="col-md-2">
 <div class="image-container">
@@ -55,6 +75,7 @@ h1.title {
 </a>
 </div>
 </div>
+
 
 <div class="row">
 <div class="col-md-2">

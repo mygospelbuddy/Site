@@ -1,0 +1,847 @@
+---
+title: "Prophet Mentions in General Conference Over Time"
+output:
+  html_document:
+    includes:
+      in_header:
+        - "https://www.mygospelbuddy.com/_includes/head-shared.html"
+        - "https://www.mygospelbuddy.com/_includes/meta/draft-prophet-names-over-time.html"
+      before_body:
+        - "https://www.mygospelbuddy.com/_includes/nav.html"
+        - "https://www.mygospelbuddy.com/_includes/banner-gospel-buddy.html"
+      after_body: "https://www.mygospelbuddy.com/_includes/footer.html"
+---
+
+#### What Is a Prophet in The Church of Jesus Christ of Latter-day Saints?
+
+To members of The Church of Jesus Christ of Latter-Day Saints, the Prophet and President of the Church is the only person on Earth with the authority from God to receive revelation for the whole Church. When a Prophet passes away, a new Prophet is selected by the Quorum of the Twelve Apostles. Historically, the new Prophet has always been the most senior member of the Quorum of the Twelve Apostles.
+
+Members of the Church of Jesus Christ of Latter-Day Saints honor and respect the Prophet, as well as the "Role of the Prophet". In building the Gospel Buddy extension and transforming the collected data, I had the questions, "Has any Prophet been mentioned more than others in General Conference talks?" and, "How quickly is a former Prophet mentioned less in General Conference talks?". The answer to these questions was very informative!
+
+#### How Often Are Prophets Mentioned in General Conference?
+
+My findings - displayed in the graph below - show that a new Prophet is <b>always</b> mentioned immensely more than they had been previously. The previous prophet is mentioned far less than during their own presidency when a new prophet is sustained. A prophet's highest number of mentions usually occurs within their first general conference as the prophet. This "first conference spike" is likely due to the excitement felt by conference speakers around having a new prophet. Mentions of the prophet then gradually decrease over the length of their presidency. 
+
+One striking example is President Howard W. Hunter. President Hunter was sustained in the October 1994 General Conference in which his mentions were strikingly high at 76. That is 1.8x higher than President Benson's highest mentions in any conference (42). Sadly, President Hunter passed away only five months after his first conference. President Hinckley was sustained as the new prophet in April 1995 conference in which the late President Hunter received 42 mentions and President Hinckley received 58. In the October 1995 General Conference, President Hunter was back to pre-prophet levels with 4 mentions.
+
+This data demonstrates a clear pattern that prophets are mentioned infrequently before and after their presidency. However, the current prophet of the church can expect to be mentioned far more frequently than any given apostle. 
+
+<br>
+<div id="prophet-visualization"></div>
+<style>
+#prophet-info {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#prophet-image {
+  border: 3px solid #ddd;
+  transition: all 0.3s ease;
+}
+
+#prophet-image:hover {
+  border-color: #007bff;
+  transform: scale(1.05);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+}
+
+#prophetChart {
+  cursor: pointer;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", async function() {
+  const WIKIPEDIA_API = "https://en.wikipedia.org/w/api.php?action=parse&page=List_of_presidents_of_the_Church_of_Jesus_Christ_of_Latter-day_Saints&prop=text&format=json&origin=*";
+  const CONFERENCE_DATA_URL = "https://kameronyork.com/datasets/general-conference-talks.json";
+
+  const container = document.getElementById("prophet-visualization");
+  container.innerHTML = `
+    <div id="prophet-load-status" style="margin-bottom: 10px; color: #666; font-size: 13px;">Loading conference data and prophet list...</div>
+    <div style="display: flex; gap: 20px; align-items: stretch;">
+      <div id="prophet-info" style="width: 200px; min-height: 400px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+        <div id="prophet-image-container" style="text-align: center; margin-bottom: 10px;">
+          <img id="prophet-image" src="" alt="Prophet Image" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; display: none;">
+        </div>
+        <div id="prophet-name" style="text-align: center; font-weight: bold; margin-bottom: 10px;">Select a Prophet</div>
+        <div id="prophet-details" style="font-size: 12px; color: #666;">Click on a prophet's name in the legend to see details</div>
+      </div>
+      <div style="flex: 1; min-width: 0; height: 430px;">
+        <canvas id="prophetChart"></canvas>
+      </div>
+    </div>
+  `;
+
+  const statusElement = document.getElementById("prophet-load-status");
+  const palette = [
+    "rgb(77, 132, 204)",   // blue
+    "rgb(220, 48, 35)",    // red
+    "rgb(126, 31, 99)",    // plum
+    "rgb(190, 103, 122)",  // muted rose
+    "rgb(232, 214, 0)",    // yellow
+    "rgb(141, 154, 0)",    // olive
+    "rgb(52, 128, 39)",    // green
+    "rgb(93, 166, 145)",   // teal
+    "rgb(127, 184, 224)",  // light blue
+    "rgb(62, 15, 143)"     // indigo
+  ];
+
+  // Comparison figures used by the second chart below.
+  // Holy Ghost intentionally omitted for now.
+  const comparisonDefinitions = [
+    {
+      key: "joseph_smith",
+      name: "Joseph Smith",
+      search_names: ["Joseph Smith", "Brother Joseph", "Prophet Joseph"],
+      wikipedia_title: "Joseph Smith",
+      color: "rgb(230, 126, 34)"
+    },
+    {
+      key: "brigham_young",
+      name: "Brigham Young",
+      search_names: ["Brigham Young", "Brother Brigham"],
+      wikipedia_title: "Brigham Young",
+      color: "rgb(52, 128, 39)"
+    },
+    {
+      key: "jesus",
+      name: "Jesus",
+      search_names: ["Jesus"],
+      image: "https://www.churchofjesuschrist.org/imgs/dbeeb9809c6ae4ef18462883b552e82677d1bca5/full/%21640%2C/0/default",
+      crop_top_half: true,
+      color: "rgb(220, 48, 35)"
+    }
+  ];
+
+  // Joseph Fielding Smith is the one case where the existing Power Query
+  // aliases cannot be generated cleanly from the Wikipedia display name.
+  // This preserves the exact four search strings used by the M query.
+  const searchNameOverrides = {
+    "Joseph Fielding Smith": ["president smith", "joseph fielding smith", "joseph f. smith", "elder smith"]
+  };
+
+  function normalizeForCounting(value) {
+    return String(value ?? "")
+      .normalize("NFKC")
+      .replace(/[\u00A0\u2007\u202F]/g, " ")
+      .replace(/[\u200B\u200C\u200D\u2060\uFEFF]/g, "")
+      .toLowerCase();
+  }
+
+  // Count non-overlapping literal matches without creating a new copy of the
+  // entire talk for every search term. This is equivalent to the Power Query
+  // replace/length method for these prophet-name phrases, but much cheaper.
+  function countLiteralMatches(normalizedText, normalizedTerm) {
+    if (!normalizedTerm) return 0;
+
+    let count = 0;
+    let startIndex = 0;
+
+    while (true) {
+      const foundIndex = normalizedText.indexOf(normalizedTerm, startIndex);
+      if (foundIndex === -1) break;
+      count++;
+      startIndex = foundIndex + normalizedTerm.length;
+    }
+
+    return count;
+  }
+
+  function buildSearchNames(fullName) {
+    if (searchNameOverrides[fullName]) return searchNameOverrides[fullName];
+
+    const parts = fullName.trim().split(/\s+/);
+    const firstName = parts[0];
+    const surname = parts[parts.length - 1];
+    return [
+      `president ${surname}`,
+      fullName,
+      `${firstName} ${surname}`,
+      `elder ${surname}`
+    ].map(x => x.toLowerCase());
+  }
+
+  function shortNameFromName(fullName) {
+    if (fullName === "Joseph Fielding Smith") return "f_smith";
+    return fullName.trim().split(/\s+/).pop().toLowerCase().replace(/[^a-z0-9]+/g, "_");
+  }
+
+  function isoDateFromCell(cell) {
+    if (!cell) return null;
+    const time = cell.querySelector("time[datetime]");
+    if (time) return time.getAttribute("datetime").slice(0, 10);
+    const match = cell.textContent.match(/\b(\d{4}-\d{2}-\d{2})\b/);
+    return match ? match[1] : null;
+  }
+
+  async function loadProphetsFromWikipedia() {
+    const response = await fetch(WIKIPEDIA_API, { cache: "default" });
+    if (!response.ok) throw new Error(`Wikipedia request failed (${response.status})`);
+
+    const payload = await response.json();
+    const html = payload?.parse?.text?.["*"];
+    if (!html) throw new Error("Wikipedia returned no parsed article HTML.");
+
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const rows = [...doc.querySelectorAll("table tr")];
+    const prophets = [];
+    let reachedMcKay = false;
+
+    rows.forEach(row => {
+      const cells = [...row.querySelectorAll(":scope > th, :scope > td")];
+      if (cells.length < 6) return;
+
+      const numberText = cells[0].textContent.trim();
+      if (!/^\d+$/.test(numberText)) return;
+
+      const nameCell = cells[2];
+      const nameLink = nameCell.querySelector("a");
+      const name = (nameLink?.textContent || nameCell.textContent).trim();
+      if (!name) return;
+
+      if (name === "David O. McKay") reachedMcKay = true;
+      if (!reachedMcKay) return;
+
+      const portrait = cells[1].querySelector("img");
+      let image = portrait?.getAttribute("src") || "";
+      if (image.startsWith("//")) image = `https:${image}`;
+
+      prophets.push({
+        id: Number(numberText),
+        name,
+        short_name: shortNameFromName(name),
+        search_names: buildSearchNames(name),
+        date_became_prophet: isoDateFromCell(cells[4]),
+        date_ended: isoDateFromCell(cells[5]),
+        image,
+        color: palette[prophets.length % palette.length]
+      });
+    });
+
+    if (!prophets.length || prophets[0].name !== "David O. McKay") {
+      throw new Error("Could not identify the David O. McKay-and-later rows in Wikipedia's presidents table.");
+    }
+
+    return prophets;
+  }
+
+  async function loadConferenceData() {
+    const response = await fetch(CONFERENCE_DATA_URL, { cache: "default" });
+    if (!response.ok) {
+      throw new Error(`Could not load ${CONFERENCE_DATA_URL} (${response.status}). Make sure it is published in the same directory as this page.`);
+    }
+    const data = await response.json();
+    if (!Array.isArray(data)) throw new Error("Conference JSON is not an array.");
+    return data;
+  }
+
+  function monthNumber(value) {
+    if (value == null) return 0;
+    if (typeof value === "number") return value;
+    const text = String(value).trim().toLowerCase();
+    if (/^\d+$/.test(text)) return Number(text);
+    const months = {
+      january: 1, jan: 1, february: 2, feb: 2, march: 3, mar: 3,
+      april: 4, apr: 4, may: 5, june: 6, jun: 6, july: 7, jul: 7,
+      august: 8, aug: 8, september: 9, sep: 9, sept: 9,
+      october: 10, oct: 10, november: 11, nov: 11, december: 12, dec: 12
+    };
+    return months[text] || 0;
+  }
+
+  function conferenceId(talk) {
+    const existing = talk["conference-id"] ?? talk.conference_id;
+    if (existing != null && String(existing).trim() !== "") return String(existing).trim();
+
+    const year = Number(talk.year) || 0;
+    const month = monthNumber(talk.month);
+    return month ? `${year}-${String(month).padStart(2, "0")}` : String(year);
+  }
+
+  function conferenceSortValue(talk) {
+    const year = Number(talk.year) || 0;
+    const month = monthNumber(talk.month);
+    return year * 100 + month;
+  }
+
+  function conferenceDate(talk) {
+    const year = Number(talk.year) || 0;
+    const month = monthNumber(talk.month) || 1;
+    return new Date(Date.UTC(year, month - 1, 1));
+  }
+
+  function currentProphetForConference(prophets, talk) {
+    const date = conferenceDate(talk);
+
+    // Switch to a new prophet only once that prophet's presidency has begun.
+    // Do not use the prior prophet's death/end date to create a vacancy.
+    // This means October 2025 remains President Nelson because President Oaks
+    // had not yet become Church President at that conference.
+    return prophets
+      .filter(prophet => {
+        if (!prophet.date_became_prophet) return false;
+        const start = new Date(`${prophet.date_became_prophet}T00:00:00Z`);
+        return start <= date;
+      })
+      .sort((a, b) => new Date(b.date_became_prophet) - new Date(a.date_became_prophet))[0] || null;
+  }
+
+  let chart = null;
+  let selectedProphet = null;
+  let prophetData = [];
+  let conferenceData = [];
+  let conferenceLabels = [];
+  let conferenceMentions = {};
+  let comparisonMentions = {};
+
+  try {
+    [prophetData, conferenceData] = await Promise.all([
+      loadProphetsFromWikipedia(),
+      loadConferenceData()
+    ]);
+
+    conferenceData = conferenceData.filter(row => Number(row.year) >= 1970);
+
+    // Normalize the prophet-name lookup list once.
+    prophetData.forEach(prophet => {
+      prophet.normalized_search_names = prophet.search_names.map(normalizeForCounting);
+    });
+
+    comparisonDefinitions.forEach(comparison => {
+      comparison.normalized_search_names = comparison.search_names.map(normalizeForCounting);
+    });
+
+    // Build one ordered x-axis item per conference_id, not one per year.
+    const conferenceMap = new Map();
+    conferenceData.forEach(talk => {
+      const id = conferenceId(talk);
+      const sortValue = conferenceSortValue(talk);
+      if (!conferenceMap.has(id) || sortValue < conferenceMap.get(id).sortValue) {
+        conferenceMap.set(id, { id, sortValue, sampleTalk: talk });
+      }
+    });
+
+    const conferences = [...conferenceMap.values()].sort((a, b) => a.sortValue - b.sortValue || a.id.localeCompare(b.id));
+    conferenceLabels = conferences.map(x => x.id);
+
+    prophetData.forEach(prophet => {
+      conferenceMentions[prophet.short_name] = Object.fromEntries(conferenceLabels.map(id => [id, 0]));
+    });
+
+    comparisonDefinitions.forEach(comparison => {
+      comparisonMentions[comparison.key] = Object.fromEntries(conferenceLabels.map(id => [id, 0]));
+    });
+
+    conferenceData.forEach(talk => {
+      const id = conferenceId(talk);
+
+      // Biggest compute optimization: normalize each large talk body once,
+      // not once for every prophet.
+      const normalizedText = normalizeForCounting(talk.text ?? "");
+
+      prophetData.forEach(prophet => {
+        let mentions = 0;
+        for (const term of prophet.normalized_search_names) {
+          mentions += countLiteralMatches(normalizedText, term);
+        }
+        conferenceMentions[prophet.short_name][id] += mentions;
+      });
+
+      // Calculate the second chart's comparison figures during this same
+      // normalized-text pass so the large talk text is never processed twice.
+      comparisonDefinitions.forEach(comparison => {
+        let mentions = 0;
+        for (const term of comparison.normalized_search_names) {
+          mentions += countLiteralMatches(normalizedText, term);
+        }
+        comparisonMentions[comparison.key][id] += mentions;
+      });
+    });
+
+    const datasets = prophetData.map(prophet => ({
+      label: prophet.name,
+      data: conferenceLabels.map(id => conferenceMentions[prophet.short_name][id] || 0),
+      borderColor: prophet.color,
+      backgroundColor: prophet.color.replace("rgb", "rgba").replace(")", ", 0.20)"),
+      borderWidth: 2.5,
+      fill: "origin",
+      tension: 0.25,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      pointHitRadius: 8,
+      spanGaps: true
+    }));
+
+    const ctx = document.getElementById("prophetChart").getContext("2d");
+    chart = new Chart(ctx, {
+      type: "line",
+      data: { labels: conferenceLabels, datasets },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          title: {
+            display: true,
+            text: "Prophet Mentions by General Conference"
+          },
+          legend: {
+            display: true,
+            position: "top",
+            onClick: function(e, legendItem) {
+              selectProphet(prophetData[legendItem.datasetIndex]);
+            }
+          },
+          tooltip: {
+            filter(tooltipItem) {
+              const value = tooltipItem.parsed?.y ?? tooltipItem.raw ?? 0;
+
+              // If a prophet is selected, only show that prophet.
+              if (selectedProphet) {
+                const prophet = prophetData[tooltipItem.datasetIndex];
+                return prophet?.short_name === selectedProphet;
+              }
+
+              // If nobody is selected, only show prophets with mentions
+              // in this conference.
+              return Number(value) > 0;
+            },
+            callbacks: {
+              title(items) {
+                if (!items.length) return "";
+                const conference = conferences[items[0].dataIndex];
+                const talk = conference.sampleTalk;
+                const month = monthNumber(talk.month);
+                const monthName = month
+                  ? new Date(Date.UTC(2000, month - 1, 1)).toLocaleString("en-US", { month: "long", timeZone: "UTC" })
+                  : String(talk.month ?? "");
+                return `${monthName} ${talk.year}`.trim();
+              },
+              afterBody(items) {
+                if (!items.length) return "";
+                const conference = conferences[items[0].dataIndex];
+                const current = currentProphetForConference(prophetData, conference.sampleTalk);
+                return current ? `Church President: ${current.name}` : "";
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Conference" },
+            ticks: {
+              autoSkip: true,
+              maxRotation: 60,
+              minRotation: 0,
+              maxTicksLimit: 24
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Number of Mentions" }
+          }
+        },
+        interaction: { intersect: false, mode: "index" },
+        onClick: function(e, elements) {
+          if (elements.length > 0) selectProphet(prophetData[elements[0].datasetIndex]);
+        }
+      }
+    });
+
+    window.prophetComparisonSource = {
+      prophetData,
+      conferenceLabels,
+      conferences,
+      conferenceMentions,
+      comparisonMentions,
+      comparisonDefinitions
+    };
+    window.dispatchEvent(new Event("prophetSourceReady"));
+
+    statusElement.innerHTML = `Loaded ${conferenceData.length.toLocaleString()} talks across ${conferenceLabels.length} conferences and ${prophetData.length} prophets post 1970.`;
+  } catch (error) {
+    console.error(error);
+    statusElement.innerHTML = `<strong>Could not build chart:</strong> ${error.message}`;
+    return;
+  }
+
+  function selectProphet(prophet) {
+    if (selectedProphet === prophet.short_name) {
+      selectedProphet = null;
+      resetChart();
+      clearProphetInfo();
+    } else {
+      selectedProphet = prophet.short_name;
+      highlightProphet(prophet);
+      showProphetInfo(prophet);
+    }
+  }
+
+  function highlightProphet(selected) {
+    chart.data.datasets.forEach((dataset, index) => {
+      const prophet = prophetData[index];
+      if (prophet.short_name === selected.short_name) {
+        dataset.borderColor = prophet.color;
+        dataset.backgroundColor = prophet.color.replace("rgb", "rgba").replace(")", ", 0.32)");
+        dataset.borderWidth = 4;
+        dataset.pointRadius = 0;
+      } else {
+        dataset.borderColor = prophet.color.replace("rgb", "rgba").replace(")", ", 0.28)");
+        dataset.backgroundColor = prophet.color.replace("rgb", "rgba").replace(")", ", 0.045)");
+        dataset.borderWidth = 1.25;
+        dataset.pointRadius = 0;
+      }
+    });
+    chart.update();
+  }
+
+  function resetChart() {
+    chart.data.datasets.forEach((dataset, index) => {
+      const prophet = prophetData[index];
+      dataset.borderColor = prophet.color;
+      dataset.backgroundColor = prophet.color.replace("rgb", "rgba").replace(")", ", 0.20)");
+      dataset.borderWidth = 2.5;
+      dataset.pointRadius = 0;
+    });
+    chart.update();
+  }
+
+  function showProphetInfo(prophet) {
+    const imageElement = document.getElementById("prophet-image");
+    const nameElement = document.getElementById("prophet-name");
+    const detailsElement = document.getElementById("prophet-details");
+
+    if (prophet.image) {
+      imageElement.src = prophet.image;
+      imageElement.style.display = "inline-block";
+    } else {
+      imageElement.style.display = "none";
+    }
+
+    nameElement.textContent = prophet.name;
+    const totalMentions = conferenceLabels.reduce((sum, id) => sum + (conferenceMentions[prophet.short_name][id] || 0), 0);
+    const becameDate = prophet.date_became_prophet ? new Date(`${prophet.date_became_prophet}T00:00:00Z`).toLocaleDateString() : "Unknown";
+    const endedDate = prophet.date_ended ? new Date(`${prophet.date_ended}T00:00:00Z`).toLocaleDateString() : "Present";
+
+    detailsElement.innerHTML = `
+      <p><strong>Became Prophet:</strong><br>${becameDate}</p>
+      <p><strong>Service Ended:</strong><br>${endedDate}</p>
+      <p><strong>Total Mentions:</strong><br>${totalMentions.toLocaleString()}</p>
+      <p><strong>Search Terms:</strong><br>${prophet.search_names.join("<br>")}</p>
+    `;
+  }
+
+  function clearProphetInfo() {
+    document.getElementById("prophet-image").style.display = "none";
+    document.getElementById("prophet-name").textContent = "Select a Prophet";
+    document.getElementById("prophet-details").innerHTML = "<p>Click on a prophet's line or legend to see details</p>";
+  }
+
+  clearProphetInfo();
+});
+</script>
+
+<br>
+<br>
+
+#### How Often Is the Current LDS Prophet Mentioned Compared With Jesus and Other Church Leaders?
+In the graph below I am showing a single line for mentions of the current prophet. Here we will compare total mentions of the current prophet in each conference to a few figures important to members of the Church of Jesus Christ of Latter-Day Saints.
+
+<br>
+
+<div id="current-prophet-comparison-visualization"></div>
+
+<style>
+#current-prophet-comparison-sidebar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+#comparison-select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: white;
+  font-size: 14px;
+}
+
+#currentProphetComparisonChart {
+  cursor: pointer;
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const container = document.getElementById("current-prophet-comparison-visualization");
+
+  container.innerHTML = `
+    <div style="display: flex; gap: 20px; align-items: stretch;">
+      <div id="current-prophet-comparison-sidebar" style="width: 200px; min-height: 400px; padding: 10px; border: 1px solid #ccc; border-radius: 8px; background-color: #f9f9f9;">
+        <select id="comparison-select">
+          <option value="">Select a Comparison</option>
+          <option value="joseph_smith">Joseph Smith</option>
+          <option value="brigham_young">Brigham Young</option>
+          <option value="jesus">Jesus</option>
+        </select>
+
+        <div id="comparison-image-container" style="display:none; width: 130px; height: 130px; margin: 18px auto 10px; border-radius: 8px; overflow: hidden;">
+          <img id="comparison-image" src="" alt="" style="width:100%; height:100%; object-fit:cover;">
+        </div>
+
+        <div id="comparison-details" style="margin-top: 18px; font-size: 12px; color: #666;">
+          <p>The current prophet line is always shown.</p>
+          <p>Select a comparison above to add another line.</p>
+        </div>
+      </div>
+
+      <div style="flex: 1; min-width: 0; height: 430px;">
+        <canvas id="currentProphetComparisonChart"></canvas>
+      </div>
+    </div>
+  `;
+
+  async function loadWikipediaComparisonImages(definitions) {
+    const wikipediaItems = definitions.filter(item => item.wikipedia_title);
+    if (!wikipediaItems.length) return;
+
+    const titles = wikipediaItems.map(item => item.wikipedia_title).join("|");
+    const url = `https://en.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=pageimages&piprop=thumbnail&pithumbsize=500&titles=${encodeURIComponent(titles)}`;
+
+    try {
+      const response = await fetch(url, { cache: "default" });
+      if (!response.ok) return;
+
+      const payload = await response.json();
+      const pages = Object.values(payload?.query?.pages || {});
+
+      wikipediaItems.forEach(item => {
+        const page = pages.find(p => p.title === item.wikipedia_title);
+        if (page?.thumbnail?.source) item.image = page.thumbnail.source;
+      });
+    } catch (error) {
+      console.warn("Could not load comparison portrait from Wikipedia:", error);
+    }
+  }
+
+  function buildComparisonChart() {
+    const source = window.prophetComparisonSource;
+    if (!source) return;
+
+    const {
+      prophetData,
+      conferenceLabels,
+      conferences,
+      conferenceMentions,
+      comparisonMentions,
+      comparisonDefinitions
+    } = source;
+
+    function conferenceDate(talk) {
+      const year = Number(talk.year) || 0;
+      const monthText = String(talk.month ?? "").trim().toLowerCase();
+      const months = {
+        january: 1, jan: 1, february: 2, feb: 2, march: 3, mar: 3,
+        april: 4, apr: 4, may: 5, june: 6, jun: 6, july: 7, jul: 7,
+        august: 8, aug: 8, september: 9, sep: 9, sept: 9,
+        october: 10, oct: 10, november: 11, nov: 11, december: 12, dec: 12
+      };
+      const month = /^\d+$/.test(monthText) ? Number(monthText) : (months[monthText] || 1);
+      return new Date(Date.UTC(year, month - 1, 1));
+    }
+
+    function currentProphetForConference(talk) {
+      const date = conferenceDate(talk);
+
+      // Keep the previous prophet through any vacancy and change over only
+      // when the next prophet's presidency has begun.
+      return prophetData
+        .filter(prophet => {
+          if (!prophet.date_became_prophet) return false;
+          const start = new Date(`${prophet.date_became_prophet}T00:00:00Z`);
+          return start <= date;
+        })
+        .sort((a, b) => new Date(b.date_became_prophet) - new Date(a.date_became_prophet))[0] || null;
+    }
+
+    function monthYearForConference(index) {
+      const talk = conferences[index].sampleTalk;
+      const date = conferenceDate(talk);
+      return date.toLocaleString("en-US", {
+        month: "long",
+        year: "numeric",
+        timeZone: "UTC"
+      });
+    }
+
+    // This line combines the separate prophet series from the first chart:
+    // for each conference, use whichever person was Church President then.
+    const currentProphetData = conferences.map((conference, index) => {
+      const current = currentProphetForConference(conference.sampleTalk);
+      if (!current) return 0;
+      const id = conferenceLabels[index];
+      return conferenceMentions[current.short_name]?.[id] || 0;
+    });
+
+    const currentDataset = {
+      label: "Current Prophet",
+      data: currentProphetData,
+      borderColor: "rgb(77, 132, 204)",
+      backgroundColor: "rgba(77, 132, 204, 0.20)",
+      borderWidth: 3,
+      fill: "origin",
+      tension: 0.25,
+      pointRadius: 0,
+      pointHoverRadius: 4,
+      pointHitRadius: 8,
+      spanGaps: true
+    };
+
+    const ctx = document.getElementById("currentProphetComparisonChart").getContext("2d");
+    const chart = new Chart(ctx, {
+      type: "line",
+      data: {
+        labels: conferenceLabels,
+        datasets: [currentDataset]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: false,
+        plugins: {
+          title: {
+            display: true,
+            text: "Current Prophet Mentions Compared with Other Figures"
+          },
+          legend: {
+            display: true,
+            position: "top"
+          },
+          tooltip: {
+            filter(tooltipItem) {
+              return Number(tooltipItem.parsed?.y ?? 0) > 0;
+            },
+            callbacks: {
+              title(items) {
+                if (!items.length) return "";
+                return monthYearForConference(items[0].dataIndex);
+              },
+              afterBody(items) {
+                if (!items.length) return "";
+                const conference = conferences[items[0].dataIndex];
+                const current = currentProphetForConference(conference.sampleTalk);
+                return current ? `Church President: ${current.name}` : "";
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            title: { display: true, text: "Conference" },
+            ticks: {
+              autoSkip: true,
+              maxRotation: 60,
+              minRotation: 0,
+              maxTicksLimit: 24
+            }
+          },
+          y: {
+            beginAtZero: true,
+            title: { display: true, text: "Number of Mentions" }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: "index"
+        }
+      }
+    });
+
+    const select = document.getElementById("comparison-select");
+    const details = document.getElementById("comparison-details");
+    const imageContainer = document.getElementById("comparison-image-container");
+    const imageElement = document.getElementById("comparison-image");
+
+    select.addEventListener("change", function() {
+      const key = this.value;
+
+      // Current Prophet is always dataset 0. Remove any prior comparison.
+      chart.data.datasets = [currentDataset];
+
+      if (!key) {
+        imageContainer.style.display = "none";
+        imageElement.src = "";
+        imageElement.alt = "";
+
+        details.innerHTML = `
+          <p>The current prophet line is always shown.</p>
+          <p>Select a comparison above to add another area.</p>
+        `;
+        chart.update();
+        return;
+      }
+
+      const comparison = comparisonDefinitions.find(item => item.key === key);
+      if (!comparison) return;
+
+      chart.data.datasets.push({
+        label: comparison.name,
+        data: conferenceLabels.map(id => comparisonMentions[key]?.[id] || 0),
+        borderColor: comparison.color,
+        backgroundColor: comparison.color.replace("rgb", "rgba").replace(")", ", 0.18)"),
+        borderWidth: 3,
+        fill: "origin",
+        tension: 0.25,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHitRadius: 8,
+        spanGaps: true
+      });
+
+      if (comparison.image) {
+        imageElement.src = comparison.image;
+        imageElement.alt = comparison.name;
+        imageElement.style.objectPosition = comparison.crop_top_half ? "center top" : "center center";
+        imageElement.style.transform = comparison.crop_top_half ? "scale(1.00)" : "none";
+        imageContainer.style.display = "block";
+      } else {
+        imageContainer.style.display = "none";
+        imageElement.src = "";
+        imageElement.alt = "";
+        imageElement.style.transform = "none";
+      }
+
+      details.innerHTML = `
+        <div style="font-weight: bold; font-size: 14px; color: #333; margin-bottom: 8px;">${comparison.name}</div>
+        <div><strong>Search Terms:</strong><br>${comparison.search_names.join("<br>")}</div>
+      `;
+
+      chart.update();
+    });
+  }
+
+  async function initializeComparisonChart() {
+    const source = window.prophetComparisonSource;
+    if (!source) return;
+
+    await loadWikipediaComparisonImages(source.comparisonDefinitions);
+    buildComparisonChart();
+  }
+
+  if (window.prophetComparisonSource) {
+    initializeComparisonChart();
+  } else {
+    window.addEventListener("prophetSourceReady", initializeComparisonChart, { once: true });
+  }
+});
+</script>
+
+<br>
+<br>
+Compare mentions of the current prophet to mentions of Jesus. Members of the church speak frequently about the current prophet, yet that pales in comparison to how frequently they talk about Jesus Christ. The high spikes seen in the previous chart are nothing compared to the consistently high mentions of our Savior within General Conference talks. In fact, the numbers show that prophets are mentioned 5-8x less frequently than Jesus. Members of the church honor and sustain the current church President, but they love and worship Jesus Christ.
+
+
+#### Why Are Prophets Mentioned More During Their Presidency?
+I believe this illustrates an important practice among members of The Church of Jesus Christ of Latter-Day Saints. Members of the church always seek to honor, sustain, and follow the Prophet God has chosen regardless of who it is. The current Prophet will always be mentioned far more than any other Apostle because they have been selected by God, through revelation, to lead His Church in this time. Members of the church talk about the Prophet frequently. While members definitely honor previous Prophets, they believe that the most important Prophet the Church has ever had is the one the Church has today!
