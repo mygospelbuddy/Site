@@ -13,12 +13,58 @@ output:
       after_body: "../_includes/footer.html"
 ---
 
-<!-- Local includes let RStudio knit the current navigation before it is deployed. -->
-<style>h1.title { display: none; }</style>
+```{=html}
 <link rel="stylesheet" href="search-common.css">
 <link rel="stylesheet" href="text-search.css">
 
+<style>
+h1.title {
+  display: none;
+}
+
+#scriptureTextSearchApp .gb-scripture-rule {
+  grid-template-columns:
+    minmax(130px, 1fr)
+    minmax(180px, 1.2fr)
+    minmax(150px, 1.5fr)
+    auto;
+}
+
+#scriptureTextSearchApp .gb-scripture-options {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px 24px;
+  margin-top: 18px;
+}
+
+#scriptureTextSearchApp .gb-scripture-options .gb-field {
+  flex: 0 0 auto;
+}
+
+#scriptureTextSearchApp #scriptureLogic {
+  width: 90px;
+}
+
+#scriptureTextSearchApp #scriptureStatus {
+  margin: 0 0 12px;
+}
+
+@media (max-width: 800px) {
+  #scriptureTextSearchApp .gb-scripture-rule {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  #scriptureTextSearchApp .gb-scripture-rule {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+
 <div class="gb-search-shell" id="scriptureTextSearchApp">
+
 <nav class="gb-search-nav" aria-label="Search tools">
 <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/">Scripture Reference Search</a>
 <a class="gb-search-nav__link gb-search-nav__link--active" aria-current="page" href="https://www.mygospelbuddy.com/search/scriptures">Scripture Text Search</a>
@@ -26,60 +72,148 @@ output:
 </nav>
 
 <section class="gb-search-card gb-search-card--search">
-<h2 class="gb-search-card__title gb-scripture-heading">Search scripture text</h2>
-<p class="gb-search-card__subtitle">Find words and phrases across the five standard works. Add filters to narrow your search.</p>
+
+<div class="gb-status gb-status--info"
+     id="scriptureStatus"
+     role="status"
+     aria-live="polite">
+Loading and caching verse data… This may take a moment.
+</div>
+
 <form id="scriptureForm">
-<div class="gb-form-grid gb-form-grid--2 gb-scripture-options">
+
+<div id="scriptureFilters" aria-label="Search filters"></div>
+
+<div class="gb-btn-row">
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureAdd">Add filter</button>
+</div>
+
+<div class="gb-scripture-options">
 <div class="gb-field">
 <label class="gb-field__label" for="scriptureLogic">Combine filters</label>
 <select class="gb-select" id="scriptureLogic">
-<option value="all">AND — match all filters</option>
-<option value="any">OR — match any filter</option>
+<option value="all">AND</option>
+<option value="any">OR</option>
 </select>
 </div>
-<label class="gb-checkbox" for="scriptureCase"><input type="checkbox" id="scriptureCase"><span>Match case exactly</span></label>
+
+<label class="gb-checkbox" for="scriptureCase">
+<input type="checkbox" id="scriptureCase">
+<span>Match case exactly</span>
+</label>
 </div>
-<div id="scriptureFilters" aria-label="Search filters"></div>
-<div class="gb-btn-row"><button type="button" class="gb-btn gb-btn--secondary" id="scriptureAdd">Add filter</button></div>
-<details class="gb-scripture-help">
-<summary>Search tips and examples</summary>
-<p><strong>Contains phrase</strong> searches the words together; quotation marks are unnecessary. Try <em>loved the world</em>. Use <strong>Contains all words</strong> or <strong>Contains any word</strong> for separate whole words.</p>
-<p><strong>Wildcards:</strong> use <code>*</code> for zero or more characters and <code>?</code> for one character within a word. Try <code>lov*</code> or <code>fai?h</code>. Wildcards match entire words; for a word followed by punctuation, use a trailing <code>*</code>. Other conditions treat <code>*</code> and <code>?</code> literally.</p>
-<p>For example, combine <strong>Verse text contains phrase: loved the world</strong> AND <strong>Book equals: John</strong>. Add chapter or verse filters with numeric comparisons or inclusive ranges. AND / OR applies to every filter; to restrict a text search to one book, choose AND.</p>
-<p>Results stay in scripture order. Highlights show matching text with nearby context. Filters on references or other fields, and exclusions, show a short verse preview when there is no positive text match.</p>
-</details>
+
 <div class="gb-btn-row">
 <button type="submit" class="gb-btn gb-btn--primary" id="scriptureSearch" disabled>Search</button>
 <button type="button" class="gb-btn gb-btn--secondary" id="scriptureClear">Clear</button>
 <button type="button" class="gb-btn gb-btn--secondary" id="scriptureRetry" hidden>Retry loading data</button>
 </div>
+
 </form>
-<div class="gb-status gb-status--info" id="scriptureStatus" role="status" aria-live="polite">Loading scripture data…</div>
+
+<details class="gb-scripture-help">
+<summary>Search tips and examples</summary>
+
+<p><strong>Contains phrase</strong> searches the words together; quotation marks are unnecessary. Try <em>loved the world</em>. Use <strong>Contains all words</strong> or <strong>Contains any word</strong> for separate whole words.</p>
+
+<p><strong>Wildcards:</strong> use <code>*</code> for zero or more characters and <code>?</code> for one character within a word. Try <code>lov*</code> or <code>fai?h</code>. Wildcards match entire words; for a word followed by punctuation, use a trailing <code>*</code>. Other conditions treat <code>*</code> and <code>?</code> literally.</p>
+
+<p>For example, combine <strong>Verse text contains phrase: loved the world</strong> AND <strong>Book equals: John</strong>. To search an entire collection, try <strong>Overall book equals: Book of Mormon</strong>.</p>
+
+<p><strong>AND</strong> requires every filter to match. <strong>OR</strong> requires at least one filter to match. To restrict a text search to a particular overall book or book, choose AND.</p>
+
+<p>Results stay in scripture order. Highlights show matching text with nearby context. Overall book or Book filters, and exclusions, show a short verse preview when there is no positive text match.</p>
+</details>
+
 <noscript>Enable JavaScript to search the scriptures.</noscript>
-<p class="gb-inline-note">Scripture data from <a href="https://kameronyork.com/datasets/scripture-verses.json">Kameron York</a>. Searches run in your browser.</p>
+
 </section>
 
 <section class="gb-results" id="scriptureResults" aria-label="Search results" hidden>
+
 <div class="gb-results__header gb-toolbar">
 <h2 class="gb-search-card__title" id="scriptureCount">Matching scriptures</h2>
+
 <div class="gb-sort-wrap">
 <label for="scripturePageSize">Rows per page</label>
-<select class="gb-select" id="scripturePageSize"><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select>
+<select class="gb-select" id="scripturePageSize">
+<option value="25" selected>25</option>
+<option value="50">50</option>
+<option value="100">100</option>
+</select>
 </div>
 </div>
+
 <div class="gb-table-wrap">
 <table class="gb-table">
 <caption class="sr-only">Matching scripture references and highlighted excerpts</caption>
-<thead><tr><th scope="col">Reference</th><th scope="col">Matching text and context</th></tr></thead>
+<thead>
+<tr>
+<th scope="col">Reference</th>
+<th scope="col">Matching text and context</th>
+</tr>
+</thead>
 <tbody id="scriptureRows"></tbody>
 </table>
 </div>
+
 <nav class="gb-scripture-pager" aria-label="Results pages">
 <button type="button" class="gb-btn gb-btn--secondary" id="scripturePrevious">Previous</button>
 <span id="scripturePage" aria-live="polite"></span>
 <button type="button" class="gb-btn gb-btn--secondary" id="scriptureNext">Next</button>
 </nav>
+
 </section>
 </div>
+
 <script src="text-engine.js"></script>
+
+<script>
+(function () {
+  const engine = window.ScriptureTextEngine;
+
+  const fields = {
+    text: 'Verse text',
+    overall_book: 'Overall book',
+    book: 'Book'
+  };
+
+  const conditions = {
+    contains: 'Contains phrase',
+    notContains: 'Does not contain phrase',
+    starts: 'Begins with',
+    ends: 'Ends with',
+    allWords: 'Contains all words',
+    anyWords: 'Contains any words',
+    wildcard: 'Matches wildcard words'
+  };
+
+  function limitOptions(existing, allowed) {
+    Object.keys(existing).forEach(function (name) {
+      delete existing[name];
+    });
+
+    Object.assign(existing, allowed);
+  }
+
+  limitOptions(engine.fields, fields);
+  limitOptions(engine.textOps, conditions);
+
+  // Book fields previously defaulted to Equals.
+  // Use Contains phrase now that Equals has been removed.
+  document.getElementById('scriptureFilters')
+    .addEventListener('change', function (event) {
+      const row = event.target.closest('.gb-scripture-rule');
+      if (!row) return;
+
+      const condition = row.querySelector('select[id^="scriptureOp"]');
+
+      if (condition && !condition.value) {
+        condition.value = 'contains';
+      }
+    });
+})();
+</script>
+
 <script src="text-search.js"></script>
+```
