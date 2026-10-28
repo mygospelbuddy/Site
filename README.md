@@ -186,3 +186,56 @@ home above.
   re-knit — none of the fixes above (header consistency, OG tags, asset
   paths, nav) will show up live until you run knit-all-files.R (or knit
   each page individually) and push the results.
+
+## Scripture Text Search
+
+`search/scriptures.Rmd` is the RStudio-editable source for `/search/scriptures`.
+It uses the existing search card, input, button, and table styles. This page uses
+local `_includes/` paths so knitting picks up the current navigation without
+waiting for deployment. Knit it normally with the project open:
+
+```r
+rmarkdown::render("search/scriptures.Rmd")
+```
+
+The page uses a worker (`search/text-worker.js`) and a shared matching engine
+(`search/text-engine.js`) to search without blocking the interface. The worker
+loads `assets/data/scriptures.json.gz` once per page visit; subsequent searches
+and pagination use the in-memory data. Normal HTTP caching can reuse the download
+on later visits. The compressed, column-oriented snapshot preserves all eleven
+source fields and all 42,002 verses in scripture order, while reducing the initial
+download from about 18 MB to 2.5 MB. It is served from this site and needs no
+cross-origin requests or search backend. Current browsers with Web Workers and
+`DecompressionStream` are required. Serve the site over HTTP(S) when previewing;
+opening the HTML directly with `file://` does not support the worker.
+
+To refresh the snapshot from Kameron York's JSON dataset, run from the project root:
+
+```r
+# Install once if needed: install.packages("jsonlite")
+source("scripts/update-scriptures.R")
+```
+
+Commit the refreshed `assets/data/scriptures.json.gz`. Knitting does not download
+or change the snapshot. Source: https://kameronyork.com/datasets/scripture-verses.json
+
+Filters support a global AND / OR choice, case sensitivity, phrases, whole words,
+all/any words, exclusions, prefix/suffix/equality tests, word wildcards (`*`, `?`),
+and numeric comparisons and inclusive ranges. Filters on metadata and negative
+text filters show a short verse preview when there is no positive text match.
+Positive text matches show highlighted context, limited to three nearby windows
+and 240 excerpt characters. Short verses may fit in their entirety. Results use
+25 rows by default, with 50 and 100 available; no unbounded “All” option is offered.
+
+Run the matching and corpus checks with Node (no package install needed):
+
+```sh
+node --test tests/scripture-text.test.cjs
+```
+
+The new card image is `assets/img/scripture-text-search.png`. It was generated
+with the built-in image tool using the existing reference/text-search icons as
+style references: “A simple open scripture book; bold dark navy rounded outlines,
+flat warm pale golden yellow pages and white accents, center crease and three
+short navy text strokes per page, transparent background, no words or extra
+objects.”

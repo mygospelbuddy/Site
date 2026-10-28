@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Scripture Text Search</title>
+<!--
+  _includes/head-shared.html
+
+  Shared <head> content for every page on the site: charset/viewport,
+  favicon, fonts, stylesheets, and the vendor/site scripts. This is
+  included via each page's YAML as `includes: in_header:`.
+
+  This file intentionally does NOT contain <title> or Open Graph/Twitter
+  meta tags — those are page-specific and belong in each page's own .Rmd,
+  in a `header-includes:` block in the YAML front matter, e.g.:
+
+    header-includes:
+      - '<meta property="og:title" content="Page Title">'
+      - '<meta property="og:description" content="One sentence about this page.">'
+      - '<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/some-image.png">'
+      - '<meta property="og:url" content="https://www.mygospelbuddy.com/path/">'
+
+  That keeps the shared look in ONE place while letting every page have
+  its own unique link-preview image/title/description.
+
+  This file also intentionally does NOT contain <!DOCTYPE>, <html>, <head>,
+  or <body> tags — those are provided once by the page itself (pandoc).
+  Including full documents-within-documents here was the cause of the
+  invalid/duplicated markup in the old header.html/header2.html files.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<link rel="icon" href="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" type="image/png">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="https://www.mygospelbuddy.com/assets/vendor/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="https://www.mygospelbuddy.com/assets/vendor/themify-icons/themify-icons.css">
+<link rel="stylesheet" href="https://www.mygospelbuddy.com/assets/vendor/highlight/hybrid.css">
+<link rel="stylesheet" href="https://www.mygospelbuddy.com/assets/css/articles.style.min.css" media="screen">
+<link rel="stylesheet" href="https://www.mygospelbuddy.com/assets/css/site.css">
+
+<script src="https://www.mygospelbuddy.com/assets/vendor/jquery/projects.jquery-1.12.4.js"></script>
+<script src="https://www.mygospelbuddy.com/assets/vendor/jquery/projects.jquery-ui.js"></script>
+<script src="https://www.mygospelbuddy.com/assets/vendor/bootstrap/bootstrap.bundle.min.js"></script>
+<script src="https://www.mygospelbuddy.com/assets/vendor/match-height/jquery.matchHeight-min.js"></script>
+<script src="https://www.mygospelbuddy.com/assets/vendor/highlight/highlight.pack.js"></script>
+<script>
+  hljs.initHighlightingOnLoad();
+</script>
+<meta name="description" content="Search scripture text across the LDS standard works with flexible filters, highlighted excerpts, and paginated results.">
+<link rel="canonical" href="https://www.mygospelbuddy.com/search/scriptures" data-external="1">
+<meta property="og:site_name" content="My Gospel Buddy">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.mygospelbuddy.com/search/scriptures">
+<meta property="og:title" content="Scripture Text Search - My Gospel Buddy">
+<meta property="og:description" content="Find scripture words and phrases with AND / OR filters and highlighted excerpts.">
+<meta property="og:image" content="https://www.mygospelbuddy.com/assets/img/scripture-text-search.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Scripture Text Search - My Gospel Buddy">
+<meta name="twitter:description" content="Find scripture words and phrases with AND / OR filters and highlighted excerpts.">
+<meta name="twitter:image" content="https://www.mygospelbuddy.com/assets/img/scripture-text-search.png">
+<style>.main-container { max-width: 940px; margin-left: auto; margin-right: auto; padding: 0 15px; }</style>
+</head>
+<body>
+<div class="container-fluid main-container">
+<!--
+  _includes/nav.html
+
+  The single, canonical top nav bar for the whole site. Included on every
+  page via `includes: before_body:` in each page's YAML.
+
+  Previously this markup was copy-pasted into 4 separate files
+  (header.html, header2.html, header-type-and-shadow.html,
+  header-bingo.html) and had started to drift out of sync — which is the
+  most likely reason the top bar looked inconsistent from page to page.
+  Now there is exactly one copy. Edit this file and every page updates.
+-->
+<header class="shadow-bottom sticky-top bg-white gb-fullbleed">
+  <nav class="navbar navbar-expand-md navbar-light">
+    <div class="container">
+      <button class="navbar-toggler border-0 mx-auto" type="button" data-toggle="collapse" data-target="#navigation" aria-controls="navigation" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse text-center" id="navigation">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/">Home</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link text-dark dropdown-toggle" href="#" id="toolsDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tools</a>
+            <div class="dropdown-menu" aria-labelledby="toolsDropdown">
+              <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/">Scripture Reference Search</a>
+              <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/scriptures">Scripture Text Search</a>
+              <a class="dropdown-item" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
+              <a class="dropdown-item" href="https://www.mygospelbuddy.com/bingo/">General Conference Bingo</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/blog/">Blog</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-dark" href="https://www.mygospelbuddy.com/help/">Contact</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+<!--
+  _includes/banner-gospel-buddy.html
+  The red band + circular Gospel Buddy icon that sits under the nav bar.
+  Pulled in via each page's `before_body:` (alongside nav.html) so it renders
+  ABOVE the page title, matching the original site layout.
+  Styling lives in /assets/css/site.css (.gb-page-banner / .gb-fullbleed).
+-->
+<div class="gb-page-banner gb-fullbleed">
+  <img src="https://www.mygospelbuddy.com/assets/img/gospel-buddy-icon.png" alt="My Gospel Buddy logo">
+</div>
+<br>
+<!-- Local includes let RStudio knit the current navigation before it is deployed. -->
+<style>h1.title { display: none; }</style>
+<p><link rel="stylesheet" href="search-common.css">
+<link rel="stylesheet" href="text-search.css"></p>
+<div id="scriptureTextSearchApp" class="gb-search-shell">
+<nav class="gb-search-nav" aria-label="Search tools">
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/">Scripture
+Reference Search</a>
+<a class="gb-search-nav__link gb-search-nav__link--active" aria-current="page" href="https://www.mygospelbuddy.com/search/scriptures">Scripture
+Text Search</a>
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference
+Text Search</a>
+</nav>
+<section class="gb-search-card gb-search-card--search">
+<h2 class="gb-search-card__title gb-scripture-heading">
+Search scripture text
+</h2>
+<p class="gb-search-card__subtitle">
+Find words and phrases across the five standard works. Add filters to
+narrow your search.
+</p>
+<form id="scriptureForm">
+<div class="gb-form-grid gb-form-grid--2 gb-scripture-options">
+<div class="gb-field">
+<p><label class="gb-field__label" for="scriptureLogic">Combine
+filters</label> <select class="gb-select" id="scriptureLogic">
+<option value="all">AND — match all filters</option>
+<option value="any">OR — match any filter</option> </select></p>
+</div>
+<p><label class="gb-checkbox" for="scriptureCase"><input type="checkbox" id="scriptureCase"><span>Match
+case exactly</span></label></p>
+</div>
+<div id="scriptureFilters" aria-label="Search filters">
+
+</div>
+<div class="gb-btn-row">
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureAdd">
+Add filter
+</button>
+</div>
+<details class="gb-scripture-help">
+<summary>
+Search tips and examples
+</summary>
+<p>
+<strong>Contains phrase</strong> searches the words together; quotation
+marks are unnecessary. Try <em>loved the world</em>. Use
+<strong>Contains all words</strong> or <strong>Contains any
+word</strong> for separate whole words.
+</p>
+<p>
+<strong>Wildcards:</strong> use <code><em></code> for zero or more
+characters and <code>?</code> for one character within a word. Try
+<code>lov</em></code> or <code>fai?h</code>. Wildcards match entire
+words; for a word followed by punctuation, use a trailing
+<code><em></code>. Other conditions treat <code></em></code> and
+<code>?</code> literally.
+</p>
+<p>
+For example, combine <strong>Verse text contains phrase: loved the
+world</strong> AND <strong>Book equals: John</strong>. Add chapter or
+verse filters with numeric comparisons or inclusive ranges. AND / OR
+applies to every filter; to restrict a text search to one book, choose
+AND.
+</p>
+<p>
+Results stay in scripture order. Highlights show matching text with
+nearby context. Filters on references or other fields, and exclusions,
+show a short verse preview when there is no positive text match.
+</p>
+</details>
+<div class="gb-btn-row">
+<button type="submit" class="gb-btn gb-btn--primary" id="scriptureSearch" disabled>
+Search
+</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureClear">
+Clear
+</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureRetry" hidden>
+Retry loading data
+</button>
+</div>
+</form>
+<div id="scriptureStatus" class="gb-status gb-status--info"
+role="status" aria-live="polite">
+Loading scripture data…
+</div>
+<noscript>
+Enable JavaScript to search the scriptures.
+</noscript>
+<p class="gb-inline-note">
+Scripture data from
+<a href="https://kameronyork.com/datasets/scripture-verses.json">Kameron
+York</a>. Searches run in your browser.
+</p>
+</section>
+<section class="gb-results" id="scriptureResults" aria-label="Search results" hidden>
+<div class="gb-results__header gb-toolbar">
+<h2 class="gb-search-card__title" id="scriptureCount">
+Matching scriptures
+</h2>
+<div class="gb-sort-wrap">
+<p><label for="scripturePageSize">Rows per page</label>
+<select class="gb-select" id="scripturePageSize"><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select></p>
+</div>
+</div>
+<div class="gb-table-wrap">
+<table class="gb-table">
+<caption class="sr-only">
+Matching scripture references and highlighted excerpts
+</caption>
+<thead>
+<tr>
+<th scope="col">
+Reference
+</th>
+<th scope="col">
+Matching text and context
+</th>
+</tr>
+</thead>
+<tbody id="scriptureRows">
+</tbody>
+</table>
+</div>
+<nav class="gb-scripture-pager" aria-label="Results pages">
+<button type="button" class="gb-btn gb-btn--secondary" id="scripturePrevious">
+Previous
+</button>
+<span id="scripturePage" aria-live="polite"></span>
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureNext">Next</button>
+</nav>
+</section>
+</div>
+<script src="text-engine.js"></script>
+<script src="text-search.js"></script>
+<!--
+  _includes/footer.html
+
+  The single, canonical footer for the whole site. Included on every page
+  via `includes: after_body:` in each page's YAML.
+
+  Fixed from the old docs/footer.html: this used to also contain its own
+  <!DOCTYPE html><html>...<body> wrapper, which — combined with the old
+  header.html doing the same thing on the other end of the page — produced
+  invalid, triple-nested HTML documents. This file now contains only the
+  fragment that actually belongs at the end of <body>.
+-->
+<footer class="section pb-4">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-8 text-md-left text-center">
+        <p class="mb-md-0 mb-4">My Gospel Buddy &copy;</p>
+      </div>
+      <div class="col-md-4 text-md-right text-center">
+        <ul class="list-inline">
+          <li class="list-inline-item"><a class="text-color d-inline-block p-2" href="https://www.instagram.com/mygospelbuddy"><i class="ti-instagram"></i></a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</footer>
+<script src="https://www.mygospelbuddy.com/assets/js/script.min.js"></script>
+</div>
+</body>
+</html>

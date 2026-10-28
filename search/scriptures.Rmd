@@ -1,0 +1,85 @@
+---
+title: "Scripture Text Search"
+output:
+  html_document:
+    self_contained: false
+    includes:
+      in_header:
+        - "../_includes/head-shared.html"
+        - "../_includes/meta/search-scriptures.html"
+      before_body:
+        - "../_includes/nav.html"
+        - "../_includes/banner-gospel-buddy.html"
+      after_body: "../_includes/footer.html"
+---
+
+<!-- Local includes let RStudio knit the current navigation before it is deployed. -->
+<style>h1.title { display: none; }</style>
+<link rel="stylesheet" href="search-common.css">
+<link rel="stylesheet" href="text-search.css">
+
+<div class="gb-search-shell" id="scriptureTextSearchApp">
+<nav class="gb-search-nav" aria-label="Search tools">
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/">Scripture Reference Search</a>
+<a class="gb-search-nav__link gb-search-nav__link--active" aria-current="page" href="https://www.mygospelbuddy.com/search/scriptures">Scripture Text Search</a>
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
+</nav>
+
+<section class="gb-search-card gb-search-card--search">
+<h2 class="gb-search-card__title gb-scripture-heading">Search scripture text</h2>
+<p class="gb-search-card__subtitle">Find words and phrases across the five standard works. Add filters to narrow your search.</p>
+<form id="scriptureForm">
+<div class="gb-form-grid gb-form-grid--2 gb-scripture-options">
+<div class="gb-field">
+<label class="gb-field__label" for="scriptureLogic">Combine filters</label>
+<select class="gb-select" id="scriptureLogic">
+<option value="all">AND — match all filters</option>
+<option value="any">OR — match any filter</option>
+</select>
+</div>
+<label class="gb-checkbox" for="scriptureCase"><input type="checkbox" id="scriptureCase"><span>Match case exactly</span></label>
+</div>
+<div id="scriptureFilters" aria-label="Search filters"></div>
+<div class="gb-btn-row"><button type="button" class="gb-btn gb-btn--secondary" id="scriptureAdd">Add filter</button></div>
+<details class="gb-scripture-help">
+<summary>Search tips and examples</summary>
+<p><strong>Contains phrase</strong> searches the words together; quotation marks are unnecessary. Try <em>loved the world</em>. Use <strong>Contains all words</strong> or <strong>Contains any word</strong> for separate whole words.</p>
+<p><strong>Wildcards:</strong> use <code>*</code> for zero or more characters and <code>?</code> for one character within a word. Try <code>lov*</code> or <code>fai?h</code>. Wildcards match entire words; for a word followed by punctuation, use a trailing <code>*</code>. Other conditions treat <code>*</code> and <code>?</code> literally.</p>
+<p>For example, combine <strong>Verse text contains phrase: loved the world</strong> AND <strong>Book equals: John</strong>. Add chapter or verse filters with numeric comparisons or inclusive ranges. AND / OR applies to every filter; to restrict a text search to one book, choose AND.</p>
+<p>Results stay in scripture order. Highlights show matching text with nearby context. Filters on references or other fields, and exclusions, show a short verse preview when there is no positive text match.</p>
+</details>
+<div class="gb-btn-row">
+<button type="submit" class="gb-btn gb-btn--primary" id="scriptureSearch" disabled>Search</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureClear">Clear</button>
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureRetry" hidden>Retry loading data</button>
+</div>
+</form>
+<div class="gb-status gb-status--info" id="scriptureStatus" role="status" aria-live="polite">Loading scripture data…</div>
+<noscript>Enable JavaScript to search the scriptures.</noscript>
+<p class="gb-inline-note">Scripture data from <a href="https://kameronyork.com/datasets/scripture-verses.json">Kameron York</a>. Searches run in your browser.</p>
+</section>
+
+<section class="gb-results" id="scriptureResults" aria-label="Search results" hidden>
+<div class="gb-results__header gb-toolbar">
+<h2 class="gb-search-card__title" id="scriptureCount">Matching scriptures</h2>
+<div class="gb-sort-wrap">
+<label for="scripturePageSize">Rows per page</label>
+<select class="gb-select" id="scripturePageSize"><option value="25" selected>25</option><option value="50">50</option><option value="100">100</option></select>
+</div>
+</div>
+<div class="gb-table-wrap">
+<table class="gb-table">
+<caption class="sr-only">Matching scripture references and highlighted excerpts</caption>
+<thead><tr><th scope="col">Reference</th><th scope="col">Matching text and context</th></tr></thead>
+<tbody id="scriptureRows"></tbody>
+</table>
+</div>
+<nav class="gb-scripture-pager" aria-label="Results pages">
+<button type="button" class="gb-btn gb-btn--secondary" id="scripturePrevious">Previous</button>
+<span id="scripturePage" aria-live="polite"></span>
+<button type="button" class="gb-btn gb-btn--secondary" id="scriptureNext">Next</button>
+</nav>
+</section>
+</div>
+<script src="text-engine.js"></script>
+<script src="text-search.js"></script>
