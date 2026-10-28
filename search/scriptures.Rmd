@@ -200,6 +200,8 @@ Loading and caching verse data… This may take a moment.
     notContains: 'Does not contain phrase',
     starts: 'Begins with',
     ends: 'Ends with',
+    equals: 'Equals',
+    notEquals: 'Does not equal',
     allWords: 'Contains all words',
     anyWords: 'Contains any words',
     wildcard: 'Matches wildcard words'
