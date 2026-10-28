@@ -23,7 +23,8 @@ h1.title {
 <div class="gb-search-shell" id="referenceSearchApp">
 
 <nav class="gb-search-nav" aria-label="Search tools">
-<a class="gb-search-nav__link gb-search-nav__link--active" href="https://www.mygospelbuddy.com/search/">Reference Search</a>
+<a class="gb-search-nav__link gb-search-nav__link--active" href="https://www.mygospelbuddy.com/search/">Scripture Reference Search</a>
+<a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/scriptures">Scripture Text Search</a>
 <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/search/words">Conference Text Search</a>
 <a class="gb-search-nav__link" href="https://www.mygospelbuddy.com/blog/using-conference-text-search.html">Search Guide</a>
 </nav>

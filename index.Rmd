@@ -71,15 +71,23 @@ h1.title {
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
 <a href="https://www.mygospelbuddy.com/search/" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
 <img src="https://www.mygospelbuddy.com/assets/img/search-gospel-buddy.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
-<h3 class="mb-3 mt-0">Reference Search</h3>
+<h3 class="mb-3 mt-0">Scripture Reference Search</h3>
 <p class="mb-0">Find when a scripture's been referenced</p>
+</a>
+</div>
+
+<div class="col-lg-4 col-sm-6 mb-4 d-flex">
+<a href="https://www.mygospelbuddy.com/search/scriptures" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
+<img src="https://www.mygospelbuddy.com/assets/img/scripture-text-search.png" alt="Open scripture book" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
+<h3 class="mb-3 mt-0">Scripture Text Search</h3>
+<p class="mb-0">Find scripture words and phrases with flexible filters.</p>
 </a>
 </div>
 
 <div class="col-lg-4 col-sm-6 mb-4 d-flex">
 <a href="https://www.mygospelbuddy.com/search/words" class="px-4 py-5 bg-white shadow text-center d-block w-100 h-100">
 <img src="https://www.mygospelbuddy.com/assets/img/text-search.png" alt="Search My Gospel Buddy" class="icon text-primary d-block mb-4" style="width: 100px; height: 100px; background-position: center; margin: 0 auto;">
-<h3 class="mb-3 mt-0">Text Search</h3>
+<h3 class="mb-3 mt-0">Conference Text Search</h3>
 <p class="mb-0">Words in Conference Talks over time.</p>
 </a>
 </div>
