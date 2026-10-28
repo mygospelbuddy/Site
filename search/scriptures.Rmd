@@ -43,9 +43,26 @@ h1.title {
 }
 
 #scriptureTextSearchApp #scriptureLogic {
-  width: 90px;
+  width: auto;
+  max-width: 100%;
 }
 
+#scriptureTextSearchApp .gb-sort-wrap {
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  max-width: 100%;
+  gap: 8px 12px;
+}
+
+#scriptureTextSearchApp .gb-sort-wrap label {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+#scriptureTextSearchApp #scripturePageSize {
+  flex: 0 0 90px;
+  width: 90px;
+}
 #scriptureTextSearchApp #scriptureStatus {
   margin: 0 0 12px;
 }
@@ -92,8 +109,8 @@ Loading and caching verse data… This may take a moment.
 <div class="gb-field">
 <label class="gb-field__label" for="scriptureLogic">Combine filters</label>
 <select class="gb-select" id="scriptureLogic">
-<option value="all">AND</option>
-<option value="any">OR</option>
+<option value="all">AND — match all filters</option>
+<option value="any">OR — match any filter</option>
 </select>
 </div>
 
